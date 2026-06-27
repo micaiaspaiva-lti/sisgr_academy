@@ -6,6 +6,8 @@ export const metadata = {
   title: "Administração de Cursos - SISGR Academy",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function CMSAdminPage() {
   // Busca todos os cursos, módulos e aulas ordenados para o painel CMS
   const allCourses = await db.query.cursos.findMany({

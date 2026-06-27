@@ -8,6 +8,8 @@ export const metadata = {
   description: "Relatórios de desempenho corporativo e engajamento dos colaboradores.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function B2BMetricasDashboardPage() {
   // 1. Buscar todas as empresas e aulas ativas no banco
   const dbEmpresas = await db.select().from(empresas);

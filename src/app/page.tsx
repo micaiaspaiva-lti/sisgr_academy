@@ -9,6 +9,8 @@ export const metadata = {
   description: "Capacite seus colaboradores e domine a gestão de resíduos sólidos. Cursos especializados em conformidade ambiental, PNRS e emissão de MTR.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   // Busca os cursos ativos do banco de dados relacionalmente
   const activeCourses = await db.query.cursos.findMany({
