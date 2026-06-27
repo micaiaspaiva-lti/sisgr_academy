@@ -52,7 +52,7 @@ interface CmsAdminClientProps {
 
 export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) {
   const [courses, setCourses] = useState<Course[]>(initialCourses);
-  const [selectedCourse, setSelectedCourse] = useState<Course>(initialCourses[0] || null);
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(initialCourses[0] || null);
   const [draggedLessonId, setDraggedLessonId] = useState<string | null>(null);
   const [processingIAId, setProcessingIAId] = useState<string | null>(null);
   const [isCreatingCourse, setIsCreatingCourse] = useState(false);
@@ -77,6 +77,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
   const handleDragOver = (e: React.DragEvent, targetLessonId: string) => {
     e.preventDefault();
     if (!draggedLessonId || draggedLessonId === targetLessonId) return;
+    if (!selectedCourse) return;
 
     // Encontra o módulo e as aulas
     const activeCourse = { ...selectedCourse };
@@ -117,6 +118,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
   const handleDragEnd = async () => {
     if (!draggedLessonId) return;
     setDraggedLessonId(null);
+    if (!selectedCourse) return;
 
     // Encontra o módulo da aula reordenada
     let activeModule: Module | undefined;
@@ -159,6 +161,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
     const res = await deleteAulaAction(lessonId);
     if (res.success) {
       toast.success("Aula excluída com sucesso!");
+      if (!selectedCourse) return;
       
       // Atualiza localmente
       const activeCourse = { ...selectedCourse };
@@ -213,6 +216,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
   const handleCreateLesson = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newLessonTitle.trim() || !newLessonUrl.trim()) return;
+    if (!selectedCourse) return;
 
     toast.info("Criando aula...");
     const res = await createAulaAction(targetModuleId, newLessonTitle, newLessonUrl, newLessonDemo);
