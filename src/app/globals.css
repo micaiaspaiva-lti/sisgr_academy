@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  --color-duet-bg-primary: #ffffff;
+  --color-duet-bg-secondary: #f7f9fc;
+  --color-duet-brand: #3c9445;
+  --color-duet-brand-hover: #2d7a34;
+  --color-duet-brand-light: #e8f5ea;
+  --color-duet-purple: #7c3aed;
+  --color-duet-purple-light: #faf5ff;
+  --color-duet-green: #3c9445;
+  --color-duet-green-hover: #2d7a34;
+  --color-duet-green-light: #e8f5ea;
+  --color-duet-text-primary: #1a202c;
+  --color-duet-text-secondary: #4a5568;
+  --color-duet-text-muted: #718096;
+  --color-duet-border: #e2e8f0;
+}
+
+:root {
+  --background: #f7f9fc;
+  --foreground: #1a202c;
+  
+  --duet-bg-primary: #ffffff;
+  --duet-bg-secondary: #f7f9fc;
+  --duet-brand: #3c9445;
+  --duet-brand-hover: #2d7a34;
+  --duet-brand-light: #e8f5ea;
+  --duet-purple: #7c3aed;
+  --duet-purple-light: #faf5ff;
+  --duet-green: #3c9445;
+  --duet-green-hover: #2d7a34;
+  --duet-green-light: #e8f5ea;
+  --duet-text-primary: #1a202c;
+  --duet-text-secondary: #4a5568;
+  --duet-text-muted: #718096;
+  --duet-border: #e2e8f0;
+}
+
+body {
+  background-color: var(--duet-bg-secondary);
+  color: var(--duet-text-primary);
+}
+
