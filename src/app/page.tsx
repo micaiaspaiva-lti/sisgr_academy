@@ -46,7 +46,7 @@ export default async function Home() {
           </Link>
           <Link
             href="/admin/cursos"
-            className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 shadow-md shadow-blue-500/10 hover:shadow-lg transition-all"
+            className="rounded-xl bg-duet-brand px-5 py-2.5 text-sm font-semibold text-white hover:bg-duet-brand-hover shadow-md shadow-duet-brand/10 hover:shadow-lg transition-all"
             title="Painel Administrativo"
           >
             Painel Admin
@@ -74,7 +74,7 @@ export default async function Home() {
             <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
               <Link
                 href="/admin/cursos"
-                className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-3 text-xs font-bold text-white hover:bg-blue-700 shadow-md transition-all w-full sm:w-auto"
+                className="inline-flex items-center justify-center rounded-xl bg-duet-brand px-5 py-3 text-xs font-bold text-white hover:bg-duet-brand-hover shadow-md transition-all w-full sm:w-auto"
               >
                 Ir para o Painel Admin
               </Link>
