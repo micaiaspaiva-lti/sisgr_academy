@@ -5,7 +5,7 @@ import Link from "next/link";
 import { 
   Plus, Folder, PlayCircle, Sparkles, 
   UserCheck, BarChart3, GripVertical, CheckCircle, 
-  Trash2, Loader2, ArrowLeft 
+  Trash2, Loader2, ArrowLeft, Users 
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { 
@@ -320,8 +320,17 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
           </button>
 
           <Link 
+            href="/admin/alunos" 
+            className="flex items-center gap-2 border border-slate-300 rounded-lg px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors bg-white"
+            title="Gerenciar Alunos"
+          >
+            <Users className="h-4 w-4" />
+            Alunos
+          </Link>
+
+          <Link 
             href="/admin/metricas" 
-            className="flex items-center gap-2 border border-slate-300 rounded-lg px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+            className="flex items-center gap-2 border border-slate-300 rounded-lg px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors bg-white"
             title="Relatórios B2B"
           >
             <BarChart3 className="h-4 w-4" />

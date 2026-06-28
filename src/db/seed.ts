@@ -27,6 +27,8 @@ async function main() {
     id: "22222222-2222-4222-b222-222222222222",
     nome: "Arthur Pendragon (SSO Teste)",
     email: "arthur.sso@residuosparceiro.com",
+    telefone: "(11) 99999-1111",
+    tipo: "vip",
     empresaId: empresa.id,
   }).returning();
 
@@ -34,6 +36,8 @@ async function main() {
     id: "22222222-3333-4333-b333-333333333333",
     nome: "Beatriz Souza",
     email: "beatriz@ecorecicla.com",
+    telefone: "(11) 99999-2222",
+    tipo: "vip",
     empresaId: empresa.id,
   }).returning();
 
@@ -41,6 +45,8 @@ async function main() {
     id: "22222222-4444-4444-b444-444444444444",
     nome: "Carlos Eduardo",
     email: "carlos@ecorecicla.com",
+    telefone: "(11) 99999-3333",
+    tipo: "vip",
     empresaId: empresa.id,
   }).returning();
 
@@ -48,6 +54,8 @@ async function main() {
     id: "22222222-5555-4555-b555-555555555555",
     nome: "Diana Prince",
     email: "diana@ecorecicla.com",
+    telefone: "(11) 99999-4444",
+    tipo: "vip",
     empresaId: empresa.id,
   }).returning();
 

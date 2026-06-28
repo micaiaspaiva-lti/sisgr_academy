@@ -12,6 +12,8 @@ export const alunos = pgTable("alunos", {
   id: uuid("id").defaultRandom().primaryKey(),
   nome: varchar("nome", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
+  telefone: varchar("telefone", { length: 20 }),
+  tipo: varchar("tipo", { length: 20 }).default("normal").notNull(),
   empresaId: uuid("empresa_id").references(() => empresas.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

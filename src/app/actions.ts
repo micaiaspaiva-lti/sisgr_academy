@@ -1,10 +1,12 @@
 "use server";
 
 import { db } from "@/db";
-import { progressoAulas, aulas, modulos, cursos } from "@/db/schema";
+import { progressoAulas, aulas, modulos, cursos, alunos, empresas } from "@/db/schema";
 import { eq, and, asc } from "drizzle-orm";
 import { addVideoToQueue } from "@/lib/queue";
 import { revalidatePath } from "next/cache";
+import { signTestToken } from "@/lib/auth";
+import { cookies } from "next/headers";
 
 // 1. Marcar aula como concluída ou pendente
 export async function concluirAulaAction(alunoId: string, aulaId: string, concluida: boolean) {
@@ -207,7 +209,6 @@ export async function clearDatabaseAction() {
 }
 
 // 9. Resetar o banco de dados para os dados semente originais (inclui empresa, aluno Arthur e cursos)
-import { empresas, alunos } from "@/db/schema";
 export async function resetDatabaseToSeedAction() {
   try {
     // 1. Limpar banco de dados
@@ -230,6 +231,8 @@ export async function resetDatabaseToSeedAction() {
       id: "22222222-2222-4222-b222-222222222222",
       nome: "Arthur Pendragon (SSO Teste)",
       email: "arthur.sso@residuosparceiro.com",
+      telefone: "(11) 99999-1111",
+      tipo: "vip",
       empresaId: empresa.id,
     }).returning();
 
@@ -237,6 +240,8 @@ export async function resetDatabaseToSeedAction() {
       id: "22222222-3333-4333-b333-333333333333",
       nome: "Beatriz Souza",
       email: "beatriz@ecorecicla.com",
+      telefone: "(11) 99999-2222",
+      tipo: "vip",
       empresaId: empresa.id,
     }).returning();
 
@@ -244,6 +249,8 @@ export async function resetDatabaseToSeedAction() {
       id: "22222222-4444-4444-b444-444444444444",
       nome: "Carlos Eduardo",
       email: "carlos@ecorecicla.com",
+      telefone: "(11) 99999-3333",
+      tipo: "vip",
       empresaId: empresa.id,
     }).returning();
 
@@ -251,6 +258,8 @@ export async function resetDatabaseToSeedAction() {
       id: "22222222-5555-4555-b555-555555555555",
       nome: "Diana Prince",
       email: "diana@ecorecicla.com",
+      telefone: "(11) 99999-4444",
+      tipo: "vip",
       empresaId: empresa.id,
     }).returning();
 
@@ -367,5 +376,134 @@ export async function resetDatabaseToSeedAction() {
   } catch (error) {
     console.error("Erro ao resetar banco de dados:", error);
     return { success: false, error: "Falha ao resetar banco de dados" };
+  }
+}
+
+// 10. Criar Aluno com validações (telefone obrigatório e e-mail único)
+export async function createAlunoAction(
+  nome: string,
+  email: string,
+  telefone: string,
+  tipo: "normal" | "vip",
+  empresaId?: string | null
+) {
+  try {
+    if (!nome.trim()) return { success: false, error: "O campo Nome é obrigatório." };
+    if (!email.trim()) return { success: false, error: "O campo E-mail é obrigatório." };
+    if (!telefone.trim()) return { success: false, error: "O campo Telefone é obrigatório." };
+
+    const formattedEmail = email.trim().toLowerCase();
+
+    // Validar e-mail único
+    const existing = await db
+      .select()
+      .from(alunos)
+      .where(eq(alunos.email, formattedEmail))
+      .limit(1);
+
+    if (existing.length > 0) {
+      return { success: false, error: "Este e-mail já está cadastrado em outro aluno." };
+    }
+
+    if (tipo === "vip" && !empresaId) {
+      return { success: false, error: "Um aluno VIP precisa estar associado a uma empresa." };
+    }
+
+    const [newAluno] = await db
+      .insert(alunos)
+      .values({
+        nome: nome.trim(),
+        email: formattedEmail,
+        telefone: telefone.trim(),
+        tipo,
+        empresaId: tipo === "vip" ? empresaId : null,
+      })
+      .returning();
+
+    revalidatePath("/admin/alunos");
+    revalidatePath("/admin/metricas");
+    return { success: true, aluno: newAluno };
+  } catch (error) {
+    console.error("Erro ao cadastrar aluno:", error);
+    return { success: false, error: "Falha ao cadastrar aluno no banco de dados." };
+  }
+}
+
+// 11. Excluir Aluno (preservando o aluno padrão do SSO)
+export async function deleteAlunoAction(id: string) {
+  try {
+    if (id === "22222222-2222-4222-b222-222222222222") {
+      return {
+        success: false,
+        error: "O aluno padrão Arthur Pendragon não pode ser excluído para não quebrar a sessão de testes padrão do sistema.",
+      };
+    }
+
+    await db.delete(alunos).where(eq(alunos.id, id));
+
+    revalidatePath("/admin/alunos");
+    revalidatePath("/admin/metricas");
+    return { success: true };
+  } catch (error) {
+    console.error("Erro ao excluir aluno:", error);
+    return { success: false, error: "Falha ao excluir aluno no banco de dados." };
+  }
+}
+
+// 12. Simular sessão de aluno (assinando token JWT e gravando cookie)
+export async function simularSessaoAlunoAction(alunoId: string) {
+  try {
+    const [aluno] = await db
+      .select()
+      .from(alunos)
+      .where(eq(alunos.id, alunoId))
+      .limit(1);
+
+    if (!aluno) {
+      return { success: false, error: "Aluno não encontrado no banco de dados." };
+    }
+
+    const token = signTestToken({
+      sub: aluno.id,
+      nome: aluno.nome,
+      email: aluno.email,
+      empresaId: aluno.empresaId || undefined,
+      role: "aluno",
+    });
+
+    const cookieStore = await cookies();
+    cookieStore.set("sso_token", token, {
+      maxAge: 30 * 24 * 60 * 60, // 30 dias
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    revalidatePath("/");
+    revalidatePath("/dashboard");
+    revalidatePath("/player");
+    revalidatePath("/admin/alunos");
+    return { success: true };
+  } catch (error) {
+    console.error("Erro ao simular sessão do aluno:", error);
+    return { success: false, error: "Falha ao simular sessão do aluno." };
+  }
+}
+
+// 13. Limpar simulação de sessão (voltando ao Arthur Pendragon padrão)
+export async function limparSessaoSimuladaAction() {
+  try {
+    const cookieStore = await cookies();
+    cookieStore.delete("sso_token");
+
+    revalidatePath("/");
+    revalidatePath("/dashboard");
+    revalidatePath("/player");
+    revalidatePath("/admin/alunos");
+    return { success: true };
+  } catch (error) {
+    console.error("Erro ao limpar sessão simulada:", error);
+    return { success: false, error: "Falha ao limpar sessão simulada." };
   }
 }
