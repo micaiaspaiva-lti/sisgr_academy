@@ -3,12 +3,12 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Lock, Mail, LogIn, GraduationCap, AlertCircle, User, Phone } from "lucide-react";
+import { Lock, Mail, LogIn, GraduationCap, AlertCircle, User, Phone, KeyRound } from "lucide-react";
 import { toast } from "sonner";
-import { alunoLoginAction, alunoRegisterAction } from "@/app/actions";
+import { alunoLoginAction, alunoRegisterAction, alunoResetPasswordAction } from "@/app/actions";
 
 export default function AlunoLoginPage() {
-  const [activeMode, setActiveMode] = useState<"login" | "register">("login");
+  const [activeMode, setActiveMode] = useState<"login" | "register" | "forgot">("login");
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -57,9 +57,9 @@ export default function AlunoLoginPage() {
       } finally {
         setLoading(false);
       }
-    } else {
-      if (!nome.trim() || !email.trim() || !password.trim()) {
-        setError("Por favor, preencha todos os campos obrigatórios.");
+    } else if (activeMode === "register") {
+      if (!nome.trim() || !email.trim() || !password.trim() || !telefone.trim()) {
+        setError("Por favor, preencha todos os campos. O telefone é obrigatório para recuperação de senha.");
         return;
       }
       setLoading(true);
@@ -72,6 +72,29 @@ export default function AlunoLoginPage() {
         } else {
           setError(res.error || "Erro ao criar conta.");
           toast.error(res.error || "Falha no cadastro.");
+        }
+      } catch (err) {
+        setError("Erro de conexão no servidor. Tente novamente.");
+        toast.error("Erro ao conectar.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    } else if (activeMode === "forgot") {
+      if (!email.trim() || !telefone.trim() || !password.trim()) {
+        setError("Por favor, preencha todos os campos.");
+        return;
+      }
+      setLoading(true);
+      try {
+        const res = await alunoResetPasswordAction(email, telefone, password);
+        if (res.success) {
+          toast.success("Senha alterada com sucesso! Login efetuado.");
+          router.push("/dashboard");
+          router.refresh();
+        } else {
+          setError(res.error || "Erro ao redefinir senha.");
+          toast.error(res.error || "Falha ao resetar.");
         }
       } catch (err) {
         setError("Erro de conexão no servidor. Tente novamente.");
@@ -97,51 +120,65 @@ export default function AlunoLoginPage() {
         {/* Logo/Header */}
         <div className="flex flex-col items-center gap-3 text-center">
           <div className="bg-emerald-50 p-3.5 rounded-2xl border border-emerald-100 text-emerald-600">
-            <GraduationCap className="h-8 w-8" />
+            {activeMode === "forgot" ? (
+              <KeyRound className="h-8 w-8" />
+            ) : (
+              <GraduationCap className="h-8 w-8" />
+            )}
           </div>
           <div>
-            <h1 className="text-2xl font-black text-slate-800 tracking-tight">EAD SISGR Academy</h1>
-            <p className="text-3xs font-extrabold text-emerald-600 uppercase tracking-widest mt-1">Portal do Aluno & Visitante</p>
+            <h1 className="text-2xl font-black text-slate-800 tracking-tight">
+              {activeMode === "forgot" ? "Recuperar Senha" : "EAD SISGR Academy"}
+            </h1>
+            <p className="text-3xs font-extrabold text-emerald-600 uppercase tracking-widest mt-1">
+              {activeMode === "forgot" ? "Redefinição Instantânea" : "Portal do Aluno & Visitante"}
+            </p>
           </div>
         </div>
 
-        {/* Alternância de Abas (Entrar / Cadastrar) */}
-        <div className="grid grid-cols-2 bg-slate-100 p-1 rounded-2xl border border-slate-200">
-          <button
-            type="button"
-            onClick={() => {
-              setActiveMode("login");
-              setError(null);
-            }}
-            className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-              activeMode === "login"
-                ? "bg-white text-slate-800 shadow-sm"
-                : "text-slate-500 hover:text-slate-800"
-            }`}
-          >
-            Entrar
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setActiveMode("register");
-              setError(null);
-            }}
-            className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-              activeMode === "register"
-                ? "bg-white text-slate-800 shadow-sm"
-                : "text-slate-500 hover:text-slate-800"
-            }`}
-          >
-            Cadastrar-se
-          </button>
-        </div>
+        {/* Alternância de Abas (Apenas no Modo Comum - Ocultado em Esqueci a Senha) */}
+        {activeMode !== "forgot" ? (
+          <div className="grid grid-cols-2 bg-slate-100 p-1 rounded-2xl border border-slate-200">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveMode("login");
+                setError(null);
+              }}
+              className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                activeMode === "login"
+                  ? "bg-white text-slate-800 shadow-sm"
+                  : "text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              Entrar
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveMode("register");
+                setError(null);
+              }}
+              className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                activeMode === "register"
+                  ? "bg-white text-slate-800 shadow-sm"
+                  : "text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              Cadastrar-se
+            </button>
+          </div>
+        ) : (
+          <p className="text-xs text-slate-500 font-semibold leading-relaxed text-center px-4 -mt-2">
+            Confirme seu e-mail e telefone cadastrados para cadastrar uma nova senha imediatamente.
+          </p>
+        )}
 
         {/* Error Feedback */}
         {error && (
           <div className="bg-red-500/10 border border-red-500/25 text-red-750 text-xs px-4 py-3 rounded-xl flex items-center gap-3 animate-shake">
             <AlertCircle className="h-5 w-5 text-red-500 shrink-0" />
-            <span className="font-semibold leading-relaxed">{error}</span>
+            <span className="font-semibold leading-relaxed text-left">{error}</span>
           </div>
         )}
 
@@ -181,14 +218,17 @@ export default function AlunoLoginPage() {
             </div>
           </div>
 
-          {/* Telefone (Apenas no Modo Cadastro - Opcional) */}
-          {activeMode === "register" && (
+          {/* Telefone (Opcional/Obrigatório dependendo do modo) */}
+          {(activeMode === "register" || activeMode === "forgot") && (
             <div className="flex flex-col gap-1">
-              <label className="text-3xs font-extrabold text-slate-500 uppercase tracking-wider pl-1">Telefone (Opcional)</label>
+              <label className="text-3xs font-extrabold text-slate-500 uppercase tracking-wider pl-1">
+                {activeMode === "register" ? "Telefone (Obrigatório p/ recuperação)" : "Telefone Cadastrado"}
+              </label>
               <div className="relative">
                 <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <input
                   type="tel"
+                  required
                   placeholder="(00) 00000-0000"
                   value={telefone}
                   onChange={handlePhoneChange}
@@ -198,21 +238,44 @@ export default function AlunoLoginPage() {
             </div>
           )}
 
-          {/* Senha */}
+          {/* Senha / Nova Senha */}
           <div className="flex flex-col gap-1">
-            <label className="text-3xs font-extrabold text-slate-500 uppercase tracking-wider pl-1">Senha</label>
+            <label className="text-3xs font-extrabold text-slate-500 uppercase tracking-wider pl-1 font-extrabold">
+              {activeMode === "forgot" ? "Escolha a Nova Senha" : "Senha"}
+            </label>
             <div className="relative">
               <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <input
                 type="password"
                 required
-                placeholder={activeMode === "register" ? "Escolha uma senha" : "Digite sua senha"}
+                placeholder={
+                  activeMode === "forgot" 
+                    ? "Nova senha (mín. 4 caracteres)" 
+                    : (activeMode === "register" ? "Escolha uma senha" : "Digite sua senha")
+                }
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-205 focus:border-emerald-500/50 rounded-xl py-3 pl-11 pr-4 text-xs text-slate-800 placeholder-slate-405 focus:outline-hidden focus:ring-4 focus:ring-emerald-500/10 transition-all font-semibold"
               />
             </div>
           </div>
+
+          {/* Link Esqueci Minha Senha (Apenas no Modo Login) */}
+          {activeMode === "login" && (
+            <div className="text-right -mt-1 pl-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveMode("forgot");
+                  setError(null);
+                  setPassword(""); // Limpa a senha
+                }}
+                className="text-[10px] font-black text-slate-450 hover:text-emerald-700 transition-colors bg-transparent border-0 cursor-pointer uppercase tracking-wider"
+              >
+                Esqueceu a senha?
+              </button>
+            </div>
+          )}
 
           <button
             type="submit"
@@ -221,20 +284,33 @@ export default function AlunoLoginPage() {
           >
             <LogIn className="h-4 w-4" />
             {loading 
-              ? (activeMode === "login" ? "Entrando..." : "Criando conta...") 
-              : (activeMode === "login" ? "Acessar Plataforma" : "Criar Conta & Acessar")
+              ? (activeMode === "login" ? "Entrando..." : (activeMode === "register" ? "Criando conta..." : "Redefinindo...")) 
+              : (activeMode === "login" ? "Acessar Plataforma" : (activeMode === "register" ? "Criar Conta & Acessar" : "Redefinir Senha & Entrar"))
             }
           </button>
         </form>
 
-        {/* Voltar para o Site Principal */}
-        <div className="text-center pt-2 border-t border-slate-100">
-          <Link
-            href="/"
-            className="text-xs font-bold text-slate-500 hover:text-emerald-700 transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer"
-          >
-            ← Voltar ao site principal
-          </Link>
+        {/* Voltar para o Site Principal ou Voltar para Login */}
+        <div className="text-center pt-2 border-t border-slate-100 flex flex-col gap-2">
+          {activeMode === "forgot" ? (
+            <button
+              type="button"
+              onClick={() => {
+                setActiveMode("login");
+                setError(null);
+              }}
+              className="text-xs font-bold text-slate-500 hover:text-emerald-700 transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              ← Voltar ao login
+            </button>
+          ) : (
+            <Link
+              href="/"
+              className="text-xs font-bold text-slate-500 hover:text-emerald-700 transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              ← Voltar ao site principal
+            </Link>
+          )}
         </div>
       </div>
     </div>

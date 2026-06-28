@@ -833,3 +833,76 @@ export async function alunoRegisterAction(
     return { success: false, error: "Falha ao registrar aluno. Tente novamente mais tarde." };
   }
 }
+
+// 16. Resetar senha do aluno mediante confirmação de telefone (self-service)
+export async function alunoResetPasswordAction(
+  email: string,
+  telefone: string,
+  novaSenhaInserida: string
+) {
+  try {
+    if (!email.trim()) return { success: false, error: "O e-mail é obrigatório." };
+    if (!telefone.trim()) return { success: false, error: "O telefone é obrigatório para validação." };
+    if (!novaSenhaInserida.trim()) return { success: false, error: "A nova senha é obrigatória." };
+
+    const formattedEmail = email.trim().toLowerCase();
+    const formattedPhone = telefone.trim();
+
+    // 1. Buscar aluno pelo e-mail
+    const [aluno] = await db
+      .select()
+      .from(alunos)
+      .where(eq(alunos.email, formattedEmail))
+      .limit(1);
+
+    if (!aluno) {
+      return { success: false, error: "Nenhum aluno encontrado com este e-mail." };
+    }
+
+    // 2. Validar se o telefone bate (removendo caracteres não numéricos para comparação mais segura)
+    const dbPhoneDigits = aluno.telefone ? aluno.telefone.replace(/\D/g, "") : "";
+    const inputPhoneDigits = formattedPhone.replace(/\D/g, "");
+
+    if (!dbPhoneDigits) {
+      return { 
+        success: false, 
+        error: "Seu cadastro não possui um telefone registrado para recuperação. Por favor, contate o suporte." 
+      };
+    }
+
+    if (dbPhoneDigits !== inputPhoneDigits) {
+      return { success: false, error: "O número de telefone não corresponde ao e-mail informado." };
+    }
+
+    // 3. Atualizar a senha
+    const [updatedAluno] = await db
+      .update(alunos)
+      .set({ senha: novaSenhaInserida.trim() })
+      .where(eq(alunos.id, aluno.id))
+      .returning();
+
+    // 4. Logar automaticamente
+    const token = signTestToken({
+      sub: updatedAluno.id,
+      nome: updatedAluno.nome,
+      email: updatedAluno.email,
+      empresaId: updatedAluno.empresaId || undefined,
+      tipo: updatedAluno.tipo || "normal",
+      role: "aluno",
+    });
+
+    const cookieStore = await cookies();
+    cookieStore.set("sso_token", token, {
+      maxAge: 30 * 24 * 60 * 60, // 30 dias
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Erro ao resetar senha do aluno:", error);
+    return { success: false, error: "Falha ao redefinir senha. Tente novamente mais tarde." };
+  }
+}
