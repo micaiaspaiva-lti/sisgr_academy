@@ -24,6 +24,34 @@ export default function HeroCarousel({ courses }: HeroCarouselProps) {
   const [isHovered, setIsHovered] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Estados para suportar o deslize de dedo (Swipe) no celular
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.touches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.touches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      handleNext();
+    } else if (isRightSwipe) {
+      handlePrev();
+    }
+  };
+
   // Inicia / para temporizador de auto-play
   useEffect(() => {
     if (courses.length <= 1 || isHovered) {
@@ -52,9 +80,12 @@ export default function HeroCarousel({ courses }: HeroCarouselProps) {
 
   return (
     <section 
-      className="relative pt-32 pb-20 md:pt-40 md:pb-24 overflow-hidden bg-white w-full border-b border-slate-200"
+      className="relative pt-32 pb-20 md:pt-40 md:pb-24 overflow-hidden bg-white w-full border-b border-slate-200 select-none touch-pan-y"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
     >
       {/* Soft Green Gradient Overlay */}
       <div className="absolute inset-0 z-0 bg-gradient-to-b from-emerald-50/30 via-emerald-50/10 to-white pointer-events-none" />
@@ -153,8 +184,7 @@ export default function HeroCarousel({ courses }: HeroCarouselProps) {
           <button
             type="button"
             onClick={handlePrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 h-11 w-11 rounded-full border border-slate-200 bg-white/90 backdrop-blur-xs flex items-center justify-center text-slate-700 shadow-md hover:bg-white transition-all cursor-pointer opacity-0 md:group-hover:opacity-100"
-            style={{ opacity: isHovered ? 1 : 0 }}
+            className="absolute left-4 top-auto bottom-[115px] translate-y-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto z-20 h-11 w-11 rounded-full border border-slate-200 bg-white/90 backdrop-blur-xs flex items-center justify-center text-slate-700 shadow-md hover:bg-white transition-all cursor-pointer opacity-100 md:opacity-0 md:group-hover:opacity-100"
             title="Slide Anterior"
           >
             <ChevronLeft className="h-5 w-5" />
@@ -162,8 +192,7 @@ export default function HeroCarousel({ courses }: HeroCarouselProps) {
           <button
             type="button"
             onClick={handleNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 h-11 w-11 rounded-full border border-slate-200 bg-white/90 backdrop-blur-xs flex items-center justify-center text-slate-700 shadow-md hover:bg-white transition-all cursor-pointer opacity-0 md:group-hover:opacity-100"
-            style={{ opacity: isHovered ? 1 : 0 }}
+            className="absolute right-4 top-auto bottom-[115px] translate-y-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto z-20 h-11 w-11 rounded-full border border-slate-200 bg-white/90 backdrop-blur-xs flex items-center justify-center text-slate-700 shadow-md hover:bg-white transition-all cursor-pointer opacity-100 md:opacity-0 md:group-hover:opacity-100"
             title="Próximo Slide"
           >
             <ChevronRight className="h-5 w-5" />
