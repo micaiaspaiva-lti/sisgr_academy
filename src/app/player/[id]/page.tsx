@@ -27,9 +27,10 @@ export default async function PlayerPage({ params }: PageProps) {
     where: eq(aulas.id, lessonId),
   });
 
-  if (!currentLesson) {
-    // Se a aula não existir, tenta obter qualquer aula ou redireciona
+  if (!currentLesson || !currentLesson.ativo) {
+    // Se a aula não existir ou estiver inativa, tenta obter qualquer aula ativa ou redireciona
     const firstLesson = await db.query.aulas.findFirst({
+      where: eq(aulas.ativo, true),
       orderBy: (aulas, { asc }) => [asc(aulas.ordem)],
     });
     if (firstLesson) {
@@ -56,6 +57,7 @@ export default async function PlayerPage({ params }: PageProps) {
         orderBy: (modulos, { asc }) => [asc(modulos.ordem)],
         with: {
           aulas: {
+            where: eq(aulas.ativo, true),
             orderBy: (aulas, { asc }) => [asc(aulas.ordem)],
           }
         }
@@ -63,7 +65,7 @@ export default async function PlayerPage({ params }: PageProps) {
     }
   });
 
-  if (!currentCourse) {
+  if (!currentCourse || !currentCourse.ativo) {
     redirect("/dashboard");
   }
 

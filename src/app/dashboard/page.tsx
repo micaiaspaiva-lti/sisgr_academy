@@ -2,7 +2,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { verifySSOToken } from "@/lib/auth";
 import { db } from "@/db";
-import { cursos, progressoAulas } from "@/db/schema";
+import { cursos, progressoAulas, aulas } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { 
@@ -53,6 +53,7 @@ export default async function Dashboard() {
         orderBy: (modulos, { asc }) => [asc(modulos.ordem)],
         with: {
           aulas: {
+            where: eq(aulas.ativo, true),
             orderBy: (aulas, { asc }) => [asc(aulas.ordem)],
           }
         }

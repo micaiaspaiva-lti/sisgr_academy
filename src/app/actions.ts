@@ -189,6 +189,66 @@ export async function createAulaAction(moduloId: string, titulo: string, videoUr
   }
 }
 
+// 7.1. Atualizar um curso existente
+export async function updateCursoAction(
+  cursoId: string,
+  titulo: string,
+  descricao: string,
+  tipo: "publico" | "vip",
+  ativo: boolean
+) {
+  try {
+    const [updatedCourse] = await db
+      .update(cursos)
+      .set({
+        titulo,
+        descricao,
+        tipo,
+        ativo,
+      })
+      .where(eq(cursos.id, cursoId))
+      .returning();
+
+    revalidatePath("/admin/cursos");
+    revalidatePath("/");
+    revalidatePath("/dashboard");
+    return { success: true, course: updatedCourse };
+  } catch (error) {
+    console.error("Erro ao atualizar curso:", error);
+    return { success: false, error: "Falha ao atualizar curso" };
+  }
+}
+
+// 7.2. Atualizar uma aula existente
+export async function updateAulaAction(
+  aulaId: string,
+  titulo: string,
+  videoUrl: string,
+  demonstrative: boolean,
+  ativo: boolean
+) {
+  try {
+    const [updatedAula] = await db
+      .update(aulas)
+      .set({
+        titulo,
+        videoUrl,
+        demonstrative,
+        ativo,
+      })
+      .where(eq(aulas.id, aulaId))
+      .returning();
+
+    revalidatePath("/admin/cursos");
+    revalidatePath("/");
+    revalidatePath("/dashboard");
+    return { success: true, aula: updatedAula };
+  } catch (error) {
+    console.error("Erro ao atualizar aula:", error);
+    return { success: false, error: "Falha ao atualizar aula" };
+  }
+}
+
 // 8. Limpar o banco de dados (remover cursos, módulos, aulas, progresso e alunos adicionais)
 import { ne } from "drizzle-orm";
 export async function clearDatabaseAction() {

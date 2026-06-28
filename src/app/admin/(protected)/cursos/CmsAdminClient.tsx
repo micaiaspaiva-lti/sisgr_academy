@@ -5,7 +5,7 @@ import Link from "next/link";
 import { 
   Plus, Folder, PlayCircle, Sparkles, 
   UserCheck, BarChart3, GripVertical, CheckCircle, 
-  Trash2, Loader2, ArrowLeft, Users, LogOut 
+  Trash2, Loader2, ArrowLeft, Users, LogOut, Pencil, Eye, EyeOff
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { 
@@ -15,7 +15,9 @@ import {
   createCursoAction,
   createAulaAction,
   clearDatabaseAction,
-  resetDatabaseToSeedAction
+  resetDatabaseToSeedAction,
+  updateCursoAction,
+  updateAulaAction
 } from "@/app/actions";
 import { logoutAdminAction } from "@/lib/auth-admin";
 
@@ -27,6 +29,7 @@ interface Lesson {
   videoUrl: string;
   legendasUrl: string | null;
   demonstrative: boolean;
+  ativo: boolean;
   ordem: number;
 }
 
@@ -67,6 +70,19 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
   const [newLessonUrl, setNewLessonUrl] = useState("");
   const [newLessonDemo, setNewLessonDemo] = useState(false);
   const [targetModuleId, setTargetModuleId] = useState("");
+
+  const [isEditingCourse, setIsEditingCourse] = useState(false);
+  const [editCourseTitle, setEditCourseTitle] = useState("");
+  const [editCourseDesc, setEditCourseDesc] = useState("");
+  const [editCourseTipo, setEditCourseTipo] = useState<"publico" | "vip">("publico");
+  const [editCourseAtivo, setEditCourseAtivo] = useState(true);
+
+  const [isEditingLesson, setIsEditingLesson] = useState(false);
+  const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
+  const [editLessonTitle, setEditLessonTitle] = useState("");
+  const [editLessonUrl, setEditLessonUrl] = useState("");
+  const [editLessonDemo, setEditLessonDemo] = useState(false);
+  const [editLessonAtivo, setEditLessonAtivo] = useState(true);
 
   const [isClearingDb, setIsClearingDb] = useState(false);
   const [isResettingDb, setIsResettingDb] = useState(false);
@@ -242,6 +258,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
               videoUrl: res.aula.videoUrl,
               legendasUrl: res.aula.legendasUrl,
               demonstrative: res.aula.demonstrative,
+              ativo: res.aula.ativo,
               ordem: res.aula.ordem
             }]
           };
@@ -259,6 +276,134 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       setTargetModuleId("");
     } else {
       toast.error(res.error || "Erro ao criar aula.");
+    }
+  };
+  const handleUpdateCourse = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedCourse || !editCourseTitle.trim()) return;
+
+    toast.info("Salvando curso...");
+    const res = await updateCursoAction(
+      selectedCourse.id,
+      editCourseTitle,
+      editCourseDesc,
+      editCourseTipo,
+      editCourseAtivo
+    );
+
+    if (res.success && res.course) {
+      toast.success("Curso atualizado com sucesso!");
+      const updated: Course = {
+        ...selectedCourse,
+        titulo: res.course.titulo,
+        descricao: res.course.descricao || "",
+        tipo: (res.course.tipo || "publico") as "publico" | "vip",
+        ativo: res.course.ativo
+      };
+      setSelectedCourse(updated);
+      setCourses(prev => prev.map(c => c.id === updated.id ? updated : c));
+      setIsEditingCourse(false);
+    } else {
+      toast.error("Erro ao atualizar curso.");
+    }
+  };
+
+  const handleToggleCoursePublish = async (course: Course) => {
+    const newAtivo = !course.ativo;
+    toast.info(newAtivo ? "Publicando curso..." : "Colocando curso em rascunho...");
+    const res = await updateCursoAction(
+      course.id,
+      course.titulo,
+      course.descricao,
+      course.tipo,
+      newAtivo
+    );
+
+    if (res.success && res.course) {
+      toast.success(newAtivo ? "Curso publicado!" : "Curso colocado em rascunho.");
+      const updated = { ...course, ativo: res.course.ativo };
+      if (selectedCourse?.id === course.id) {
+        setSelectedCourse(updated);
+      }
+      setCourses(prev => prev.map(c => c.id === course.id ? updated : c));
+    } else {
+      toast.error("Erro ao alterar status do curso.");
+    }
+  };
+
+  const handleUpdateLesson = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedCourse || !editingLesson || !editLessonTitle.trim() || !editLessonUrl.trim()) return;
+
+    toast.info("Salvando aula...");
+    const res = await updateAulaAction(
+      editingLesson.id,
+      editLessonTitle,
+      editLessonUrl,
+      editLessonDemo,
+      editLessonAtivo
+    );
+
+    if (res.success && res.aula) {
+      toast.success("Aula atualizada com sucesso!");
+      const updatedCourse = { ...selectedCourse };
+      updatedCourse.modulos = updatedCourse.modulos.map(m => {
+        if (m.id === editingLesson.moduloId) {
+          return {
+            ...m,
+            aulas: m.aulas.map(a => a.id === editingLesson.id ? {
+              ...a,
+              titulo: res.aula!.titulo,
+              videoUrl: res.aula!.videoUrl,
+              demonstrative: res.aula!.demonstrative,
+              ativo: res.aula!.ativo
+            } : a)
+          };
+        }
+        return m;
+      });
+
+      setSelectedCourse(updatedCourse);
+      setCourses(prev => prev.map(c => c.id === updatedCourse.id ? updatedCourse : c));
+      setIsEditingLesson(false);
+      setEditingLesson(null);
+    } else {
+      toast.error("Erro ao atualizar aula.");
+    }
+  };
+
+  const handleToggleLessonPublish = async (lesson: Lesson) => {
+    const newAtivo = !lesson.ativo;
+    toast.info(newAtivo ? "Publicando aula..." : "Colocando aula em rascunho...");
+    const res = await updateAulaAction(
+      lesson.id,
+      lesson.titulo,
+      lesson.videoUrl,
+      lesson.demonstrative,
+      newAtivo
+    );
+
+    if (res.success && res.aula) {
+      toast.success(newAtivo ? "Aula publicada!" : "Aula colocada em rascunho.");
+      if (!selectedCourse) return;
+      const updatedCourse = { ...selectedCourse };
+      updatedCourse.modulos = updatedCourse.modulos.map(m => {
+        if (m.id === lesson.moduloId) {
+          return {
+            ...m,
+            aulas: m.aulas.map(a => a.id === lesson.id ? {
+              ...a,
+              ativo: res.aula!.ativo
+            } : a)
+          };
+        }
+        return m;
+      });
+
+      setSelectedCourse(updatedCourse);
+      setCourses(prev => prev.map(c => c.id === updatedCourse.id ? updatedCourse : c));
+    } else {
+      toast.error("Erro ao alterar status da aula.");
     }
   };
 
@@ -396,16 +541,23 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                   }`}
                 >
                   <div className="flex justify-between items-center w-full gap-2">
-                    <span className="line-clamp-1 flex-grow">{c.titulo}</span>
-                    {c.tipo === "vip" ? (
-                      <span className="inline-flex shrink-0 items-center rounded-md bg-amber-50 px-1.5 py-0.5 text-[9px] font-black text-amber-800 ring-1 ring-inset ring-amber-600/10 uppercase tracking-wider">
-                        VIP
-                      </span>
-                    ) : (
-                      <span className="inline-flex shrink-0 items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[9px] font-black text-emerald-700 ring-1 ring-inset ring-emerald-600/10 uppercase tracking-wider">
-                        Púb
-                      </span>
-                    )}
+                    <span className={`line-clamp-1 flex-grow ${!c.ativo ? "text-slate-400 line-through decoration-slate-300" : ""}`}>{c.titulo}</span>
+                    <div className="flex gap-1.5 items-center">
+                      {!c.ativo && (
+                        <span className="inline-flex shrink-0 items-center rounded-md bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold text-slate-550 border border-slate-200 uppercase tracking-wider">
+                          Rascunho
+                        </span>
+                      )}
+                      {c.tipo === "vip" ? (
+                        <span className="inline-flex shrink-0 items-center rounded-md bg-amber-50 px-1.5 py-0.5 text-[9px] font-black text-amber-800 ring-1 ring-inset ring-amber-600/10 uppercase tracking-wider">
+                          VIP
+                        </span>
+                      ) : (
+                        <span className="inline-flex shrink-0 items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[9px] font-black text-emerald-700 ring-1 ring-inset ring-emerald-600/10 uppercase tracking-wider">
+                          Púb
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <span className="text-3xs font-medium text-slate-400">
                     {c.modulos?.length || 0} Módulos • {c.modulos?.reduce((acc, curr) => acc + (curr.aulas?.length || 0), 0) || 0} Aulas
@@ -420,20 +572,71 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
         {selectedCourse ? (
           <main className="lg:col-span-8 flex flex-col gap-6">
             <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-sm flex flex-col gap-6">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-3xs font-extrabold text-duet-brand uppercase tracking-wider">Editor do Curso</span>
-                  {selectedCourse.tipo === "vip" ? (
-                    <span className="inline-flex items-center rounded-md bg-amber-50 px-2 py-0.5 text-[10px] font-extrabold text-amber-800 ring-1 ring-inset ring-amber-600/20 uppercase tracking-wider">
-                      VIP (Exclusivo B2B)
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold text-emerald-700 ring-1 ring-inset ring-emerald-600/20 uppercase tracking-wider">
-                      Público Geral
-                    </span>
+              <div className="flex justify-between items-start gap-4">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-3xs font-extrabold text-duet-brand uppercase tracking-wider">Editor do Curso</span>
+                    {selectedCourse.tipo === "vip" ? (
+                      <span className="inline-flex items-center rounded-md bg-amber-50 px-2 py-0.5 text-[10px] font-extrabold text-amber-800 ring-1 ring-inset ring-amber-600/20 uppercase tracking-wider">
+                        VIP (Exclusivo B2B)
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold text-emerald-700 ring-1 ring-inset ring-emerald-600/20 uppercase tracking-wider">
+                        Público Geral
+                      </span>
+                    )}
+                    {selectedCourse.ativo ? (
+                      <span className="inline-flex items-center rounded-md bg-emerald-100 px-2 py-0.5 text-[10px] font-extrabold text-emerald-800 uppercase tracking-wider">
+                        Publicado
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-extrabold text-slate-600 uppercase tracking-wider border border-slate-200">
+                        Rascunho
+                      </span>
+                    )}
+                  </div>
+                  <h1 className="text-2xl font-black text-slate-950 leading-tight">{selectedCourse.titulo}</h1>
+                  {selectedCourse.descricao && (
+                    <p className="text-xs font-medium text-slate-500 line-clamp-2">{selectedCourse.descricao}</p>
                   )}
                 </div>
-                <h1 className="text-2xl font-black text-slate-950">{selectedCourse.titulo}</h1>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setEditCourseTitle(selectedCourse.titulo);
+                      setEditCourseDesc(selectedCourse.descricao || "");
+                      setEditCourseTipo(selectedCourse.tipo);
+                      setEditCourseAtivo(selectedCourse.ativo);
+                      setIsEditingCourse(true);
+                    }}
+                    className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold bg-white transition-colors cursor-pointer animate-in fade-in duration-200"
+                  >
+                    <Pencil className="h-3.5 w-3.5 text-slate-550" />
+                    Editar
+                  </button>
+
+                  <button
+                    onClick={() => handleToggleCoursePublish(selectedCourse)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-bold transition-colors cursor-pointer ${
+                      selectedCourse.ativo
+                        ? "border-amber-250 bg-amber-50 hover:bg-amber-100 text-amber-800"
+                        : "border-emerald-250 bg-emerald-50 hover:bg-emerald-100 text-emerald-800"
+                    }`}
+                  >
+                    {selectedCourse.ativo ? (
+                      <>
+                        <EyeOff className="h-3.5 w-3.5" />
+                        Despublicar
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="h-3.5 w-3.5 text-emerald-650" />
+                        Publicar
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
 
               {/* Lista de Módulos */}
@@ -470,19 +673,62 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                           onDragEnd={handleDragEnd}
                           className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-colors shadow-2xs ${
                             draggedLessonId === aula.id ? "opacity-40 border-dashed" : ""
-                          }`}
+                          } ${!aula.ativo ? "bg-slate-50/50" : ""}`}
                         >
                           <div className="flex items-center gap-3 truncate">
                             <GripVertical className="h-4 w-4 text-slate-400 cursor-grab shrink-0" />
-                            <PlayCircle className="h-5 w-5 text-slate-500 shrink-0" />
+                            <PlayCircle className={`h-5 w-5 shrink-0 ${!aula.ativo ? "text-slate-300" : "text-slate-500"}`} />
                             <div className="flex flex-col gap-0.5 truncate">
-                              <span className="font-bold text-xs text-slate-800 truncate">{aula.titulo}</span>
-                              <span className="text-3xs text-slate-400 truncate">Ordem: {aula.ordem}</span>
+                              <div className="flex items-center gap-2 truncate">
+                                <span className={`font-bold text-xs truncate ${!aula.ativo ? "text-slate-400 line-through decoration-slate-300" : "text-slate-800"}`}>
+                                  {aula.titulo}
+                                </span>
+                                {aula.demonstrative && (
+                                  <span className="inline-flex shrink-0 items-center rounded-md bg-emerald-50 px-1 py-0.5 text-[8px] font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/10 uppercase tracking-wider">
+                                    Demo
+                                  </span>
+                                )}
+                                {!aula.ativo && (
+                                  <span className="inline-flex shrink-0 items-center rounded-md bg-slate-100 px-1 py-0.5 text-[8px] font-bold text-slate-500 border border-slate-200 uppercase tracking-wider">
+                                    Rascunho
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-3xs text-slate-400 truncate">Ordem: {aula.ordem} • {aula.videoUrl}</span>
                             </div>
                           </div>
 
-                          {/* Ações (IA / Excluir) */}
-                          <div className="flex items-center gap-3 self-end sm:self-center">
+                          {/* Ações (Editar, Publicar, IA, Excluir) */}
+                          <div className="flex items-center gap-2.5 self-end sm:self-center">
+                            {/* Botão Publicar/Despublicar Aula */}
+                            <button
+                              onClick={() => handleToggleLessonPublish(aula)}
+                              className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
+                                aula.ativo
+                                  ? "border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-700"
+                                  : "border-emerald-250 bg-emerald-50 hover:bg-emerald-100 text-emerald-700"
+                              }`}
+                              title={aula.ativo ? "Colocar aula em rascunho (Despublicar)" : "Publicar aula"}
+                            >
+                              {aula.ativo ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                            </button>
+
+                            {/* Botão Editar Aula */}
+                            <button
+                              onClick={() => {
+                                setEditingLesson(aula);
+                                setEditLessonTitle(aula.titulo);
+                                setEditLessonUrl(aula.videoUrl);
+                                setEditLessonDemo(aula.demonstrative);
+                                setEditLessonAtivo(aula.ativo);
+                                setIsEditingLesson(true);
+                              }}
+                              className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-650 bg-white transition-colors cursor-pointer"
+                              title="Editar Aula"
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </button>
+
                             {aula.legendasUrl ? (
                               <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-1 text-3xs font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/10">
                                 <CheckCircle className="h-3 w-3" />
@@ -672,6 +918,140 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                   className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 cursor-pointer"
                 >
                   Adicionar Aula
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* Modal de Edição de Curso */}
+      {isEditingCourse && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 border border-slate-200 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
+            <h2 className="text-lg font-black text-slate-900">Editar Curso</h2>
+            <form onSubmit={handleUpdateCourse} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-slate-700">Título do Curso</label>
+                <input
+                  type="text"
+                  required
+                  value={editCourseTitle}
+                  onChange={e => setEditCourseTitle(e.target.value)}
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-slate-700">Descrição</label>
+                <textarea
+                  value={editCourseDesc}
+                  onChange={e => setEditCourseDesc(e.target.value)}
+                  rows={3}
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-slate-700">Classificação</label>
+                <div className="grid grid-cols-2 gap-2 mt-1">
+                  <button
+                    type="button"
+                    onClick={() => setEditCourseTipo("publico")}
+                    className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                      editCourseTipo === "publico"
+                        ? "border-emerald-600 bg-duet-brand text-white shadow-xs"
+                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                     Público Geral
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditCourseTipo("vip")}
+                    className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                      editCourseTipo === "vip"
+                        ? "border-amber-600 bg-amber-600 text-white shadow-xs"
+                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                     VIP (Clientes)
+                  </button>
+                </div>
+              </div>
+              <div className="flex gap-3 justify-end mt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditingCourse(false)}
+                  className="px-4 py-2 border border-slate-350 rounded-lg text-xs font-bold text-slate-650 hover:bg-slate-50 cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 cursor-pointer"
+                >
+                  Salvar Alterações
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Edição de Aula */}
+      {isEditingLesson && editingLesson && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 border border-slate-200 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
+            <h2 className="text-lg font-black text-slate-900">Editar Aula</h2>
+            <form onSubmit={handleUpdateLesson} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-slate-700">Título da Aula</label>
+                <input
+                  type="text"
+                  required
+                  value={editLessonTitle}
+                  onChange={e => setEditLessonTitle(e.target.value)}
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-slate-700">URL do Vídeo</label>
+                <input
+                  type="text"
+                  required
+                  value={editLessonUrl}
+                  onChange={e => setEditLessonUrl(e.target.value)}
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                />
+              </div>
+              {selectedCourse?.tipo === "vip" && (
+                <div className="flex items-center gap-2 mt-1">
+                  <input
+                    type="checkbox"
+                    id="edit-demonstrative"
+                    checked={editLessonDemo}
+                    onChange={e => setEditLessonDemo(e.target.checked)}
+                    className="rounded-xs border-slate-300 text-emerald-600 focus:ring-emerald-600"
+                  />
+                  <label htmlFor="edit-demonstrative" className="text-xs font-bold text-slate-700 cursor-pointer">
+                    Aula Demonstrativa (Acesso Gratuito)
+                  </label>
+                </div>
+              )}
+              <div className="flex gap-3 justify-end mt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditingLesson(false);
+                    setEditingLesson(null);
+                  }}
+                  className="px-4 py-2 border border-slate-350 rounded-lg text-xs font-bold text-slate-650 hover:bg-slate-50 cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 cursor-pointer"
+                >
+                  Salvar Alterações
                 </button>
               </div>
             </form>

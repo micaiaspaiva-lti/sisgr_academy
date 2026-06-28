@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Play, CheckCircle2, BookOpen } from "lucide-react";
 import { db } from "@/db";
-import { cursos } from "@/db/schema";
+import { cursos, aulas } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 function getYouTubeEmbedUrl(url: string): string | null {
@@ -52,6 +52,7 @@ export default async function Home() {
         orderBy: (modulos, { asc }) => [asc(modulos.ordem)],
         with: {
           aulas: {
+            where: eq(aulas.ativo, true),
             orderBy: (aulas, { asc }) => [asc(aulas.ordem)],
           }
         }

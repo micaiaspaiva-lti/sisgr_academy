@@ -18,7 +18,7 @@ export default async function DemonstrativoPage({ params }: PageProps) {
     where: eq(aulas.id, lessonId),
   });
 
-  if (!currentLesson) {
+  if (!currentLesson || !currentLesson.ativo) {
     redirect("/");
   }
 
@@ -40,7 +40,7 @@ export default async function DemonstrativoPage({ params }: PageProps) {
     where: eq(cursos.id, currentModule.cursoId),
   });
 
-  if (!currentCourse) {
+  if (!currentCourse || !currentCourse.ativo) {
     redirect("/");
   }
 
@@ -55,6 +55,7 @@ export default async function DemonstrativoPage({ params }: PageProps) {
   let visibleLessons: any[] = [];
   if (moduleIds.length > 0) {
     const allLessons = await db.query.aulas.findMany({
+      where: eq(aulas.ativo, true),
       orderBy: (aulas, { asc }) => [asc(aulas.ordem)],
     });
     visibleLessons = allLessons

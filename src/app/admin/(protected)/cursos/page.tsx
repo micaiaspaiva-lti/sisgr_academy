@@ -45,6 +45,7 @@ export default async function CMSAdminPage() {
         videoUrl: a.videoUrl,
         legendasUrl: a.legendasUrl,
         demonstrative: a.demonstrative,
+        ativo: a.ativo,
         ordem: a.ordem,
       })),
     })),
