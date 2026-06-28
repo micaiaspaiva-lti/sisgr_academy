@@ -1175,101 +1175,113 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       {/* Modal de Criação de Aula */}
       {isCreatingLesson && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 border border-slate-200 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
-            <h2 className="text-lg font-black text-slate-900">Nova Aula</h2>
+          <div className="bg-white rounded-2xl max-w-3xl w-full p-6 border border-slate-200 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
+            <h2 className="text-lg font-black text-slate-900 border-b border-slate-100 pb-2">Nova Aula</h2>
             <form onSubmit={handleCreateLesson} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-slate-700">Título da Aula</label>
-                <input
-                  type="text"
-                  required
-                  value={newLessonTitle}
-                  onChange={e => setNewLessonTitle(e.target.value)}
-                  placeholder="Ex: 1.3 Práticas de Coleta Seletiva"
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-slate-700">URL do Vídeo (MP4)</label>
-                <input
-                  type="text"
-                  required
-                  value={newLessonUrl}
-                  onChange={e => setNewLessonUrl(e.target.value)}
-                  placeholder="Ex: https://exemplo.com/video.mp4"
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
-                />
-                <span className="text-3xs text-slate-400">Pode ser uma URL HTTP de vídeo real ou um caminho local.</span>
-              </div>
-              <ImageUploadZone
-                value={newLessonImage}
-                onChange={setNewLessonImage}
-                label="Imagem de Capa / Thumbnail (Aula)"
-              />
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-slate-700">Materiais de Apoio (PDF, Planilhas, etc.)</label>
-                
-                {/* Lista de materiais já adicionados */}
-                {newLessonFiles.length > 0 && (
-                  <div className="flex flex-col gap-2 border border-slate-205 rounded-xl p-3 bg-slate-50/50">
-                    {newLessonFiles.map((file, idx) => (
-                      <div key={idx} className="flex items-center justify-between gap-3 p-2 bg-white rounded-lg border border-slate-150 shadow-3xs">
-                        <div className="flex items-center gap-2 truncate">
-                          <FileText className="h-4 w-4 text-emerald-600 shrink-0" />
-                          <span className="text-xs font-semibold text-slate-800 truncate" title={file.name}>
-                            {file.name}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setNewLessonFiles(prev => prev.filter((_, i) => i !== idx));
-                          }}
-                          className="p-1 rounded-md hover:bg-red-50 text-slate-400 hover:text-red-650 transition-colors cursor-pointer"
-                          title="Remover material"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Coluna Esquerda: Detalhes da Aula */}
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-bold text-slate-700">Título da Aula</label>
+                    <input
+                      type="text"
+                      required
+                      value={newLessonTitle}
+                      onChange={e => setNewLessonTitle(e.target.value)}
+                      placeholder="Ex: 1.3 Práticas de Coleta Seletiva"
+                      className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                    />
                   </div>
-                )}
-
-                {/* Zona de Upload para adicionar novo arquivo */}
-                <ImageUploadZone
-                  value=""
-                  onChange={(url) => {
-                    const fileName = url.split("/").pop() || "arquivo";
-                    const cleanName = fileName.replace(/^\d+-/, ""); // remove o timestamp prefixo
-                    setNewLessonFiles(prev => [...prev, { name: cleanName, url }]);
-                    toast.success(`Arquivo ${cleanName} adicionado!`);
-                  }}
-                  label=""
-                  accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
-                  placeholderText="Clique para anexar um arquivo de apoio"
-                />
-              </div>
-              {selectedCourse?.tipo === "vip" && (
-                <div className="flex items-center gap-2 mt-1">
-                  <input
-                    type="checkbox"
-                    id="demonstrative"
-                    checked={newLessonDemo}
-                    onChange={e => setNewLessonDemo(e.target.checked)}
-                    className="rounded-xs border-slate-300 text-emerald-600 focus:ring-emerald-600"
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-bold text-slate-700">URL do Vídeo (MP4)</label>
+                    <input
+                      type="text"
+                      required
+                      value={newLessonUrl}
+                      onChange={e => setNewLessonUrl(e.target.value)}
+                      placeholder="Ex: https://exemplo.com/video.mp4"
+                      className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                    />
+                    <span className="text-3xs text-slate-400">Pode ser uma URL HTTP de vídeo real ou um caminho local.</span>
+                  </div>
+                  <ImageUploadZone
+                    value={newLessonImage}
+                    onChange={setNewLessonImage}
+                    label="Imagem de Capa / Thumbnail (Aula)"
                   />
-                  <label htmlFor="demonstrative" className="text-xs font-bold text-slate-700 cursor-pointer">
-                    Aula Demonstrativa (Acesso Gratuito)
-                  </label>
+                  {selectedCourse?.tipo === "vip" && (
+                    <div className="flex items-center gap-2 mt-1">
+                      <input
+                        type="checkbox"
+                        id="demonstrative"
+                        checked={newLessonDemo}
+                        onChange={e => setNewLessonDemo(e.target.checked)}
+                        className="rounded-xs border-slate-300 text-emerald-600 focus:ring-emerald-600"
+                      />
+                      <label htmlFor="demonstrative" className="text-xs font-bold text-slate-700 cursor-pointer">
+                        Aula Demonstrativa (Acesso Gratuito)
+                      </label>
+                    </div>
+                  )}
                 </div>
-              )}
-              <div className="flex gap-3 justify-end mt-2">
+
+                {/* Coluna Direita: Materiais de Apoio */}
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs font-bold text-slate-700">Materiais de Apoio (PDF, Planilhas, etc.)</label>
+                    
+                    {/* Lista de materiais já adicionados */}
+                    {newLessonFiles.length > 0 && (
+                      <div className="flex flex-col gap-2 border border-slate-205 rounded-xl p-3 bg-slate-50/50 max-h-[160px] overflow-y-auto">
+                        {newLessonFiles.map((file, idx) => (
+                          <div key={idx} className="flex items-center justify-between gap-3 p-2 bg-white rounded-lg border border-slate-150 shadow-3xs">
+                            <div className="flex items-center gap-2 truncate">
+                              <FileText className="h-4 w-4 text-emerald-600 shrink-0" />
+                              <span className="text-xs font-semibold text-slate-800 truncate" title={file.name}>
+                                {file.name}
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setNewLessonFiles(prev => prev.filter((_, i) => i !== idx));
+                              }}
+                              className="p-1 rounded-md hover:bg-red-50 text-slate-400 hover:text-red-650 transition-colors cursor-pointer"
+                              title="Remover material"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Zona de Upload para adicionar novo arquivo */}
+                    <ImageUploadZone
+                      value=""
+                      onChange={(url) => {
+                        const fileName = url.split("/").pop() || "arquivo";
+                        const cleanName = fileName.replace(/^\d+-/, ""); // remove o timestamp prefixo
+                        setNewLessonFiles(prev => [...prev, { name: cleanName, url }]);
+                        toast.success(`Arquivo ${cleanName} adicionado!`);
+                      }}
+                      label=""
+                      accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
+                      placeholderText="Clique para anexar um arquivo de apoio"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="flex gap-3 justify-end mt-2 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => {
                     setIsCreatingLesson(false);
                     setNewLessonTitle("");
                     setNewLessonUrl("");
+                    setNewLessonFiles([]);
                     setNewLessonDemo(false);
                     setTargetModuleId("");
                   }}
@@ -1279,7 +1291,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 cursor-pointer"
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 cursor-pointer shadow-xs"
                 >
                   Adicionar Aula
                 </button>
@@ -1368,92 +1380,103 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       {/* Modal de Edição de Aula */}
       {isEditingLesson && editingLesson && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 border border-slate-200 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
-            <h2 className="text-lg font-black text-slate-900">Editar Aula</h2>
+          <div className="bg-white rounded-2xl max-w-3xl w-full p-6 border border-slate-200 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
+            <h2 className="text-lg font-black text-slate-900 border-b border-slate-100 pb-2">Editar Aula</h2>
             <form onSubmit={handleUpdateLesson} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-slate-700">Título da Aula</label>
-                <input
-                  type="text"
-                  required
-                  value={editLessonTitle}
-                  onChange={e => setEditLessonTitle(e.target.value)}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-slate-700">URL do Vídeo</label>
-                <input
-                  type="text"
-                  required
-                  value={editLessonUrl}
-                  onChange={e => setEditLessonUrl(e.target.value)}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
-                />
-              </div>
-              <ImageUploadZone
-                value={editLessonImage}
-                onChange={setEditLessonImage}
-                label="Imagem de Capa / Thumbnail (Aula)"
-              />
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-slate-700">Materiais de Apoio (PDF, Planilhas, etc.)</label>
-                
-                {/* Lista de materiais já adicionados */}
-                {editLessonFiles.length > 0 && (
-                  <div className="flex flex-col gap-2 border border-slate-205 rounded-xl p-3 bg-slate-50/50">
-                    {editLessonFiles.map((file, idx) => (
-                      <div key={idx} className="flex items-center justify-between gap-3 p-2 bg-white rounded-lg border border-slate-150 shadow-3xs">
-                        <div className="flex items-center gap-2 truncate">
-                          <FileText className="h-4 w-4 text-emerald-600 shrink-0" />
-                          <span className="text-xs font-semibold text-slate-800 truncate" title={file.name}>
-                            {file.name}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditLessonFiles(prev => prev.filter((_, i) => i !== idx));
-                          }}
-                          className="p-1 rounded-md hover:bg-red-50 text-slate-400 hover:text-red-650 transition-colors cursor-pointer"
-                          title="Remover material"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Coluna Esquerda: Detalhes da Aula */}
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-bold text-slate-700">Título da Aula</label>
+                    <input
+                      type="text"
+                      required
+                      value={editLessonTitle}
+                      onChange={e => setEditLessonTitle(e.target.value)}
+                      className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                    />
                   </div>
-                )}
-
-                {/* Zona de Upload para adicionar novo arquivo */}
-                <ImageUploadZone
-                  value=""
-                  onChange={(url) => {
-                    const fileName = url.split("/").pop() || "arquivo";
-                    const cleanName = fileName.replace(/^\d+-/, ""); // remove o timestamp prefixo
-                    setEditLessonFiles(prev => [...prev, { name: cleanName, url }]);
-                    toast.success(`Arquivo ${cleanName} adicionado!`);
-                  }}
-                  label=""
-                  accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
-                  placeholderText="Clique para anexar um arquivo de apoio"
-                />
-              </div>
-              {selectedCourse?.tipo === "vip" && (
-                <div className="flex items-center gap-2 mt-1">
-                  <input
-                    type="checkbox"
-                    id="edit-demonstrative"
-                    checked={editLessonDemo}
-                    onChange={e => setEditLessonDemo(e.target.checked)}
-                    className="rounded-xs border-slate-300 text-emerald-600 focus:ring-emerald-600"
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-bold text-slate-700">URL do Vídeo</label>
+                    <input
+                      type="text"
+                      required
+                      value={editLessonUrl}
+                      onChange={e => setEditLessonUrl(e.target.value)}
+                      className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                    />
+                  </div>
+                  <ImageUploadZone
+                    value={editLessonImage}
+                    onChange={setEditLessonImage}
+                    label="Imagem de Capa / Thumbnail (Aula)"
                   />
-                  <label htmlFor="edit-demonstrative" className="text-xs font-bold text-slate-700 cursor-pointer">
-                    Aula Demonstrativa (Acesso Gratuito)
-                  </label>
+                  {selectedCourse?.tipo === "vip" && (
+                    <div className="flex items-center gap-2 mt-1">
+                      <input
+                        type="checkbox"
+                        id="edit-demonstrative"
+                        checked={editLessonDemo}
+                        onChange={e => setEditLessonDemo(e.target.checked)}
+                        className="rounded-xs border-slate-300 text-emerald-600 focus:ring-emerald-600"
+                      />
+                      <label htmlFor="edit-demonstrative" className="text-xs font-bold text-slate-700 cursor-pointer">
+                        Aula Demonstrativa (Acesso Gratuito)
+                      </label>
+                    </div>
+                  )}
                 </div>
-              )}
-              <div className="flex gap-3 justify-end mt-2">
+
+                {/* Coluna Direita: Materiais de Apoio */}
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs font-bold text-slate-700">Materiais de Apoio (PDF, Planilhas, etc.)</label>
+                    
+                    {/* Lista de materiais já adicionados */}
+                    {editLessonFiles.length > 0 && (
+                      <div className="flex flex-col gap-2 border border-slate-205 rounded-xl p-3 bg-slate-50/50 max-h-[160px] overflow-y-auto">
+                        {editLessonFiles.map((file, idx) => (
+                          <div key={idx} className="flex items-center justify-between gap-3 p-2 bg-white rounded-lg border border-slate-150 shadow-3xs">
+                            <div className="flex items-center gap-2 truncate">
+                              <FileText className="h-4 w-4 text-emerald-600 shrink-0" />
+                              <span className="text-xs font-semibold text-slate-800 truncate" title={file.name}>
+                                {file.name}
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditLessonFiles(prev => prev.filter((_, i) => i !== idx));
+                              }}
+                              className="p-1 rounded-md hover:bg-red-50 text-slate-400 hover:text-red-650 transition-colors cursor-pointer"
+                              title="Remover material"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Zona de Upload para adicionar novo arquivo */}
+                    <ImageUploadZone
+                      value=""
+                      onChange={(url) => {
+                        const fileName = url.split("/").pop() || "arquivo";
+                        const cleanName = fileName.replace(/^\d+-/, ""); // remove o timestamp prefixo
+                        setEditLessonFiles(prev => [...prev, { name: cleanName, url }]);
+                        toast.success(`Arquivo ${cleanName} adicionado!`);
+                      }}
+                      label=""
+                      accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
+                      placeholderText="Clique para anexar um arquivo de apoio"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="flex gap-3 justify-end mt-2 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => {
@@ -1466,7 +1489,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 cursor-pointer"
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 cursor-pointer shadow-xs"
                 >
                   Salvar Alterações
                 </button>
