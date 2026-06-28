@@ -198,10 +198,10 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
         tipo: (res.course.tipo || "publico") as "publico" | "vip",
         modulos: [
           {
-            id: "m-dummy",
+            id: res.module?.id || "m-dummy",
             cursoId: res.course.id,
-            titulo: "Módulo 1: Introdução",
-            ordem: 1,
+            titulo: res.module?.titulo || "Módulo 1: Introdução",
+            ordem: res.module?.ordem || 1,
             aulas: []
           }
         ]

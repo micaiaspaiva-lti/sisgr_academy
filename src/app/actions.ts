@@ -141,16 +141,19 @@ export async function createCursoAction(titulo: string, descricao: string, tipo:
       .returning();
       
     // Criar um módulo padrão inicial
-    await db.insert(modulos).values({
-      cursoId: newCourse.id,
-      titulo: "Módulo 1: Introdução",
-      ordem: 1,
-    });
+    const [newModule] = await db
+      .insert(modulos)
+      .values({
+        cursoId: newCourse.id,
+        titulo: "Módulo 1: Introdução",
+        ordem: 1,
+      })
+      .returning();
 
     revalidatePath("/admin/cursos");
     revalidatePath("/");
     revalidatePath("/dashboard");
-    return { success: true, course: newCourse };
+    return { success: true, course: newCourse, module: newModule };
   } catch (error) {
     console.error("Erro ao criar curso:", error);
     return { success: false, error: "Falha ao criar curso" };
