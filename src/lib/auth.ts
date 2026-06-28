@@ -9,10 +9,21 @@ export interface UserSession {
   role: "aluno" | "admin" | "instrutor";
 }
 
+// Auxiliar defensivo para limpar e formatar chaves copiadas do .env (remove aspas e ajusta quebras de linha)
+function cleanKey(key: string | undefined): string {
+  if (!key) return "";
+  let cleaned = key.trim();
+  if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
+    cleaned = cleaned.slice(1, -1);
+  }
+  if (cleaned.startsWith("'") && cleaned.endsWith("'")) {
+    cleaned = cleaned.slice(1, -1);
+  }
+  return cleaned.replace(/\\n/g, '\n');
+}
+
 // Resgata e formata a chave pública RSA cadastrada
-const publicKey = process.env.JWT_PUBLIC_KEY 
-  ? process.env.JWT_PUBLIC_KEY.replace(/\\n/g, '\n')
-  : "";
+const publicKey = cleanKey(process.env.JWT_PUBLIC_KEY);
 
 export function verifySSOToken(token: string): UserSession | null {
   try {
@@ -57,9 +68,7 @@ export function getMockSession(): UserSession {
 
 // Auxiliar para assinar tokens de teste em ambiente de desenvolvimento ou testes automatizados
 export function signTestToken(payload: any): string {
-  const privateKey = process.env.JWT_PRIVATE_KEY
-    ? process.env.JWT_PRIVATE_KEY.replace(/\\n/g, '\n')
-    : "";
+  const privateKey = cleanKey(process.env.JWT_PRIVATE_KEY);
   if (!privateKey || privateKey.includes("...")) {
     throw new Error("JWT_PRIVATE_KEY não está configurado para assinar tokens.");
   }

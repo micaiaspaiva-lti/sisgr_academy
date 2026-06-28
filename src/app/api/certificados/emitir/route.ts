@@ -118,9 +118,15 @@ export async function GET(request: Request) {
     };
 
     // 6. Assinatura Digital Criptográfica (RSA SHA256)
-    const privateKey = process.env.JWT_PRIVATE_KEY 
-      ? process.env.JWT_PRIVATE_KEY.replace(/\\n/g, '\n')
-      : "";
+    const rawPrivateKey = process.env.JWT_PRIVATE_KEY || "";
+    let privateKey = rawPrivateKey.trim();
+    if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
+      privateKey = privateKey.slice(1, -1);
+    }
+    if (privateKey.startsWith("'") && privateKey.endsWith("'")) {
+      privateKey = privateKey.slice(1, -1);
+    }
+    privateKey = privateKey.replace(/\\n/g, '\n');
 
     let signatureHex = "mock-signature-hash-code";
 
