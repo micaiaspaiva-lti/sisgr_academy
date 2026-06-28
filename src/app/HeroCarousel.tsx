@@ -42,8 +42,6 @@ export default function HeroCarousel({ courses }: HeroCarouselProps) {
 
   if (!courses || courses.length === 0) return null;
 
-  const currentCourse = courses[activeIndex];
-
   const handlePrev = () => {
     setActiveIndex((prev) => (prev - 1 + courses.length) % courses.length);
   };
@@ -54,93 +52,104 @@ export default function HeroCarousel({ courses }: HeroCarouselProps) {
 
   return (
     <section 
-      className="relative pt-32 pb-20 md:pt-44 md:pb-28 overflow-hidden bg-white w-full border-b border-slate-200"
+      className="relative pt-32 pb-20 md:pt-40 md:pb-24 overflow-hidden bg-white w-full border-b border-slate-200"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Soft Green Gradient Overlay */}
       <div className="absolute inset-0 z-0 bg-gradient-to-b from-emerald-50/30 via-emerald-50/10 to-white pointer-events-none" />
 
-      {/* Grid Content Wrapper */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 flex flex-col md:flex-row items-center gap-12 w-full">
-        
-        {/* Lado Esquerdo: Textos do Slide Atual com transição suave */}
+      {/* Slider Window Container */}
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 w-full overflow-hidden">
         <div 
-          key={`text-${currentCourse.id}`} 
-          className="flex-1 flex flex-col gap-6 text-center md:text-left animate-in fade-in slide-in-from-left-4 duration-500"
+          className="flex transition-transform duration-500 ease-in-out"
+          style={{ transform: `translateX(-${activeIndex * 100}%)` }}
         >
-          {currentCourse.tipo === "vip" ? (
-            <span className="inline-flex max-w-fit mx-auto md:mx-0 items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-1.5 text-xs font-bold text-amber-700 ring-1 ring-inset ring-amber-600/10">
-              Curso VIP (Parceiros B2B)
-            </span>
-          ) : (
-            <span className="inline-flex max-w-fit mx-auto md:mx-0 items-center gap-1.5 rounded-full bg-emerald-50 px-3.5 py-1.5 text-xs font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/10">
-              Curso em Destaque
-            </span>
-          )}
-          
-          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-950 leading-tight tracking-tight min-h-[96px] md:min-h-[144px]">
-            {currentCourse.titulo}
-          </h1>
-          
-          <p className="text-base md:text-lg text-slate-605 leading-relaxed max-w-xl mx-auto md:mx-0 font-medium min-h-[72px]">
-            {currentCourse.descricao || "Domine novos conhecimentos e qualifique sua equipe de forma 100% prática."}
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start mt-2">
-            {currentCourse.demoLesson && (
-              <Link
-                href={`/demonstrativo/${currentCourse.demoLesson.id}`}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-8 py-3.5 font-bold text-white hover:bg-emerald-700 shadow-xl shadow-emerald-600/20 hover:shadow-2xl transform hover:-translate-y-0.5 transition-all cursor-pointer"
-                title="Assistir Aula Gratuita"
+          {courses.map((course) => {
+            const demoLesson = course.demoLesson;
+            return (
+              <div 
+                key={course.id} 
+                className="w-full shrink-0 flex-none grid md:grid-cols-12 gap-12 items-center min-h-[380px] md:min-h-[340px] pb-4"
               >
-                <Play className="h-5 w-5 fill-current" />
-                Aula Gratuita
-              </Link>
-            )}
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-205 bg-white px-8 py-3.5 font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transform hover:-translate-y-0.5 transition-all cursor-pointer"
-              title="Acessar Área do Aluno"
-            >
-              Área do Aluno
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-          </div>
-        </div>
-        
-        {/* Lado Direito: Imagem e link de preview do Slide Atual com transição suave */}
-        <div 
-          key={`img-${currentCourse.id}`}
-          className="flex-1 w-full max-w-md md:max-w-none relative aspect-video rounded-3xl overflow-hidden bg-slate-800 border-[10px] border-white shadow-2xl group animate-in fade-in slide-in-from-right-4 duration-500"
-        >
-          <img
-            src={currentCourse.imagemCapa || "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=600&auto=format&fit=crop"}
-            alt={currentCourse.titulo}
-            className="object-cover w-full h-full group-hover:scale-103 transition-transform duration-550"
-          />
-          {currentCourse.demoLesson && (
-            <Link 
-              href={`/demonstrativo/${currentCourse.demoLesson.id}`}
-              className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300 cursor-pointer"
-              title="Assistir Aula Demonstrativa"
-            >
-              <div className="h-16 w-16 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-xl transform scale-90 group-hover:scale-100 transition-all duration-300">
-                <Play className="h-6 w-6 fill-current translate-x-0.5" />
-              </div>
-            </Link>
-          )}
-        </div>
+                {/* Lado Esquerdo: Textos com min-heights calculados para tamanho fixo */}
+                <div className="md:col-span-6 flex flex-col gap-5 text-center md:text-left justify-center h-full">
+                  <div>
+                    {course.tipo === "vip" ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-[10px] font-bold text-amber-700 ring-1 ring-inset ring-amber-600/10 mb-3">
+                        Curso VIP (Parceiros B2B)
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/10 mb-3">
+                        Curso em Destaque
+                      </span>
+                    )}
+                    
+                    {/* Altura mínima rígida para o título para evitar redimensionamentos de layout */}
+                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-950 leading-tight tracking-tight line-clamp-2 min-h-[72px] md:min-h-[96px] lg:min-h-[120px]">
+                      {course.titulo}
+                    </h1>
+                  </div>
+                  
+                  {/* Altura mínima rígida para a descrição */}
+                  <p className="text-xs md:text-sm text-slate-550 leading-relaxed font-semibold line-clamp-3 min-h-[54px] md:min-h-[60px]">
+                    {course.descricao || "Domine novos conhecimentos e qualifique sua equipe de forma 100% prática."}
+                  </p>
+                  
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start mt-2">
+                    {demoLesson && (
+                      <Link
+                        href={`/demonstrativo/${demoLesson.id}`}
+                        className="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-6 py-3 text-xs font-bold text-white hover:bg-emerald-700 shadow-md shadow-emerald-600/15 hover:shadow-lg transform hover:-translate-y-0.5 transition-all cursor-pointer shrink-0"
+                        title="Assistir Aula Gratuita"
+                      >
+                        <Play className="h-4 w-4 fill-current" />
+                        Aula Gratuita
+                      </Link>
+                    )}
+                    <Link
+                      href="/dashboard"
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-205 bg-white px-6 py-3 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transform hover:-translate-y-0.5 transition-all cursor-pointer shrink-0"
+                      title="Acessar Área do Aluno"
+                    >
+                      Área do Aluno
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </div>
+                </div>
 
+                {/* Lado Direito: Imagem de Capa (Aspect Ratio fixo de vídeo) */}
+                <div className="md:col-span-6 w-full relative aspect-video rounded-3xl overflow-hidden bg-slate-800 border-[8px] border-white shadow-xl group">
+                  <img
+                    src={course.imagemCapa || "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=600&auto=format&fit=crop"}
+                    alt={course.titulo}
+                    className="object-cover w-full h-full group-hover:scale-102 transition-transform duration-500"
+                  />
+                  {demoLesson && (
+                    <Link 
+                      href={`/demonstrativo/${demoLesson.id}`}
+                      className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300 cursor-pointer"
+                      title="Assistir Aula Demonstrativa"
+                    >
+                      <div className="h-14 w-14 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-lg transform scale-95 group-hover:scale-100 transition-all duration-300">
+                        <Play className="h-5 w-5 fill-current translate-x-0.5" />
+                      </div>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Controles de Navegação Lateral (Visíveis ao pairar ou em dispositivos móveis se houver múltiplos slides) */}
+      {/* Controles de Navegação Lateral (Overlay) */}
       {courses.length > 1 && (
         <>
           <button
             type="button"
             onClick={handlePrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 h-11 w-11 rounded-full border border-slate-200 bg-white/90 backdrop-blur-xs flex items-center justify-center text-slate-700 shadow-md hover:bg-white transition-all cursor-pointer opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 h-11 w-11 rounded-full border border-slate-200 bg-white/90 backdrop-blur-xs flex items-center justify-center text-slate-700 shadow-md hover:bg-white transition-all cursor-pointer opacity-0 md:group-hover:opacity-100"
             style={{ opacity: isHovered ? 1 : 0 }}
             title="Slide Anterior"
           >
@@ -149,7 +158,7 @@ export default function HeroCarousel({ courses }: HeroCarouselProps) {
           <button
             type="button"
             onClick={handleNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 h-11 w-11 rounded-full border border-slate-200 bg-white/90 backdrop-blur-xs flex items-center justify-center text-slate-700 shadow-md hover:bg-white transition-all cursor-pointer opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 h-11 w-11 rounded-full border border-slate-200 bg-white/90 backdrop-blur-xs flex items-center justify-center text-slate-700 shadow-md hover:bg-white transition-all cursor-pointer opacity-0 md:group-hover:opacity-100"
             style={{ opacity: isHovered ? 1 : 0 }}
             title="Próximo Slide"
           >
