@@ -105,15 +105,20 @@ export default async function Home() {
         
         <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 flex flex-col md:flex-row items-center gap-12 w-full">
           <div className="flex-1 flex flex-col gap-6 text-center md:text-left">
-            <span className="inline-flex max-w-fit mx-auto md:mx-0 items-center gap-1.5 rounded-full bg-emerald-50 px-3.5 py-1.5 text-xs font-bold text-emerald-700">
-              Conhecimento que Transforma
-            </span>
-            <h1 className="text-4xl md:text-6xl font-extrabold text-slate-950 leading-tight tracking-tight">
-              Educação Profissional em <br className="hidden md:inline" />
-              <span className="text-emerald-600">Gestão de Resíduos</span>
+            {featuredCourse.tipo === "vip" ? (
+              <span className="inline-flex max-w-fit mx-auto md:mx-0 items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-1.5 text-xs font-bold text-amber-700">
+                Curso VIP (Parceiros B2B)
+              </span>
+            ) : (
+              <span className="inline-flex max-w-fit mx-auto md:mx-0 items-center gap-1.5 rounded-full bg-emerald-50 px-3.5 py-1.5 text-xs font-bold text-emerald-700">
+                Curso em Destaque
+              </span>
+            )}
+            <h1 className="text-4xl md:text-5xl font-extrabold text-slate-950 leading-tight tracking-tight">
+              {featuredCourse.titulo}
             </h1>
             <p className="text-base md:text-lg text-slate-600 leading-relaxed max-w-xl mx-auto md:mx-0 font-medium">
-              A SISGR Academy qualifica o mercado e treina sua equipe para reduzir chamados de suporte, garantir conformidade legal com a PNRS e otimizar processos de triagem e reciclagem.
+              {featuredCourse.descricao || "Domine novos conhecimentos e qualifique sua equipe de forma 100% prática."}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
               {demoLesson && (
