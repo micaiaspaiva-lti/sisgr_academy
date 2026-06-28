@@ -44,6 +44,10 @@ export default async function DemonstrativoPage({ params }: PageProps) {
     redirect("/");
   }
 
+  if (currentCourse.tipo === "vip") {
+    redirect("/login");
+  }
+
   // Buscar todos os módulos deste curso
   const courseModules = await db.query.modulos.findMany({
     where: eq(modulos.cursoId, currentCourse.id),
