@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Play, CheckCircle2, BookOpen } from "lucide-react";
+import { ArrowRight, Play, CheckCircle2, BookOpen, UserCheck, Tv, Award, ShieldCheck, Users } from "lucide-react";
 import CoursesDirectory from "./CoursesDirectory";
 import HeroCarousel from "./HeroCarousel";
 import { db } from "@/db";
@@ -163,7 +163,91 @@ export default async function Home() {
       <HeroCarousel courses={featuredCoursesData} />
 
       {/* Courses Grid */}
-      <main className="flex-grow py-20 px-6 md:px-12 w-full max-w-7xl mx-auto">
+      <main className="flex-grow py-20 px-6 md:px-12 w-full max-w-7xl mx-auto flex flex-col gap-24">
+        
+        {/* Seção Como Funciona e Público-Alvo */}
+        <section className="scroll-mt-24">
+          
+          {/* Bloco de Público-Alvo: Público Geral vs SISGR SSO */}
+          <div className="grid md:grid-cols-2 gap-8 mb-20">
+            <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col gap-4 hover:shadow-md transition-shadow">
+              <div className="h-12 w-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 shadow-2xs">
+                <Users className="h-6 w-6" />
+              </div>
+              <h3 className="text-lg font-black text-slate-900">Público Geral</h3>
+              <p className="text-xs font-semibold text-slate-550 leading-relaxed">
+                Quer alavancar sua carreira ou se especializar no setor de sustentabilidade? Explore nossos cursos públicos de alta qualidade e assista a aulas demonstrativas gratuitamente para começar imediatamente.
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-3xl border border-amber-200 p-8 shadow-sm flex flex-col gap-4 relative overflow-hidden hover:shadow-md transition-shadow">
+              <div className="absolute top-0 right-0 bg-amber-500 text-[9px] font-black text-white px-3 py-1 rounded-bl-xl uppercase tracking-wider">
+                Corporativo SSO
+              </div>
+              <div className="h-12 w-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-705 shadow-2xs">
+                <ShieldCheck className="h-6 w-6" />
+              </div>
+              <h3 className="text-lg font-black text-slate-900">Clientes ERP SISGR</h3>
+              <p className="text-xs font-semibold text-slate-555 leading-relaxed">
+                Aproveite a integração nativa com o <strong>SISGR - Sistema de Gestão de Resíduos</strong>. Faça login unificado via SSO corporativo para liberar capacitações VIP e treinamentos exclusivos para sua equipe.
+              </p>
+            </div>
+          </div>
+
+          {/* Bloco de Etapas / Como Funciona */}
+          <div className="text-center max-w-xl mx-auto mb-14">
+            <span className="text-3xs font-extrabold text-emerald-600 uppercase tracking-widest block mb-2">Simples & Direto</span>
+            <h2 className="text-3xl font-black text-slate-950 leading-tight mb-4">Qualifique-se em 3 Etapas</h2>
+            <p className="text-xs font-bold text-slate-500 leading-relaxed">
+              Uma trilha de aprendizado focada em resultados rápidos, materiais complementares e emissão de certificados válidos.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Passo 1 */}
+            <div className="flex flex-col items-center text-center p-6 bg-white rounded-3xl border border-slate-200 shadow-3xs relative">
+              <div className="absolute -top-4 bg-emerald-600 text-xs font-black text-white h-8 w-8 rounded-full flex items-center justify-center shadow-md">
+                1
+              </div>
+              <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center text-emerald-650 mb-4 mt-2">
+                <UserCheck className="h-5 w-5" />
+              </div>
+              <h4 className="text-sm font-extrabold text-slate-900 mb-2">1. Escolha ou Faça Login</h4>
+              <p className="text-3xs font-semibold text-slate-500 leading-relaxed max-w-[220px]">
+                Navegue pelas especializações públicas ou faça login corporativo (SSO) caso sua organização seja parceira do ERP SISGR.
+              </p>
+            </div>
+
+            {/* Passo 2 */}
+            <div className="flex flex-col items-center text-center p-6 bg-white rounded-3xl border border-slate-205 shadow-3xs relative">
+              <div className="absolute -top-4 bg-emerald-600 text-xs font-black text-white h-8 w-8 rounded-full flex items-center justify-center shadow-md">
+                2
+              </div>
+              <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center text-emerald-655 mb-4 mt-2">
+                <Tv className="h-5 w-5" />
+              </div>
+              <h4 className="text-sm font-extrabold text-slate-900 mb-2">2. Estude e Baixe Anexos</h4>
+              <p className="text-3xs font-semibold text-slate-500 leading-relaxed max-w-[220px]">
+                Assista às videoaulas em alta resolução no player integrado e baixe materiais e apostilas de apoio para aprofundar.
+              </p>
+            </div>
+
+            {/* Passo 3 */}
+            <div className="flex flex-col items-center text-center p-6 bg-white rounded-3xl border border-slate-200 shadow-3xs relative">
+              <div className="absolute -top-4 bg-emerald-600 text-xs font-black text-white h-8 w-8 rounded-full flex items-center justify-center shadow-md">
+                3
+              </div>
+              <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center text-emerald-660 mb-4 mt-2">
+                <Award className="h-5 w-5" />
+              </div>
+              <h4 className="text-sm font-extrabold text-slate-900 mb-2">3. Emita o Certificado</h4>
+              <p className="text-3xs font-semibold text-slate-500 leading-relaxed max-w-[220px]">
+                Conclua todas as aulas do curso para liberar o download do seu certificado digital de conclusão reconhecido pelo mercado.
+              </p>
+            </div>
+          </div>
+        </section>
+
         <CoursesDirectory courses={activeCourses} />
       </main>
 
