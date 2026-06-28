@@ -282,7 +282,10 @@ export default function PlayerClient({
                 {activeTab === "apoio" && (
                   <div className="prose max-w-none text-sm text-slate-650 leading-relaxed">
                     {currentLesson.descricaoApoio ? (
-                      <div dangerouslySetInnerHTML={{ __html: currentLesson.descricaoApoio }} />
+                      <div 
+                        style={{ whiteSpace: "pre-wrap" }}
+                        dangerouslySetInnerHTML={{ __html: currentLesson.descricaoApoio }} 
+                      />
                     ) : (
                       <p className="text-slate-400 italic">Nenhum texto de apoio cadastrado para esta aula.</p>
                     )}

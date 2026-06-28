@@ -1353,6 +1353,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                       {newLessonDesc.trim() ? (
                         <div 
                           className="text-xs text-slate-750 font-medium leading-relaxed"
+                          style={{ whiteSpace: "pre-wrap" }}
                           dangerouslySetInnerHTML={{ __html: newLessonDesc }} 
                         />
                       ) : (
@@ -1635,6 +1636,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                       {editLessonDesc.trim() ? (
                         <div 
                           className="text-xs text-slate-750 font-medium leading-relaxed"
+                          style={{ whiteSpace: "pre-wrap" }}
                           dangerouslySetInnerHTML={{ __html: editLessonDesc }} 
                         />
                       ) : (

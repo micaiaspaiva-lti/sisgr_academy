@@ -395,6 +395,7 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
               </h1>
               <div 
                 className="text-slate-650 leading-relaxed font-medium text-sm prose prose-sm max-w-none"
+                style={{ whiteSpace: "pre-wrap" }}
                 dangerouslySetInnerHTML={{ __html: lesson.descricaoApoio }}
               />
 
