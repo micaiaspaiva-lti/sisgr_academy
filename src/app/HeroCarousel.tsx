@@ -61,7 +61,7 @@ export default function HeroCarousel({ courses }: HeroCarouselProps) {
 
     timerRef.current = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % courses.length);
-    }, 6000); // Muda a cada 6 segundos
+    }, 5000); // Muda a cada 5 segundos
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);

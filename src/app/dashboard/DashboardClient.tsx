@@ -204,14 +204,14 @@ export default function DashboardClient({ session, courses }: DashboardClientPro
             {filteredCourses.map((course) => (
               <div 
                 key={course.id}
-                className="flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition-all hover:-translate-y-0.5 duration-200"
+                className="flex flex-col rounded-3xl border border-slate-200 overflow-hidden bg-white shadow-xl shadow-emerald-500/3 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
               >
                 {/* Capa */}
-                <div className="relative aspect-video">
+                <div className="relative w-full aspect-video overflow-hidden">
                   <img
                     src={getCourseImage(course)}
                     alt={course.titulo}
-                    className="object-cover w-full h-full"
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                   {course.isLocked && (
                     <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center">
@@ -229,8 +229,8 @@ export default function DashboardClient({ session, courses }: DashboardClientPro
                 </div>
                 
                 {/* Conteúdo */}
-                <div className="p-5 flex-1 flex flex-col justify-between gap-4">
-                  <div className="flex flex-col gap-2">
+                <div className="p-6 flex-1 flex flex-col justify-between gap-6">
+                  <div className="flex flex-col gap-3">
                     <div className="flex justify-between items-center">
                       <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${
                         course.tipo === "vip" 
@@ -245,11 +245,11 @@ export default function DashboardClient({ session, courses }: DashboardClientPro
                         </span>
                       )}
                     </div>
-                    <h3 className="text-base font-bold text-slate-850 line-clamp-2 min-h-[3rem]" title={course.titulo}>
+                    <h3 className="text-base font-extrabold text-slate-950 line-clamp-1" title={course.titulo}>
                       {course.titulo}
                     </h3>
-                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
-                      {course.descricao}
+                    <p className="text-xs text-slate-500 line-clamp-3 leading-relaxed font-semibold">
+                      {course.descricao || "Sem descrição disponível."}
                     </p>
                   </div>
 
@@ -270,21 +270,21 @@ export default function DashboardClient({ session, courses }: DashboardClientPro
                   )}
 
                   {/* Botões de Ação */}
-                  <div className="flex flex-col gap-3 border-t border-slate-100 pt-4">
+                  <div className="flex gap-4 items-center border-t border-slate-200 pt-4">
                     {course.isLocked ? (
                       <a
                         href="https://sisgr.com.br/contato"
                         target="_blank"
-                        className="flex-grow inline-flex items-center justify-center gap-2 rounded-lg bg-slate-100 hover:bg-slate-200 px-4 py-2.5 text-xs font-bold text-purple-700 border border-purple-200/30 transition-all text-center"
+                        className="flex-grow inline-flex items-center justify-center gap-2 rounded-xl bg-slate-150 hover:bg-slate-200 px-4 py-2.5 text-xs font-bold text-purple-750 border border-purple-200/30 transition-all text-center"
                         title="Fale conosco para liberar o conteúdo VIP"
                       >
-                        <Lock className="h-3.5 w-3.5 text-purple-600" />
+                        <Lock className="h-3.5 w-3.5 text-purple-650" />
                         Liberar Acesso VIP
                       </a>
                     ) : course.progresso === 100 ? (
                       <Link
                         href={`/api/certificados/emitir?cursoId=${course.id}`}
-                        className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2.5 text-xs font-bold text-white hover:opacity-90 transition-opacity"
+                        className="flex-grow inline-flex items-center justify-center gap-2 rounded-xl bg-purple-600 px-4 py-2.5 text-xs font-bold text-white hover:opacity-90 transition-opacity shadow-md shadow-purple-500/10"
                         target="_blank"
                         title="Baixar Certificado"
                       >
@@ -297,7 +297,7 @@ export default function DashboardClient({ session, courses }: DashboardClientPro
                           ? `/player/${course.proximaAulaId}`
                           : `/player/${course.proximaAulaId || (course.modulos[0]?.aulas[0]?.id)}`
                         }
-                        className="flex-grow inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-emerald-700 transition-colors"
+                        className="flex-grow inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-emerald-700 transition-colors shadow-md shadow-emerald-500/10"
                         title={course.progresso > 0 ? "Continuar Curso" : "Iniciar Curso"}
                       >
                         <Play className="h-3.5 w-3.5 fill-current" />
