@@ -9,7 +9,27 @@ import {
   Play, BookOpen, Award, CheckCircle2, 
   Sparkles, LogOut, Clock, Lock 
 } from "lucide-react";
+function getYouTubeVideoId(url: string): string | null {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  if (match && match[2].length === 11) {
+    return match[2];
+  }
+  return null;
+}
 
+function getCourseImage(course: any): string {
+  for (const m of course.modulos || []) {
+    for (const a of m.aulas || []) {
+      const ytid = getYouTubeVideoId(a.videoUrl);
+      if (ytid) {
+        return `https://img.youtube.com/vi/${ytid}/hqdefault.jpg`;
+      }
+    }
+  }
+  return course.imagemCapa || "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=600&auto=format&fit=crop";
+}
 export const metadata = {
   title: "Dashboard do Aluno - SISGR Academy",
   description: "Acompanhe seus cursos de gestão de resíduos, progresso de aulas e conquistas de certificados.",
@@ -191,7 +211,7 @@ export default async function Dashboard() {
               >
                 <div className="relative aspect-video">
                   <img
-                    src={course.imagemCapa || undefined}
+                    src={getCourseImage(course)}
                     alt={course.titulo}
                     className="object-cover w-full h-full"
                   />
