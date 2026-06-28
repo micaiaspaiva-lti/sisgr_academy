@@ -60,6 +60,7 @@ export default async function Home() {
   // Busca os cursos ativos do banco de dados relacionalmente
   const activeCourses = await db.query.cursos.findMany({
     where: eq(cursos.ativo, true),
+    orderBy: (cursos, { asc, desc }) => [asc(cursos.ordem), desc(cursos.createdAt)],
     with: {
       modulos: {
         orderBy: (modulos, { asc }) => [asc(modulos.ordem)],
@@ -134,7 +135,7 @@ export default async function Home() {
     );
   }
 
-  const featuredCourse = activeCourses.find(c => c.tipo === "publico") || activeCourses[0];
+  const featuredCourse = activeCourses.find(c => c.destaque) || activeCourses.find(c => c.tipo === "publico") || activeCourses[0];
   const otherCourses = activeCourses.filter(c => c.id !== featuredCourse.id);
 
   // Primeira aula demonstrativa do curso em destaque (apenas cursos Públicos possuem aulas demonstrativas para visitantes; cursos VIP exigem SSO/login)

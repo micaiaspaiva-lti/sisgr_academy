@@ -18,7 +18,10 @@ import {
   resetDatabaseToSeedAction,
   updateCursoAction,
   updateAulaAction,
-  createModuloAction
+  createModuloAction,
+  setCursoDestaqueAction,
+  moveCursoAction,
+  moveModuloAction
 } from "@/app/actions";
 import { logoutAdminAction } from "@/lib/auth-admin";
 
@@ -51,6 +54,8 @@ interface Course {
   imagemCapa: string;
   ativo: boolean;
   tipo: "publico" | "vip";
+  destaque: boolean;
+  ordem: number;
   modulos: Module[];
 }
 
@@ -419,6 +424,8 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
         imagemCapa: res.course.imagemCapa || "",
         ativo: res.course.ativo,
         tipo: (res.course.tipo || "publico") as "publico" | "vip",
+        destaque: res.course.destaque || false,
+        ordem: res.course.ordem || 1,
         modulos: [
           {
             id: res.module?.id || "m-dummy",
@@ -576,6 +583,60 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       setCourses(prev => prev.map(c => c.id === course.id ? updated : c));
     } else {
       toast.error("Erro ao alterar status do curso.");
+    }
+  };
+
+  const handleMoveCourse = async (cursoId: string, direction: "up" | "down") => {
+    try {
+      const res = await moveCursoAction(cursoId, direction);
+      if (res.success) {
+        toast.success("Ordem do curso atualizada!");
+        setCourses(prev => {
+          const index = prev.findIndex(c => c.id === cursoId);
+          if (index === -1) return prev;
+          const targetIndex = direction === "up" ? index - 1 : index + 1;
+          if (targetIndex < 0 || targetIndex >= prev.length) return prev;
+          
+          const updated = [...prev];
+          const temp = updated[index];
+          updated[index] = updated[targetIndex];
+          updated[targetIndex] = temp;
+          return updated;
+        });
+      } else {
+        toast.error(res.error || "Erro ao reordenar curso");
+      }
+    } catch (err) {
+      toast.error("Erro de conexão");
+    }
+  };
+
+  const handleMoveModule = async (moduloId: string, direction: "up" | "down") => {
+    try {
+      const res = await moveModuloAction(moduloId, direction);
+      if (res.success) {
+        toast.success("Ordem do módulo atualizada!");
+        if (selectedCourse) {
+          const updatedModulos = [...(selectedCourse.modulos || [])];
+          const index = updatedModulos.findIndex(m => m.id === moduloId);
+          if (index !== -1) {
+            const targetIndex = direction === "up" ? index - 1 : index + 1;
+            if (targetIndex >= 0 && targetIndex < updatedModulos.length) {
+              const temp = updatedModulos[index];
+              updatedModulos[index] = updatedModulos[targetIndex];
+              updatedModulos[targetIndex] = temp;
+              
+              const updatedCourse = { ...selectedCourse, modulos: updatedModulos };
+              setSelectedCourse(updatedCourse);
+              setCourses(prev => prev.map(c => c.id === selectedCourse.id ? updatedCourse : c));
+            }
+          }
+        }
+      } else {
+        toast.error(res.error || "Erro ao reordenar módulo");
+      }
+    } catch (err) {
+      toast.error("Erro de conexão");
     }
   };
 
@@ -767,48 +828,80 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
             </div>
 
             <div className="flex flex-col gap-2">
-              {courses.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => setSelectedCourse(c)}
-                  className={`w-full text-left p-3 rounded-xl border text-xs font-bold transition-all flex gap-3 items-center ${
-                    selectedCourse?.id === c.id
-                      ? "border-duet-brand bg-duet-brand-light text-emerald-800"
-                      : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-                  }`}
-                >
-                  {c.imagemCapa && (
-                    <img 
-                      src={c.imagemCapa} 
-                      alt="" 
-                      className="h-10 w-16 object-cover rounded-lg border border-slate-200 shrink-0 shadow-2xs"
-                    />
-                  )}
-                  <div className="flex flex-col gap-1 flex-grow min-w-0">
-                    <div className="flex justify-between items-center w-full gap-2">
-                      <span className={`line-clamp-1 flex-grow ${!c.ativo ? "text-slate-400 line-through decoration-slate-300" : ""}`}>{c.titulo}</span>
-                      <div className="flex gap-1 items-center shrink-0">
-                        {!c.ativo && (
-                          <span className="inline-flex shrink-0 items-center rounded-md bg-slate-100 px-1.5 py-0.5 text-[8px] font-bold text-slate-550 border border-slate-200 uppercase tracking-wider">
-                            Rascunho
-                          </span>
-                        )}
-                        {c.tipo === "vip" ? (
-                          <span className="inline-flex shrink-0 items-center rounded-md bg-amber-50 px-1 py-0.5 text-[8px] font-bold text-amber-700 ring-1 ring-inset ring-amber-600/10 uppercase tracking-wider">
-                            VIP
-                          </span>
-                        ) : (
-                          <span className="inline-flex shrink-0 items-center rounded-md bg-emerald-50 px-1 py-0.5 text-[8px] font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/10 uppercase tracking-wider">
-                            Púb
-                          </span>
-                        )}
+              {courses.map((c, idx) => (
+                <div key={c.id} className="flex items-center gap-1.5 w-full group">
+                  <button
+                    onClick={() => setSelectedCourse(c)}
+                    className={`flex-grow text-left p-3 rounded-xl border text-xs font-bold transition-all flex gap-3 items-center min-w-0 ${
+                      selectedCourse?.id === c.id
+                        ? "border-duet-brand bg-duet-brand-light text-emerald-800"
+                        : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    {c.imagemCapa && (
+                      <img 
+                        src={c.imagemCapa} 
+                        alt="" 
+                        className="h-10 w-16 object-cover rounded-lg border border-slate-200 shrink-0 shadow-2xs"
+                      />
+                    )}
+                    <div className="flex flex-col gap-1 flex-grow min-w-0">
+                      <div className="flex justify-between items-center w-full gap-2">
+                        <span className={`line-clamp-1 flex-grow ${!c.ativo ? "text-slate-400 line-through decoration-slate-300" : ""}`}>{c.titulo}</span>
+                        <div className="flex gap-1 items-center shrink-0">
+                          {c.destaque && (
+                            <span className="inline-flex shrink-0 items-center rounded-md bg-purple-50 px-1 py-0.5 text-[8px] font-bold text-purple-700 ring-1 ring-inset ring-purple-600/10 uppercase tracking-wider">
+                              ★
+                            </span>
+                          )}
+                          {!c.ativo && (
+                            <span className="inline-flex shrink-0 items-center rounded-md bg-slate-100 px-1.5 py-0.5 text-[8px] font-bold text-slate-550 border border-slate-200 uppercase tracking-wider">
+                              Rascunho
+                            </span>
+                          )}
+                          {c.tipo === "vip" ? (
+                            <span className="inline-flex shrink-0 items-center rounded-md bg-amber-50 px-1 py-0.5 text-[8px] font-bold text-amber-700 ring-1 ring-inset ring-amber-600/10 uppercase tracking-wider">
+                              VIP
+                            </span>
+                          ) : (
+                            <span className="inline-flex shrink-0 items-center rounded-md bg-emerald-50 px-1 py-0.5 text-[8px] font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/10 uppercase tracking-wider">
+                              Púb
+                            </span>
+                          )}
+                        </div>
                       </div>
+                      <span className="text-3xs font-medium text-slate-400">
+                        {c.modulos?.length || 0} Módulos • {c.modulos?.reduce((acc, curr) => acc + (curr.aulas?.length || 0), 0) || 0} Aulas
+                      </span>
                     </div>
-                    <span className="text-3xs font-medium text-slate-400">
-                      {c.modulos?.length || 0} Módulos • {c.modulos?.reduce((acc, curr) => acc + (curr.aulas?.length || 0), 0) || 0} Aulas
-                    </span>
+                  </button>
+                  <div className="flex flex-col gap-1 shrink-0">
+                    <button
+                      type="button"
+                      disabled={idx === 0}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMoveCourse(c.id, "up");
+                      }}
+                      className="p-1 rounded-md border border-slate-200 hover:bg-slate-50 text-slate-400 hover:text-slate-700 disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer transition-colors bg-white shadow-3xs"
+                      title="Mover Curso para Cima"
+                    >
+                      <span className="text-[10px] block leading-none select-none">▲</span>
+                    </button>
+                    <button
+                      type="button"
+                      disabled={idx === courses.length - 1}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMoveCourse(c.id, "down");
+                      }}
+                      className="p-1 rounded-md border border-slate-200 hover:bg-slate-50 text-slate-400 hover:text-slate-700 disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer transition-colors bg-white shadow-3xs"
+                      title="Mover Curso para Baixo"
+                    >
+                      <span className="text-[10px] block leading-none select-none">▼</span>
+                    </button>
                   </div>
-                </button>
+                </div>
               ))}
             </div>
           </div>
@@ -848,6 +941,11 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                           Rascunho
                         </span>
                       )}
+                      {selectedCourse.destaque && (
+                        <span className="inline-flex items-center rounded-md bg-purple-50 px-2 py-0.5 text-[10px] font-extrabold text-purple-700 ring-1 ring-inset ring-purple-600/20 uppercase tracking-wider">
+                          ★ Destaque
+                        </span>
+                      )}
                     </div>
                     <h1 className="text-2xl font-black text-slate-950 leading-tight truncate">{selectedCourse.titulo}</h1>
                     {selectedCourse.descricao && (
@@ -857,6 +955,38 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                 </div>
 
                 <div className="flex gap-2 shrink-0">
+                  {/* Botão Destaque */}
+                  <button
+                    onClick={async () => {
+                      try {
+                        const res = await setCursoDestaqueAction(selectedCourse.id);
+                        if (res.success) {
+                          toast.success("Curso definido como destaque na Landing Page!");
+                          setCourses(prev =>
+                            prev.map(c => ({
+                              ...c,
+                              destaque: c.id === selectedCourse.id,
+                            }))
+                          );
+                          setSelectedCourse(prev => prev ? { ...prev, destaque: true } : null);
+                        } else {
+                          toast.error(res.error || "Erro ao definir destaque");
+                        }
+                      } catch (err) {
+                        toast.error("Erro de conexão");
+                      }
+                    }}
+                    className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-bold transition-colors cursor-pointer ${
+                      selectedCourse.destaque
+                        ? "border-purple-250 bg-purple-50 hover:bg-purple-100 text-purple-800"
+                        : "border-slate-300 bg-white hover:bg-slate-50 text-slate-700"
+                    }`}
+                    title="Definir como o destaque principal na Landing Page"
+                  >
+                    <Sparkles className={`h-3.5 w-3.5 ${selectedCourse.destaque ? "text-purple-600 fill-purple-650" : "text-slate-400"}`} />
+                    {selectedCourse.destaque ? "Destaque" : "Destacar"}
+                  </button>
+
                   <button
                     onClick={() => {
                       setEditCourseTitle(selectedCourse.titulo);
@@ -911,25 +1041,50 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                   </button>
                 </div>
 
-                {selectedCourse.modulos?.map((modulo) => (
+                {selectedCourse.modulos?.map((modulo, modIdx) => (
                   <div key={modulo.id} className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
                     {/* Módulo Header */}
                     <div className="bg-slate-100 px-6 py-4 flex justify-between items-center border-b border-slate-200">
-                      <div className="flex items-center gap-3">
-                        <Folder className="h-5 w-5 text-emerald-600" />
-                        <span className="font-bold text-sm text-slate-800">{modulo.titulo}</span>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <Folder className="h-5 w-5 text-emerald-600 shrink-0" />
+                        <span className="font-bold text-sm text-slate-800 truncate">{modulo.titulo}</span>
                       </div>
-                      <button
-                        onClick={() => {
-                          setTargetModuleId(modulo.id);
-                          setIsCreatingLesson(true);
-                        }}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-200 text-slate-600 text-3xs font-bold bg-white transition-colors cursor-pointer"
-                        title="Adicionar Aula a este Módulo"
-                      >
-                        <Plus className="h-3 w-3" />
-                        Nova Aula
-                      </button>
+                      
+                      <div className="flex items-center gap-2 shrink-0">
+                        {/* Botões de Reordenação do Módulo */}
+                        <div className="flex gap-1 mr-1">
+                          <button
+                            type="button"
+                            disabled={modIdx === 0}
+                            onClick={() => handleMoveModule(modulo.id, "up")}
+                            className="p-1 rounded-md border border-slate-300 bg-white hover:bg-slate-200 text-slate-500 disabled:opacity-30 disabled:hover:bg-white disabled:cursor-not-allowed cursor-pointer transition-colors shadow-3xs"
+                            title="Mover Módulo para Cima"
+                          >
+                            <span className="text-[9px] block px-0.5 leading-none select-none">▲</span>
+                          </button>
+                          <button
+                            type="button"
+                            disabled={modIdx === (selectedCourse.modulos?.length || 0) - 1}
+                            onClick={() => handleMoveModule(modulo.id, "down")}
+                            className="p-1 rounded-md border border-slate-300 bg-white hover:bg-slate-200 text-slate-500 disabled:opacity-30 disabled:hover:bg-white disabled:cursor-not-allowed cursor-pointer transition-colors shadow-3xs"
+                            title="Mover Módulo para Baixo"
+                          >
+                            <span className="text-[9px] block px-0.5 leading-none select-none">▼</span>
+                          </button>
+                        </div>
+
+                        <button
+                          onClick={() => {
+                            setTargetModuleId(modulo.id);
+                            setIsCreatingLesson(true);
+                          }}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-200 text-slate-600 text-3xs font-bold bg-white transition-colors cursor-pointer shadow-3xs"
+                          title="Adicionar Aula a este Módulo"
+                        >
+                          <Plus className="h-3 w-3" />
+                          Nova Aula
+                        </button>
+                      </div>
                     </div>
 
                     {/* Listagem de Aulas */}

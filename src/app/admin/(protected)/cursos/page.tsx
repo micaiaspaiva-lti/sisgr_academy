@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function CMSAdminPage() {
   // Busca todos os cursos, módulos e aulas ordenados para o painel CMS
   const allCourses = await db.query.cursos.findMany({
-    orderBy: (cursos, { desc }) => [desc(cursos.createdAt)],
+    orderBy: (cursos, { asc, desc }) => [asc(cursos.ordem), desc(cursos.createdAt)],
     with: {
       modulos: {
         orderBy: (modulos, { asc }) => [asc(modulos.ordem)],
@@ -32,6 +32,8 @@ export default async function CMSAdminPage() {
     imagemCapa: course.imagemCapa || "",
     ativo: course.ativo,
     tipo: course.tipo as "publico" | "vip",
+    destaque: course.destaque,
+    ordem: course.ordem,
     modulos: course.modulos.map(m => ({
       id: m.id,
       cursoId: m.cursoId,

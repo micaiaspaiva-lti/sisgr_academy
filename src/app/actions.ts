@@ -129,6 +129,7 @@ export async function triggerIAAutomationAction(aulaId: string) {
 // 6. Criar um novo curso demonstrativo
 export async function createCursoAction(titulo: string, descricao: string, tipo: "publico" | "vip" = "publico", imagemCapa?: string) {
   try {
+    const existingCursos = await db.select().from(cursos);
     const [newCourse] = await db
       .insert(cursos)
       .values({
@@ -137,6 +138,8 @@ export async function createCursoAction(titulo: string, descricao: string, tipo:
         imagemCapa: imagemCapa?.trim() || "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=600&auto=format&fit=crop",
         ativo: true,
         tipo,
+        ordem: existingCursos.length + 1,
+        destaque: false,
       })
       .returning();
       
@@ -674,5 +677,92 @@ export async function alunoLoginAction(email: string, senhaInserida: string) {
   } catch (error) {
     console.error("Erro ao autenticar aluno:", error);
     return { success: false, error: "Ocorreu um erro interno de login." };
+  }
+}
+
+// 12. Definir curso em destaque
+export async function setCursoDestaqueAction(cursoId: string) {
+  try {
+    await db.transaction(async (tx) => {
+      await tx.update(cursos).set({ destaque: false });
+      await tx.update(cursos).set({ destaque: true }).where(eq(cursos.id, cursoId));
+    });
+
+    revalidatePath("/admin/cursos");
+    revalidatePath("/");
+    revalidatePath("/dashboard");
+    return { success: true };
+  } catch (error) {
+    console.error("Erro ao definir curso em destaque:", error);
+    return { success: false, error: "Falha ao definir destaque" };
+  }
+}
+
+// 13. Mover posição do curso (para cima/baixo)
+export async function moveCursoAction(cursoId: string, direction: "up" | "down") {
+  try {
+    const allCourses = await db.select().from(cursos).orderBy(cursos.ordem);
+    const currentIndex = allCourses.findIndex(c => c.id === cursoId);
+    if (currentIndex === -1) return { success: false, error: "Curso não encontrado" };
+
+    const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= allCourses.length) {
+      return { success: false, error: "Movimento inválido" };
+    }
+
+    const currentCourse = allCourses[currentIndex];
+    const targetCourse = allCourses[targetIndex];
+
+    await db.transaction(async (tx) => {
+      await tx.update(cursos).set({ ordem: targetCourse.ordem }).where(eq(cursos.id, currentCourse.id));
+      await tx.update(cursos).set({ ordem: currentCourse.ordem }).where(eq(cursos.id, targetCourse.id));
+    });
+
+    revalidatePath("/admin/cursos");
+    revalidatePath("/");
+    revalidatePath("/dashboard");
+    return { success: true };
+  } catch (error) {
+    console.error("Erro ao reordenar curso:", error);
+    return { success: false, error: "Falha ao reordenar curso" };
+  }
+}
+
+// 14. Mover posição do módulo (para cima/baixo)
+export async function moveModuloAction(moduloId: string, direction: "up" | "down") {
+  try {
+    const currentModule = await db.query.modulos.findFirst({
+      where: eq(modulos.id, moduloId)
+    });
+    if (!currentModule) return { success: false, error: "Módulo não encontrado" };
+
+    const allModules = await db
+      .select()
+      .from(modulos)
+      .where(eq(modulos.cursoId, currentModule.cursoId))
+      .orderBy(modulos.ordem);
+
+    const currentIndex = allModules.findIndex(m => m.id === moduloId);
+    if (currentIndex === -1) return { success: false, error: "Módulo não encontrado" };
+
+    const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= allModules.length) {
+      return { success: false, error: "Movimento inválido" };
+    }
+
+    const targetModule = allModules[targetIndex];
+
+    await db.transaction(async (tx) => {
+      await tx.update(modulos).set({ ordem: targetModule.ordem }).where(eq(modulos.id, currentModule.id));
+      await tx.update(modulos).set({ ordem: currentModule.ordem }).where(eq(modulos.id, targetModule.id));
+    });
+
+    revalidatePath("/admin/cursos");
+    revalidatePath("/");
+    revalidatePath("/dashboard");
+    return { success: true };
+  } catch (error) {
+    console.error("Erro ao reordenar módulo:", error);
+    return { success: false, error: "Falha ao reordenar módulo" };
   }
 }

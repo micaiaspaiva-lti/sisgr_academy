@@ -26,6 +26,8 @@ export const cursos = pgTable("cursos", {
   imagemCapa: varchar("imagem_capa", { length: 512 }),
   ativo: boolean("ativo").default(true).notNull(),
   tipo: varchar("tipo", { length: 20 }).default("publico").notNull(),
+  destaque: boolean("destaque").default(false).notNull(),
+  ordem: integer("ordem").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
