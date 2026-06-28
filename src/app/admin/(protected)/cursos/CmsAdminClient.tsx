@@ -1350,26 +1350,10 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                         id="newLessonDescTextarea"
                         value={newLessonDesc}
                         onChange={e => setNewLessonDesc(e.target.value)}
-                        rows={4}
+                        rows={12}
                         placeholder="Escreva a descrição, conteúdo ou links de apoio da aula utilizando HTML para formatação..."
-                        className="rounded-b-lg border-x border-b border-slate-300 p-3 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 font-mono"
+                        className="rounded-b-lg border-x border-b border-slate-300 p-3 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 font-mono flex-grow min-h-[220px]"
                       />
-                    </div>
-
-                    {/* Live Preview Container */}
-                    <div className="flex flex-col gap-1.5 flex-1">
-                      <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider">Visualização em Tempo Real (Aluno)</span>
-                      <div className="border border-slate-200 rounded-xl p-4 bg-slate-55 min-h-[100px] max-h-[180px] overflow-y-auto shadow-3xs prose prose-sm max-w-none">
-                        {newLessonDesc.trim() ? (
-                          <div 
-                            className="text-xs text-slate-750 font-medium leading-relaxed"
-                            style={{ whiteSpace: "pre-wrap" }}
-                            dangerouslySetInnerHTML={{ __html: newLessonDesc }} 
-                          />
-                        ) : (
-                          <p className="text-xs text-slate-400 italic">Escreva acima para visualizar a renderização formatada...</p>
-                        )}
-                      </div>
                     </div>
                   </div>
 
@@ -1643,26 +1627,10 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                         id="editLessonDescTextarea"
                         value={editLessonDesc}
                         onChange={e => setEditLessonDesc(e.target.value)}
-                        rows={4}
+                        rows={12}
                         placeholder="Escreva a descrição, conteúdo ou links de apoio da aula utilizando HTML para formatação..."
-                        className="rounded-b-lg border-x border-b border-slate-300 p-3 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 font-mono"
+                        className="rounded-b-lg border-x border-b border-slate-300 p-3 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 font-mono flex-grow min-h-[220px]"
                       />
-                    </div>
-
-                    {/* Live Preview Container */}
-                    <div className="flex flex-col gap-1.5 flex-1">
-                      <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider">Visualização em Tempo Real (Aluno)</span>
-                      <div className="border border-slate-200 rounded-xl p-4 bg-slate-55 min-h-[100px] max-h-[180px] overflow-y-auto shadow-3xs prose prose-sm max-w-none">
-                        {editLessonDesc.trim() ? (
-                          <div 
-                            className="text-xs text-slate-750 font-medium leading-relaxed"
-                            style={{ whiteSpace: "pre-wrap" }}
-                            dangerouslySetInnerHTML={{ __html: editLessonDesc }} 
-                          />
-                        ) : (
-                          <p className="text-xs text-slate-400 italic">Escreva acima para visualizar a renderização formatada...</p>
-                        )}
-                      </div>
                     </div>
                   </div>
 
