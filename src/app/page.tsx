@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Play, CheckCircle2, BookOpen, UserCheck, Tv, Award, ShieldCheck, Users } from "lucide-react";
 import CoursesDirectory from "./CoursesDirectory";
 import HeroCarousel from "./HeroCarousel";
+import LandingHeader from "./LandingHeader";
 import { db } from "@/db";
 import { cursos, aulas } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -78,37 +79,10 @@ export default async function Home() {
 
   const isEmpty = !activeCourses || activeCourses.length === 0;
 
-  // Header Component JSX (rendered in both states)
-  const renderHeader = () => (
-    <header className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 transition-all">
-      <div className="max-w-[1600px] mx-auto px-6 md:px-12 h-20 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-          <img src="/logo.png" alt="SISGR Academy" className="h-14 w-auto" />
-        </Link>
-        <div className="flex items-center gap-4">
-          <Link
-            href="/dashboard"
-            className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all"
-            title="Acessar Área do Aluno"
-          >
-            Área do Aluno
-          </Link>
-          <Link
-            href="/admin/cursos"
-            className="rounded-xl bg-duet-brand px-5 py-2.5 text-sm font-semibold text-white hover:bg-duet-brand-hover shadow-md shadow-duet-brand/10 hover:shadow-lg transition-all"
-            title="Painel Administrativo"
-          >
-            Painel Admin
-          </Link>
-        </div>
-      </div>
-    </header>
-  );
-
   if (isEmpty) {
     return (
       <div className="flex-1 flex flex-col font-sans bg-[#FAFAFA] min-h-screen">
-        {renderHeader()}
+        <LandingHeader />
         <section className="flex-grow flex flex-col items-center justify-center pt-32 pb-20 px-6 text-center">
           <div className="max-w-md mx-auto bg-white border border-slate-200 rounded-3xl p-8 shadow-xl flex flex-col gap-6 items-center">
             <div className="h-16 w-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-400">
@@ -157,7 +131,7 @@ export default async function Home() {
 
   return (
     <div className="flex-1 flex flex-col font-sans bg-[#FAFAFA] min-h-screen">
-      {renderHeader()}
+      <LandingHeader />
 
       {/* Hero Section (Carrossel de Cursos em Destaque) */}
       <HeroCarousel courses={featuredCoursesData} />
