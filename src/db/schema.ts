@@ -29,6 +29,7 @@ export const cursos = pgTable("cursos", {
   destaque: boolean("destaque").default(false).notNull(),
   ordem: integer("ordem").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const modulos = pgTable("modulos", {

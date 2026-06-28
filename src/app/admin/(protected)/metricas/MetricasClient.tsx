@@ -115,7 +115,7 @@ export default function MetricasClient({ companies, metricsData }: MetricasClien
       </header>
 
       {/* Conteúdo Principal */}
-      <main className="flex-grow py-10 px-6 md:px-12 max-w-7xl mx-auto w-full flex flex-col gap-8">
+      <main className="flex-grow py-10 px-6 md:px-12 max-w-none mx-auto w-full px-6 md:px-12 xl:px-16 flex flex-col gap-8">
         
         {/* Filtro por Empresa */}
         <section className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

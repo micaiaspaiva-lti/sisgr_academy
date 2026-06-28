@@ -59,18 +59,22 @@ export default function HeroCarousel({ courses }: HeroCarouselProps) {
       {/* Soft Green Gradient Overlay */}
       <div className="absolute inset-0 z-0 bg-gradient-to-b from-emerald-50/30 via-emerald-50/10 to-white pointer-events-none" />
 
-      {/* Slider Window Container */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 w-full overflow-hidden">
+      {/* Slider Window Container (Wider layout matching the page width) */}
+      <div className="max-w-[1600px] mx-auto relative z-10 w-full overflow-hidden">
         <div 
-          className="flex w-full transition-transform duration-500 ease-in-out"
-          style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+          className="flex transition-transform duration-500 ease-in-out"
+          style={{ 
+            transform: `translateX(-${activeIndex * (100 / courses.length)}%)`,
+            width: `${courses.length * 100}%`
+          }}
         >
           {courses.map((course) => {
             const demoLesson = course.demoLesson;
             return (
               <div 
                 key={course.id} 
-                className="basis-full shrink-0 grid md:grid-cols-12 gap-12 items-center min-h-[380px] md:min-h-[340px] pb-4"
+                className="shrink-0 grid md:grid-cols-12 gap-12 items-center min-h-[380px] md:min-h-[340px] pb-4 px-6 md:px-12"
+                style={{ width: `${100 / courses.length}%` }}
               >
                 {/* Lado Esquerdo: Textos com min-heights calculados para tamanho fixo */}
                 <div className="md:col-span-6 flex flex-col gap-5 text-center md:text-left justify-center h-full">

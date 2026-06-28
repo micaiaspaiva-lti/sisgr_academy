@@ -178,7 +178,7 @@ export default async function Dashboard() {
       </header>
 
       {/* Conteúdo Principal */}
-      <main className="flex-1 py-10 px-6 md:px-12 max-w-7xl mx-auto w-full flex flex-col gap-10">
+      <main className="flex-1 py-10 px-6 md:px-12 max-w-none mx-auto w-full px-6 md:px-12 xl:px-16 flex flex-col gap-10">
         
         {/* Banner "Continuar de onde parei" */}
         {continueLessonId && (

@@ -81,7 +81,7 @@ export default async function Home() {
   // Header Component JSX (rendered in both states)
   const renderHeader = () => (
     <header className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 transition-all">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 h-20 flex items-center justify-between">
+      <div className="max-w-[1600px] mx-auto px-6 md:px-12 h-20 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
           <img src="/logo.png" alt="SISGR Academy" className="h-14 w-auto" />
         </Link>
@@ -163,7 +163,7 @@ export default async function Home() {
       <HeroCarousel courses={featuredCoursesData} />
 
       {/* Courses Grid */}
-      <main className="flex-grow py-12 px-6 md:px-12 w-full max-w-7xl mx-auto flex flex-col gap-16">
+      <main className="flex-grow py-12 px-6 md:px-12 w-full max-w-[1600px] mx-auto flex flex-col gap-16">
         
         {/* Seção Como Funciona e Público-Alvo (Compacta) */}
         <section className="grid lg:grid-cols-12 gap-8 scroll-mt-24">

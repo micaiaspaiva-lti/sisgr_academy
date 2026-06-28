@@ -248,6 +248,7 @@ export async function updateCursoAction(
         tipo,
         imagemCapa: imagemCapa?.trim() || "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=600&auto=format&fit=crop",
         ativo,
+        updatedAt: new Date()
       })
       .where(eq(cursos.id, cursoId))
       .returning();

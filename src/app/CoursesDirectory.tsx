@@ -181,6 +181,22 @@ export default function CoursesDirectory({ courses }: CoursesDirectoryProps) {
 
       </div>
 
+      {/* Contador de Cursos Dinâmico */}
+      <div className="text-xs font-semibold text-slate-500 flex items-center justify-between px-1 shrink-0 -mt-2">
+        <div>
+          Exibindo <span className="font-black text-slate-800">{filteredCourses.length}</span> {filteredCourses.length === 1 ? "curso" : "cursos"}
+          {searchQuery && (
+            <span> para "<span className="text-emerald-700 font-black">{searchQuery}</span>"</span>
+          )}
+          {selectedFilter !== "todos" && (
+            <span> no acesso <span className="text-emerald-700 font-black uppercase text-[9px] bg-emerald-50 border border-emerald-100 rounded px-1.5 py-0.5">{selectedFilter}</span></span>
+          )}
+        </div>
+        {courses.length !== filteredCourses.length && (
+          <span className="text-[10px] text-slate-400 font-medium">Total na plataforma: {courses.length}</span>
+        )}
+      </div>
+
       {/* Grid de Cursos */}
       {paginatedCourses.length > 0 ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">

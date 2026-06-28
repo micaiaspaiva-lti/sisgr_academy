@@ -56,6 +56,8 @@ interface Course {
   tipo: "publico" | "vip";
   destaque: boolean;
   ordem: number;
+  createdAt: Date;
+  updatedAt: Date;
   modulos: Module[];
 }
 
@@ -428,6 +430,8 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
         tipo: (res.course.tipo || "publico") as "publico" | "vip",
         destaque: res.course.destaque || false,
         ordem: res.course.ordem || 1,
+        createdAt: res.course.createdAt ? new Date(res.course.createdAt) : new Date(),
+        updatedAt: res.course.updatedAt ? new Date(res.course.updatedAt) : new Date(),
         modulos: [
           {
             id: res.module?.id || "m-dummy",
@@ -815,12 +819,17 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       </header>
 
       {/* Grid CMS */}
-      <div className="flex-1 grid lg:grid-cols-12 gap-8 p-6 md:p-12 max-w-7xl mx-auto w-full">
+      <div className="flex-1 grid lg:grid-cols-12 gap-8 p-6 md:p-12 max-w-none mx-auto w-full px-6 md:px-12 xl:px-16">
         {/* Sidebar Lateral de Cursos */}
         <aside className="lg:col-span-4 flex flex-col gap-6">
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col gap-4">
             <div className="flex justify-between items-center">
-              <h2 className="font-extrabold text-slate-800 text-sm">Meus Cursos</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="font-extrabold text-slate-800 text-sm">Meus Cursos</h2>
+                <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-extrabold text-slate-600 border border-slate-200" title="Cursos filtrados / listados">
+                  {courses.filter(c => c.titulo.toLowerCase().includes(sidebarSearch.toLowerCase()) && (sidebarFilter === "todos" || c.tipo === sidebarFilter)).length}
+                </span>
+              </div>
               <button 
                 onClick={() => setIsCreatingCourse(true)}
                 className="p-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-600 transition-colors bg-white cursor-pointer"
@@ -1059,6 +1068,20 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                     {selectedCourse.descricao && (
                       <p className="text-xs font-medium text-slate-500 line-clamp-2">{selectedCourse.descricao}</p>
                     )}
+                    
+                    {/* Datas de Criação e Atualização do Curso */}
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 items-center mt-1.5 text-[10px] font-semibold text-slate-400">
+                      {selectedCourse.createdAt && (
+                        <span>
+                          Criado em: <span className="text-slate-550">{new Date(selectedCourse.createdAt).toLocaleDateString("pt-BR")} às {new Date(selectedCourse.createdAt).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}</span>
+                        </span>
+                      )}
+                      {selectedCourse.updatedAt && new Date(selectedCourse.updatedAt).getTime() - new Date(selectedCourse.createdAt || 0).getTime() > 1000 && (
+                        <span>
+                          • Atualizado em: <span className="text-slate-550">{new Date(selectedCourse.updatedAt).toLocaleDateString("pt-BR")} às {new Date(selectedCourse.updatedAt).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}</span>
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 

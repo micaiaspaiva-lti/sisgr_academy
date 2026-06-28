@@ -278,7 +278,7 @@ export default function AlunosClient({ initialAlunos, empresas, activeSessionId 
       </header>
 
       {/* Grid Principal */}
-      <div className="flex-1 grid lg:grid-cols-12 gap-8 p-6 md:p-12 max-w-7xl mx-auto w-full">
+      <div className="flex-1 grid lg:grid-cols-12 gap-8 p-6 md:p-12 max-w-none mx-auto w-full px-6 md:px-12 xl:px-16">
         {/* Lado Esquerdo: Listagem de Alunos */}
         <main className="lg:col-span-8 flex flex-col gap-6">
           <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
