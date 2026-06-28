@@ -676,34 +676,43 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                 <button
                   key={c.id}
                   onClick={() => setSelectedCourse(c)}
-                  className={`w-full text-left p-4 rounded-xl border text-xs font-bold transition-all flex flex-col gap-1.5 ${
+                  className={`w-full text-left p-3 rounded-xl border text-xs font-bold transition-all flex gap-3 items-center ${
                     selectedCourse?.id === c.id
                       ? "border-duet-brand bg-duet-brand-light text-emerald-800"
                       : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
                   }`}
                 >
-                  <div className="flex justify-between items-center w-full gap-2">
-                    <span className={`line-clamp-1 flex-grow ${!c.ativo ? "text-slate-400 line-through decoration-slate-300" : ""}`}>{c.titulo}</span>
-                    <div className="flex gap-1.5 items-center">
-                      {!c.ativo && (
-                        <span className="inline-flex shrink-0 items-center rounded-md bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold text-slate-550 border border-slate-200 uppercase tracking-wider">
-                          Rascunho
-                        </span>
-                      )}
-                      {c.tipo === "vip" ? (
-                        <span className="inline-flex shrink-0 items-center rounded-md bg-amber-50 px-1.5 py-0.5 text-[9px] font-black text-amber-800 ring-1 ring-inset ring-amber-600/10 uppercase tracking-wider">
-                          VIP
-                        </span>
-                      ) : (
-                        <span className="inline-flex shrink-0 items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[9px] font-black text-emerald-700 ring-1 ring-inset ring-emerald-600/10 uppercase tracking-wider">
-                          Púb
-                        </span>
-                      )}
+                  {c.imagemCapa && (
+                    <img 
+                      src={c.imagemCapa} 
+                      alt="" 
+                      className="h-10 w-16 object-cover rounded-lg border border-slate-200 shrink-0 shadow-2xs"
+                    />
+                  )}
+                  <div className="flex flex-col gap-1 flex-grow min-w-0">
+                    <div className="flex justify-between items-center w-full gap-2">
+                      <span className={`line-clamp-1 flex-grow ${!c.ativo ? "text-slate-400 line-through decoration-slate-300" : ""}`}>{c.titulo}</span>
+                      <div className="flex gap-1 items-center shrink-0">
+                        {!c.ativo && (
+                          <span className="inline-flex shrink-0 items-center rounded-md bg-slate-100 px-1.5 py-0.5 text-[8px] font-bold text-slate-550 border border-slate-200 uppercase tracking-wider">
+                            Rascunho
+                          </span>
+                        )}
+                        {c.tipo === "vip" ? (
+                          <span className="inline-flex shrink-0 items-center rounded-md bg-amber-50 px-1 py-0.5 text-[8px] font-bold text-amber-700 ring-1 ring-inset ring-amber-600/10 uppercase tracking-wider">
+                            VIP
+                          </span>
+                        ) : (
+                          <span className="inline-flex shrink-0 items-center rounded-md bg-emerald-50 px-1 py-0.5 text-[8px] font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/10 uppercase tracking-wider">
+                            Púb
+                          </span>
+                        )}
+                      </div>
                     </div>
+                    <span className="text-3xs font-medium text-slate-400">
+                      {c.modulos?.length || 0} Módulos • {c.modulos?.reduce((acc, curr) => acc + (curr.aulas?.length || 0), 0) || 0} Aulas
+                    </span>
                   </div>
-                  <span className="text-3xs font-medium text-slate-400">
-                    {c.modulos?.length || 0} Módulos • {c.modulos?.reduce((acc, curr) => acc + (curr.aulas?.length || 0), 0) || 0} Aulas
-                  </span>
                 </button>
               ))}
             </div>
@@ -714,36 +723,45 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
         {selectedCourse ? (
           <main className="lg:col-span-8 flex flex-col gap-6">
             <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-sm flex flex-col gap-6">
-              <div className="flex justify-between items-start gap-4">
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-3xs font-extrabold text-duet-brand uppercase tracking-wider">Editor do Curso</span>
-                    {selectedCourse.tipo === "vip" ? (
-                      <span className="inline-flex items-center rounded-md bg-amber-50 px-2 py-0.5 text-[10px] font-extrabold text-amber-800 ring-1 ring-inset ring-amber-600/20 uppercase tracking-wider">
-                        VIP (Exclusivo B2B)
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold text-emerald-700 ring-1 ring-inset ring-emerald-600/20 uppercase tracking-wider">
-                        Público Geral
-                      </span>
-                    )}
-                    {selectedCourse.ativo ? (
-                      <span className="inline-flex items-center rounded-md bg-emerald-100 px-2 py-0.5 text-[10px] font-extrabold text-emerald-800 uppercase tracking-wider">
-                        Publicado
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-extrabold text-slate-600 uppercase tracking-wider border border-slate-200">
-                        Rascunho
-                      </span>
+              <div className="flex flex-col sm:flex-row justify-between items-start gap-5">
+                <div className="flex gap-4 items-start flex-grow min-w-0">
+                  {selectedCourse.imagemCapa && (
+                    <img 
+                      src={selectedCourse.imagemCapa} 
+                      alt="" 
+                      className="h-16 w-28 object-cover rounded-xl border border-slate-200 shadow-xs shrink-0"
+                    />
+                  )}
+                  <div className="flex flex-col gap-1 flex-grow min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-3xs font-extrabold text-duet-brand uppercase tracking-wider">Editor do Curso</span>
+                      {selectedCourse.tipo === "vip" ? (
+                        <span className="inline-flex items-center rounded-md bg-amber-50 px-2 py-0.5 text-[10px] font-extrabold text-amber-800 ring-1 ring-inset ring-amber-600/20 uppercase tracking-wider">
+                          VIP (Exclusivo B2B)
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold text-emerald-700 ring-1 ring-inset ring-emerald-600/20 uppercase tracking-wider">
+                          Público Geral
+                        </span>
+                      )}
+                      {selectedCourse.ativo ? (
+                        <span className="inline-flex items-center rounded-md bg-emerald-100 px-2 py-0.5 text-[10px] font-extrabold text-emerald-800 uppercase tracking-wider">
+                          Publicado
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-extrabold text-slate-600 uppercase tracking-wider border border-slate-200">
+                          Rascunho
+                        </span>
+                      )}
+                    </div>
+                    <h1 className="text-2xl font-black text-slate-950 leading-tight truncate">{selectedCourse.titulo}</h1>
+                    {selectedCourse.descricao && (
+                      <p className="text-xs font-medium text-slate-500 line-clamp-2">{selectedCourse.descricao}</p>
                     )}
                   </div>
-                  <h1 className="text-2xl font-black text-slate-950 leading-tight">{selectedCourse.titulo}</h1>
-                  {selectedCourse.descricao && (
-                    <p className="text-xs font-medium text-slate-500 line-clamp-2">{selectedCourse.descricao}</p>
-                  )}
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 shrink-0">
                   <button
                     onClick={() => {
                       setEditCourseTitle(selectedCourse.titulo);
