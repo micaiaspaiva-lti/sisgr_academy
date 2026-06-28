@@ -329,21 +329,21 @@ export default function PlayerClient({
                           download
                           target="_blank"
                           rel="noreferrer"
-                          className="border border-slate-205 rounded-xl p-4 flex justify-between items-center bg-white hover:bg-slate-50 transition-colors shadow-2xs group"
+                          className="border border-slate-205 rounded-xl p-4 flex justify-between items-center bg-white hover:bg-slate-50 transition-colors shadow-2xs group w-full"
                           title={`Baixar ${file.name}`}
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 bg-emerald-50 text-emerald-700 rounded-lg group-hover:bg-emerald-100 transition-colors">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="p-2 bg-emerald-50 text-emerald-700 rounded-lg group-hover:bg-emerald-100 transition-colors shrink-0">
                               <BookOpen className="h-5 w-5" />
                             </div>
-                            <div className="text-left">
-                              <h4 className="font-extrabold text-slate-800 text-sm truncate max-w-xs sm:max-w-md">
+                            <div className="text-left min-w-0">
+                              <h4 className="font-extrabold text-slate-800 text-sm truncate max-w-[150px] sm:max-w-md">
                                 {file.name}
                               </h4>
-                              <span className="text-3xs text-slate-450 uppercase font-black tracking-wider">Clique para baixar o material</span>
+                              <span className="text-3xs text-slate-455 uppercase font-black tracking-wider block">Clique para baixar</span>
                             </div>
                           </div>
-                          <Download className="h-4 w-4 text-slate-450 group-hover:text-emerald-600 transition-colors" />
+                          <Download className="h-4 w-4 text-slate-455 group-hover:text-emerald-600 transition-colors shrink-0" />
                         </a>
                       ))
                     ) : (

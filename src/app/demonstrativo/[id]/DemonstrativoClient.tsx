@@ -403,13 +403,13 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
               {lesson.materiais && lesson.materiais.length > 0 && (
                 <div className="flex flex-col gap-2 mt-2">
                   {lesson.materiais.map((file, idx) => (
-                    <div key={idx} className="p-4 rounded-xl border border-slate-205 bg-white shadow-2xs flex justify-between items-center group">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-emerald-50 text-emerald-700 rounded-lg">
+                    <div key={idx} className="p-4 rounded-xl border border-slate-205 bg-white shadow-2xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 group w-full">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="p-2 bg-emerald-50 text-emerald-700 rounded-lg shrink-0">
                           <BookOpen className="h-5 w-5" />
                         </div>
-                        <div className="flex flex-col">
-                          <span className="text-xs font-bold text-slate-800 truncate max-w-[200px] sm:max-w-xs" title={file.name}>
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-xs font-bold text-slate-800 truncate max-w-[150px] sm:max-w-xs" title={file.name}>
                             {file.name}
                           </span>
                           <span className="text-3xs text-slate-400">Material de apoio da aula</span>
@@ -419,7 +419,7 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
                         onClick={() => {
                           toast.info("Cadastre-se gratuitamente respondendo o quiz para baixar o material de apoio!");
                         }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors text-3xs font-extrabold cursor-pointer uppercase tracking-wider"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors text-3xs font-extrabold cursor-pointer uppercase tracking-wider shrink-0"
                       >
                         <Download className="h-3.5 w-3.5" />
                         Baixar
