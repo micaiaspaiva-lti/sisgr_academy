@@ -48,6 +48,7 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
   const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
   const [isSubmittingLead, setIsSubmittingLead] = useState(false);
+  const [activeRightTab, setActiveRightTab] = useState<"aulas" | "chat">("aulas");
 
   // Form de Captura de Leads com campo Senha
   const [leadForm, setLeadForm] = useState({
@@ -107,6 +108,7 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
   const handleVideoEnded = () => {
     setVideoEnded(true);
     setQuizStep("ready");
+    setActiveRightTab("chat");
     setChatMessages(prev => [
       ...prev,
       {
@@ -140,6 +142,7 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
     setQuizStep("active");
     setActiveQuestionIndex(0);
     setSelectedAnswers({});
+    setActiveRightTab("chat");
   };
 
   const handleAnswerSelect = (option: string) => {
@@ -328,153 +331,172 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
               </div>
             </div>
           </div>
+        </main>
 
-          {/* Índice de Aulas */}
-          {lessons.length > 1 && (
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col gap-4">
-              <h2 className="font-extrabold text-sm text-slate-850 flex items-center gap-2">
-                <Play className="h-4 w-4 text-emerald-600 fill-current" />
-                Aulas deste Curso ({lessons.length})
-              </h2>
-              <div className="grid sm:grid-cols-2 gap-3">
-                {lessons.map((a, i) => (
+        {/* Lado Direito: Assistente de IA e Quiz */}
+        <aside className="lg:col-span-4 flex flex-col bg-slate-950 rounded-2xl border border-slate-800 shadow-sm overflow-hidden h-[600px] lg:h-auto animate-in fade-in duration-300">
+          {/* Header com Abas */}
+          <div className="bg-slate-900 text-white border-b border-slate-800 flex">
+            <button
+              onClick={() => setActiveRightTab("aulas")}
+              className={`flex-1 py-4 text-xs font-black uppercase tracking-wider text-center border-b-2 transition-all ${
+                activeRightTab === "aulas"
+                  ? "border-emerald-500 text-white bg-slate-950/20"
+                  : "border-transparent text-slate-400 hover:text-slate-250"
+              }`}
+            >
+              Aulas ({lessons.length})
+            </button>
+            <button
+              onClick={() => setActiveRightTab("chat")}
+              className={`flex-1 py-4 text-xs font-black uppercase tracking-wider text-center border-b-2 transition-all flex items-center justify-center gap-1.5 ${
+                activeRightTab === "chat"
+                  ? "border-emerald-500 text-white bg-slate-950/20"
+                  : "border-transparent text-slate-400 hover:text-slate-250"
+              }`}
+            >
+              <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+              Chat com IA
+            </button>
+          </div>
+
+          {/* Renderização Condicional do Conteúdo da Sidebar */}
+          {activeRightTab === "aulas" ? (
+            <div className="flex-grow overflow-y-auto flex flex-col divide-y divide-slate-850 bg-slate-950">
+              {lessons.map((a, i) => {
+                const isActive = a.id === lesson.id;
+                return (
                   <Link
                     key={a.id}
                     href={`/demonstrativo/${a.id}`}
-                    className={`p-4 rounded-xl border text-xs font-bold transition-all flex items-center justify-between group ${
-                      a.id === lesson.id
-                        ? "border-emerald-600 bg-emerald-50/20 text-emerald-800"
-                        : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-350"
+                    className={`flex items-center justify-between px-6 py-4 text-xs transition-colors border-b border-slate-900/60 ${
+                      isActive
+                        ? "bg-slate-900 text-white font-bold"
+                        : "text-slate-300 hover:bg-slate-900/50 hover:text-white"
                     }`}
                   >
-                    <div className="flex items-center gap-2 truncate">
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${
-                        a.id === lesson.id ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-550 group-hover:bg-slate-200"
+                    <div className="flex items-center gap-3 truncate">
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
+                        isActive ? "bg-emerald-600 text-white" : "bg-slate-900 text-slate-500"
                       }`}>
                         {i + 1}
                       </span>
                       <span className="truncate">{a.titulo}</span>
                     </div>
-                    {a.id === lesson.id ? (
-                      <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md uppercase shrink-0">Reproduzindo</span>
+                    {isActive ? (
+                      <span className="text-[10px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0">
+                        Reproduzindo
+                      </span>
                     ) : (
-                      <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md uppercase shrink-0 group-hover:bg-slate-200">Grátis</span>
+                      <span className="text-[10px] font-bold text-slate-500 bg-slate-900 px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0">
+                        Grátis
+                      </span>
                     )}
                   </Link>
-                ))}
-              </div>
+                );
+              })}
             </div>
-          )}
-        </main>
-
-        {/* Lado Direito: Assistente de IA e Quiz */}
-        <aside className="lg:col-span-4 flex flex-col bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-[600px] lg:h-auto">
-          {/* Header do Chat */}
-          <div className="bg-slate-900 text-white p-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="font-bold text-sm">Assistente Acadêmico IA</span>
-            </div>
-            <Sparkles className="h-4 w-4 text-amber-400" />
-          </div>
-
-          {/* Área de Mensagens / Quiz */}
-          <div className="flex-grow p-4 overflow-y-auto flex flex-col gap-4">
-            {chatMessages.map((msg, index) => (
-              <div
-                key={index}
-                className={`flex gap-3 max-w-[85%] ${
-                  msg.sender === "user" ? "self-end flex-row-reverse" : "self-start"
-                }`}
-              >
-                <div
-                  className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-xs ${
-                    msg.sender === "user" ? "bg-slate-650" : "bg-emerald-600"
-                  }`}
-                >
-                  {msg.sender === "user" ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
-                </div>
-                <div
-                  className={`rounded-2xl p-3.5 text-xs leading-relaxed font-medium ${
-                    msg.sender === "user"
-                      ? "bg-slate-650 text-white rounded-tr-none"
-                      : "bg-slate-100 text-slate-800 rounded-tl-none border border-slate-150"
-                  }`}
-                >
-                  <p>{msg.text}</p>
-                  
-                  {/* Botão de Trigger do Quiz */}
-                  {msg.quiz && quizStep === "ready" && (
-                    <button
-                      onClick={startQuiz}
-                      className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 py-2 px-4 text-xs font-bold text-white hover:bg-emerald-700 transition-colors shadow-xs cursor-pointer"
-                    >
-                      Começar Quiz de Fixação
-                      <ChevronRight className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-
-            {/* Quiz Ativo */}
-            {quizStep === "active" && (
-              <div className="rounded-xl border-2 border-emerald-600 bg-emerald-50/10 p-4 flex flex-col gap-4 mt-2">
-                <div className="flex justify-between items-center border-b border-slate-200 pb-2">
-                  <span className="text-3xs font-extrabold text-emerald-600 uppercase">Pergunta {activeQuestionIndex + 1} de {quizQuestions.length}</span>
-                  <Sparkles className="h-4 w-4 text-emerald-600" />
-                </div>
-                
-                <h3 className="font-extrabold text-xs text-slate-800 leading-relaxed">
-                  {quizQuestions[activeQuestionIndex].pergunta}
-                </h3>
-                
-                <div className="flex flex-col gap-2">
-                  {quizQuestions[activeQuestionIndex].opcoes.map((opcao, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handleAnswerSelect(opcao)}
-                      className={`w-full text-left p-3 rounded-lg border text-3xs leading-relaxed transition-all cursor-pointer ${
-                        selectedAnswers[quizQuestions[activeQuestionIndex].id] === opcao
-                          ? "border-emerald-600 bg-emerald-50/30 text-emerald-800 font-bold shadow-xs"
-                          : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+          ) : (
+            <>
+              {/* Área de Mensagens / Quiz */}
+              <div className="flex-grow p-4 overflow-y-auto flex flex-col gap-4 bg-white">
+                {chatMessages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`flex gap-3 max-w-[85%] ${
+                      msg.sender === "user" ? "self-end flex-row-reverse" : "self-start"
+                    }`}
+                  >
+                    <div
+                      className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-xs ${
+                        msg.sender === "user" ? "bg-slate-655" : "bg-emerald-650"
                       }`}
                     >
-                      {opcao}
+                      {msg.sender === "user" ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+                    </div>
+                    <div
+                      className={`rounded-2xl p-3.5 text-xs leading-relaxed font-medium ${
+                        msg.sender === "user"
+                          ? "bg-slate-650 text-white rounded-tr-none"
+                          : "bg-slate-100 text-slate-800 rounded-tl-none border border-slate-150"
+                      }`}
+                    >
+                      <p>{msg.text}</p>
+                      
+                      {/* Botão de Trigger do Quiz */}
+                      {msg.quiz && quizStep === "ready" && (
+                        <button
+                          onClick={startQuiz}
+                          className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-650 py-2 px-4 text-xs font-bold text-white hover:bg-emerald-700 transition-colors shadow-xs cursor-pointer"
+                        >
+                          Começar Quiz de Fixação
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+
+                {/* Quiz Ativo */}
+                {quizStep === "active" && (
+                  <div className="rounded-xl border-2 border-emerald-600 bg-emerald-50/10 p-4 flex flex-col gap-4 mt-2">
+                    <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+                      <span className="text-3xs font-extrabold text-emerald-600 uppercase">Pergunta {activeQuestionIndex + 1} de {quizQuestions.length}</span>
+                      <Sparkles className="h-4 w-4 text-emerald-600" />
+                    </div>
+                    
+                    <h3 className="font-extrabold text-xs text-slate-800 leading-relaxed">
+                      {quizQuestions[activeQuestionIndex].pergunta}
+                    </h3>
+                    
+                    <div className="flex flex-col gap-2">
+                      {quizQuestions[activeQuestionIndex].opcoes.map((opcao, i) => (
+                        <button
+                          key={i}
+                          onClick={() => handleAnswerSelect(opcao)}
+                          className={`w-full text-left p-3 rounded-lg border text-3xs leading-relaxed transition-all cursor-pointer ${
+                            selectedAnswers[quizQuestions[activeQuestionIndex].id] === opcao
+                              ? "border-emerald-650 bg-emerald-50/30 text-emerald-800 font-bold shadow-xs"
+                              : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                          }`}
+                        >
+                          {opcao}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      disabled={!selectedAnswers[quizQuestions[activeQuestionIndex].id]}
+                      onClick={nextQuestion}
+                      className="mt-2 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 py-2 px-4 text-xs font-bold text-white hover:bg-emerald-750 disabled:bg-slate-350 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                    >
+                      {activeQuestionIndex < quizQuestions.length - 1 ? "Próxima Pergunta" : "Finalizar Quiz"}
+                      <ChevronRight className="h-4 w-4" />
                     </button>
-                  ))}
-                </div>
-
-                <button
-                  disabled={!selectedAnswers[quizQuestions[activeQuestionIndex].id]}
-                  onClick={nextQuestion}
-                  className="mt-2 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 py-2 px-4 text-xs font-bold text-white hover:bg-emerald-700 disabled:bg-slate-350 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                >
-                  {activeQuestionIndex < quizQuestions.length - 1 ? "Próxima Pergunta" : "Finalizar Quiz"}
-                  <ChevronRight className="h-4 w-4" />
-                </button>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
-          {/* Input de Mensagem */}
-          {quizStep === "idle" && (
-            <form onSubmit={handleSendMessage} className="border-t border-slate-200 p-3 bg-slate-50 flex gap-2">
-              <input
-                type="text"
-                value={inputMessage}
-                onChange={e => setInputMessage(e.target.value)}
-                placeholder="Tire uma dúvida sobre a aula..."
-                className="flex-grow rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
-              />
-              <button
-                type="submit"
-                className="rounded-lg bg-emerald-600 p-2 text-white hover:bg-emerald-700 transition-colors cursor-pointer"
-                title="Enviar mensagem"
-              >
-                <Send className="h-4 w-4" />
-              </button>
-            </form>
+              {/* Input de Mensagem */}
+              {quizStep === "idle" && (
+                <form onSubmit={handleSendMessage} className="border-t border-slate-200 p-3 bg-slate-50 flex gap-2">
+                  <input
+                    type="text"
+                    value={inputMessage}
+                    onChange={e => setInputMessage(e.target.value)}
+                    placeholder="Tire uma dúvida sobre a aula..."
+                    className="flex-grow rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                  />
+                  <button
+                    type="submit"
+                    className="rounded-lg bg-emerald-600 p-2 text-white hover:bg-emerald-700 transition-colors cursor-pointer"
+                    title="Enviar mensagem"
+                  >
+                    <Send className="h-4 w-4" />
+                  </button>
+                </form>
+              )}
+            </>
           )}
         </aside>
       </div>
