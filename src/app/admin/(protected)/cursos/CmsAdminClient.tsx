@@ -234,6 +234,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
   const [courses, setCourses] = useState<Course[]>(initialCourses);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(initialCourses[0] || null);
   const [sidebarSearch, setSidebarSearch] = useState("");
+  const [sidebarFilter, setSidebarFilter] = useState<"todos" | "publico" | "vip">("todos");
   const [draggedLessonId, setDraggedLessonId] = useState<string | null>(null);
   const [processingIAId, setProcessingIAId] = useState<string | null>(null);
 
@@ -841,36 +842,75 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
               />
             </div>
 
-            <div className="flex flex-col gap-5 overflow-y-auto max-h-[620px] pr-1 scrollbar-thin">
+            {/* Abas de Filtro de Acesso */}
+            <div className="flex gap-1 bg-slate-100 p-1 rounded-xl shrink-0">
+              <button
+                type="button"
+                onClick={() => setSidebarFilter("todos")}
+                className={`flex-1 py-1 px-2 text-[10px] font-extrabold uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
+                  sidebarFilter === "todos"
+                    ? "bg-white text-slate-800 shadow-3xs"
+                    : "text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                Todos
+              </button>
+              <button
+                type="button"
+                onClick={() => setSidebarFilter("publico")}
+                className={`flex-1 py-1 px-2 text-[10px] font-extrabold uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
+                  sidebarFilter === "publico"
+                    ? "bg-white text-slate-800 shadow-3xs"
+                    : "text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                Públicos
+              </button>
+              <button
+                type="button"
+                onClick={() => setSidebarFilter("vip")}
+                className={`flex-1 py-1 px-2 text-[10px] font-extrabold uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
+                  sidebarFilter === "vip"
+                    ? "bg-white text-slate-800 shadow-3xs"
+                    : "text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                VIP
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-5 overflow-y-auto max-h-[580px] pr-1 scrollbar-thin">
               {/* Seção Cursos em Destaque (Se houver e se não estiver buscando) */}
-              {!sidebarSearch && courses.filter(c => c.destaque).length > 0 && (
+              {!sidebarSearch && courses.filter(c => c.destaque && (sidebarFilter === "todos" || c.tipo === sidebarFilter)).length > 0 && (
                 <div className="flex flex-col gap-2">
                   <h3 className="text-[10px] font-black text-purple-700 uppercase tracking-wider flex items-center gap-1">
                     <Sparkles className="h-3 w-3 fill-purple-100" />
                     Cursos em Destaque
                   </h3>
                   <div className="flex flex-col gap-1.5">
-                    {courses.filter(c => c.destaque).map((c) => (
-                      <button
-                        key={`featured-${c.id}`}
-                        onClick={() => setSelectedCourse(c)}
-                        className={`text-left p-2.5 rounded-xl border text-[11px] font-extrabold transition-all flex gap-2.5 items-center min-w-0 ${
-                          selectedCourse?.id === c.id
-                            ? "border-purple-400 bg-purple-50 text-purple-900 shadow-2xs"
-                            : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-                        }`}
-                      >
-                        {c.imagemCapa && (
-                          <img 
-                            src={c.imagemCapa} 
-                            alt="" 
-                            className="h-8 w-12 object-cover rounded-lg border border-slate-200 shrink-0 shadow-3xs"
-                          />
-                        )}
-                        <span className="truncate flex-grow">{c.titulo}</span>
-                        <span className="bg-purple-100 text-[9px] font-black text-purple-700 px-1.5 py-0.5 rounded-sm uppercase tracking-wide shrink-0">Destaque</span>
-                      </button>
-                    ))}
+                    {courses
+                      .filter(c => c.destaque && (sidebarFilter === "todos" || c.tipo === sidebarFilter))
+                      .map((c) => (
+                        <button
+                          key={`featured-${c.id}`}
+                          onClick={() => setSelectedCourse(c)}
+                          className={`text-left p-2.5 rounded-xl border text-[11px] font-extrabold transition-all flex gap-2.5 items-center min-w-0 ${
+                            selectedCourse?.id === c.id
+                              ? "border-purple-400 bg-purple-50 text-purple-900 shadow-2xs"
+                              : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                          }`}
+                        >
+                          {c.imagemCapa && (
+                            <img 
+                              src={c.imagemCapa} 
+                              alt="" 
+                              className="h-8 w-12 object-cover rounded-lg border border-slate-200 shrink-0 shadow-3xs"
+                            />
+                          )}
+                          <span className="truncate flex-grow">{c.titulo}</span>
+                          <span className="bg-purple-100 text-[9px] font-black text-purple-700 px-1.5 py-0.5 rounded-sm uppercase tracking-wide shrink-0">Destaque</span>
+                        </button>
+                      ))}
                   </div>
                 </div>
               )}
@@ -883,7 +923,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                 
                 <div className="flex flex-col gap-2">
                   {courses
-                    .filter(c => c.titulo.toLowerCase().includes(sidebarSearch.toLowerCase()))
+                    .filter(c => c.titulo.toLowerCase().includes(sidebarSearch.toLowerCase()) && (sidebarFilter === "todos" || c.tipo === sidebarFilter))
                     .map((c, idx, filteredArr) => (
                       <div key={c.id} className="flex items-center gap-1.5 w-full group">
                         <button
@@ -903,7 +943,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                           )}
                           <div className="flex flex-col gap-1 flex-grow min-w-0">
                             <div className="flex justify-between items-center w-full gap-2">
-                              <span className={`line-clamp-1 flex-grow ${!c.ativo ? "text-slate-400 line-through decoration-slate-350" : ""}`}>{c.titulo}</span>
+                              <span className={`line-clamp-1 flex-grow ${!c.ativo ? "text-slate-400 line-through decoration-slate-355" : ""}`}>{c.titulo}</span>
                               <div className="flex gap-1 items-center shrink-0">
                                 {c.destaque && (
                                   <span className="inline-flex shrink-0 items-center rounded-md bg-purple-50 px-1 py-0.5 text-[8px] font-bold text-purple-700 ring-1 ring-inset ring-purple-600/10 uppercase tracking-wider">
@@ -932,8 +972,8 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                           </div>
                         </button>
                         
-                        {/* Botões de Reordenação: exibidos apenas quando não há busca ativa */}
-                        {!sidebarSearch && (
+                        {/* Botões de Reordenação: exibidos apenas quando não há busca/filtro ativos */}
+                        {!sidebarSearch && sidebarFilter === "todos" && (
                           <div className="flex flex-col gap-1 shrink-0">
                             <button
                               type="button"
@@ -964,7 +1004,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                       </div>
                     ))}
                   
-                  {courses.filter(c => c.titulo.toLowerCase().includes(sidebarSearch.toLowerCase())).length === 0 && (
+                  {courses.filter(c => c.titulo.toLowerCase().includes(sidebarSearch.toLowerCase()) && (sidebarFilter === "todos" || c.tipo === sidebarFilter)).length === 0 && (
                     <div className="text-center py-6 text-slate-400 text-xs font-semibold">
                       Nenhum curso encontrado.
                     </div>
