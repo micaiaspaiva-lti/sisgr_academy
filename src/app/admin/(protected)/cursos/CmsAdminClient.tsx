@@ -682,25 +682,6 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
         </div>
 
         <div className="flex items-center gap-4">
-          <button
-            onClick={handleClearDatabase}
-            disabled={isClearingDb}
-            className="flex items-center gap-1.5 border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg px-3 py-2 text-xs font-bold disabled:opacity-50 transition-colors cursor-pointer"
-            title="Apaga todos os cursos e aulas do banco"
-          >
-            {isClearingDb ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
-            Limpar EAD
-          </button>
-          
-          <button
-            onClick={handleResetDatabase}
-            disabled={isResettingDb}
-            className="flex items-center gap-1.5 border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 rounded-lg px-3 py-2 text-xs font-bold disabled:opacity-50 transition-colors cursor-pointer"
-            title="Restaura os cursos de demonstração padrão"
-          >
-            {isResettingDb ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5 text-purple-600" />}
-            Resetar Padrão
-          </button>
 
           <Link 
             href="/admin/alunos" 

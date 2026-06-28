@@ -1,0 +1,831 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+</head>
+
+<style>
+    .centralize {
+        text-align: center
+    }
+</style>
+
+<body>
+    <table border="1">
+                <thead>
+            <tr>
+                <td colspan="69">
+                    <h3>Agendamentos</h3>
+                </td>
+            </tr>
+                            <tr>
+                    <td colspan="69">
+                                                                                                                        
+                        
+                        Filtros utilizados: Status="<b>Em Rota</b>"                    </td>
+                </tr>
+                        <tr>
+                                    <th class="header">#</th>
+                                    <th class="header">OS</th>
+                                    <th class="header">Id da Rota(Rota/DOCS)</th>
+                                    <th class="header">Status</th>
+                                    <th class="header">Tipo</th>
+                                    <th class="header">Cliente ID</th>
+                                    <th class="header">Cadri</th>
+                                    <th class="header">Cliente Razão Social</th>
+                                    <th class="header">Cliente Nome Fantasia</th>
+                                    <th class="header">Cliente CNPJ</th>
+                                    <th class="header">Dia(s) Medição</th>
+                                    <th class="header">Cliente Endereço</th>
+                                    <th class="header">Latitude</th>
+                                    <th class="header">Longitude</th>
+                                    <th class="header">Cliente Cidade</th>
+                                    <th class="header">Cliente Estado</th>
+                                    <th class="header">Cliente Categoria</th>
+                                    <th class="header">Gerador ID</th>
+                                    <th class="header">Gerador Razão Social</th>
+                                    <th class="header">Gerador Nome Fantasia</th>
+                                    <th class="header">Gerador CNPJ</th>
+                                    <th class="header">Endereço Agendamento</th>
+                                    <th class="header">Cidade Agendamento</th>
+                                    <th class="header">Estado Agendamento</th>
+                                    <th class="header">Transportadora</th>
+                                    <th class="header">Transportadora CNPJ</th>
+                                    <th class="header">Motorista</th>
+                                    <th class="header">Placa</th>
+                                    <th class="header">Tipo de Veículo</th>
+                                    <th class="header">Ajudante(s)</th>
+                                    <th class="header">Data de Agendamento</th>
+                                    <th class="header">Identificador da rota</th>
+                                    <th class="header">Receptor</th>
+                                    <th class="header">Receptor CNPJ</th>
+                                    <th class="header">Receptor Endereço</th>
+                                    <th class="header">MTR</th>
+                                    <th class="header">Qtd Equipamento Prevista</th>
+                                    <th class="header">Qtd Equipamento Realizada</th>
+                                    <th class="header">Ação Equipamento Prevista</th>
+                                    <th class="header">Ação Equipamento Realizada</th>
+                                    <th class="header">Equipamento Entrega</th>
+                                    <th class="header">Equipamento Retirada</th>
+                                    <th class="header">Tipo de Equipamento</th>
+                                    <th class="header">Serviço</th>
+                                    <th class="header">Tipo de Coleta</th>
+                                    <th class="header">Tipo do Resíduo</th>
+                                    <th class="header">Quantidade</th>
+                                    <th class="header">Und de Medida</th>
+                                    <th class="header">Produto(s)</th>
+                                    <th class="header">Tratamento</th>
+                                    <th class="header">Código de Integração (Tipo do Resíduo)</th>
+                                    <th class="header">Qtd Mínima (Franquia)</th>
+                                    <th class="header">Valor Franquia</th>
+                                    <th class="header">Vl Unit Coleta</th>
+                                    <th class="header">Vl Unit Destinação</th>
+                                    <th class="header">Qtd Cobrança</th>
+                                    <th class="header">Unid. Cobrança (Coleta)</th>
+                                    <th class="header">Vl Total Coleta</th>
+                                    <th class="header">Vl Total Destinação</th>
+                                    <th class="header">Vl Total</th>
+                                    <th class="header">Ticket de Medição</th>
+                                    <th class="header">Manifesto/Nota Fiscal</th>
+                                    <th class="header">Início do Atendimento</th>
+                                    <th class="header">Início da Coleta</th>
+                                    <th class="header">Fim da Coleta</th>
+                                    <th class="header">Fim do Atendimento</th>
+                                    <th class="header">Data da Efetivação</th>
+                                    <th class="header">Data da Revisão</th>
+                                    <th class="header">Observação</th>
+                            </tr>
+        </thead>
+        <tbody>
+            
+                                                                                    <tr>
+                                                            <td>549712</td>
+                                                            <td></td>
+                                                            <td>105648</td>
+                                                            <td>ROTA</td>
+                                                            <td>COLETA</td>
+                                                            <td>586</td>
+                                                            <td></td>
+                                                            <td>BRF S.A. (FÁBRICA)</td>
+                                                            <td>BRF - FÁBRICA</td>
+                                                            <td>01.838.723/0346-17</td>
+                                                            <td>--</td>
+                                                            <td>ROD. PE 050, S/N - KM 02 ALA 02, DISTRITO INDUSTRIAL (PREFEITO JOSE AUGUSTO FERRER)</td>
+                                                            <td>-8.0941985</td>
+                                                            <td>-35.2571224</td>
+                                                            <td>Vitória de Santo Antão</td>
+                                                            <td>PE</td>
+                                                            <td>INDUSTRIAL</td>
+                                                            <td>696</td>
+                                                            <td>BRF S.A.</td>
+                                                            <td>BRF - CLASSE II - FÁBRICA</td>
+                                                            <td>01.838.723/0346-17</td>
+                                                            <td>ROD PE-050 S/N, S/N - KM 02 ALA 02, DISTRITO INDUSTRIAL </td>
+                                                            <td>Vitória de Santo Antão</td>
+                                                            <td>PE</td>
+                                                            <td>ELUS ENGENHARIA AMBIENTAL LTDA</td>
+                                                            <td>01.459.413/0001-00</td>
+                                                            <td>ALEXSANDRO SOUZA ALBUQUERQUE</td>
+                                                            <td>KGF-3147</td>
+                                                            <td>ROLL ON ROLL OFF</td>
+                                                            <td></td>
+                                                            <td>01/06/2026</td>
+                                                            <td></td>
+                                                            <td>ORIZON MEIO AMBIENTE S.A.</td>
+                                                            <td>03.279.285/0027-79</td>
+                                                            <td>ROD EMPRESARIO JOAO SANTOS FILHO, 1000, MURIBECA,  Jaboatão dos Guararapes - PE, 54350-100</td>
+                                                            <td></td>
+                                                            <td>1</td>
+                                                            <td></td>
+                                                            <td>Vai Vem</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>CAÇAMBÃO 38 M³</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>LIXO COMUM - ATERRO</td>
+                                                            <td></td>
+                                                            <td>t</td>
+                                                            <td></td>
+                                                            <td>ATERRO</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>873,4</td>
+                                                            <td>0</td>
+                                                            <td>1</td>
+                                                            <td>EQUIPAMENTO</td>
+                                                            <td>873,4</td>
+                                                            <td>0</td>
+                                                            <td>873,4</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                    </tr>
+                    
+                                                                    
+                                                                                    <tr>
+                                                            <td>549704</td>
+                                                            <td></td>
+                                                            <td>105671</td>
+                                                            <td>ROTA</td>
+                                                            <td>COLETA</td>
+                                                            <td>586</td>
+                                                            <td></td>
+                                                            <td>BRF S.A. (FÁBRICA)</td>
+                                                            <td>BRF - FÁBRICA</td>
+                                                            <td>01.838.723/0346-17</td>
+                                                            <td>--</td>
+                                                            <td>ROD. PE 050, S/N - KM 02 ALA 02, DISTRITO INDUSTRIAL (PREFEITO JOSE AUGUSTO FERRER)</td>
+                                                            <td>-8.0941985</td>
+                                                            <td>-35.2571224</td>
+                                                            <td>Vitória de Santo Antão</td>
+                                                            <td>PE</td>
+                                                            <td>INDUSTRIAL</td>
+                                                            <td>696</td>
+                                                            <td>BRF S.A.</td>
+                                                            <td>BRF - CLASSE II - FÁBRICA</td>
+                                                            <td>01.838.723/0346-17</td>
+                                                            <td>ROD PE-050 S/N, S/N - KM 02 ALA 02, DISTRITO INDUSTRIAL </td>
+                                                            <td>Vitória de Santo Antão</td>
+                                                            <td>PE</td>
+                                                            <td>ELUS ENGENHARIA AMBIENTAL LTDA</td>
+                                                            <td>01.459.413/0001-00</td>
+                                                            <td>ANDERSON INACIO DE OLIVEIRA</td>
+                                                            <td>PEC-4163</td>
+                                                            <td>ROLL ON ROLL OFF</td>
+                                                            <td></td>
+                                                            <td>01/06/2026</td>
+                                                            <td></td>
+                                                            <td>ORIZON MEIO AMBIENTE S.A.</td>
+                                                            <td>03.279.285/0027-79</td>
+                                                            <td>ROD EMPRESARIO JOAO SANTOS FILHO, 1000, MURIBECA,  Jaboatão dos Guararapes - PE, 54350-100</td>
+                                                            <td></td>
+                                                            <td>1</td>
+                                                            <td></td>
+                                                            <td>Vai Vem</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>CAÇAMBÃO 38 M³</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>IMPRÓPRIO PARA CONSUMO - ATERRO</td>
+                                                            <td></td>
+                                                            <td>t</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>873,4</td>
+                                                            <td>0</td>
+                                                            <td>1</td>
+                                                            <td>EQUIPAMENTO</td>
+                                                            <td>873,4</td>
+                                                            <td>0</td>
+                                                            <td>873,4</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                    </tr>
+                    
+                                                                    
+                                                                                    <tr>
+                                                            <td>549687</td>
+                                                            <td></td>
+                                                            <td>105623</td>
+                                                            <td>ROTA</td>
+                                                            <td>COLETA</td>
+                                                            <td>628</td>
+                                                            <td></td>
+                                                            <td>GERDAU ACOS LONGOS S.A.</td>
+                                                            <td>GERDAU - CURADO</td>
+                                                            <td>07.358.761/0051-28</td>
+                                                            <td>--</td>
+                                                            <td>AV GETULIO VARGAS, 3666, CURADO</td>
+                                                            <td>-8.0751978</td>
+                                                            <td>-34.9677578</td>
+                                                            <td>Recife</td>
+                                                            <td>PE</td>
+                                                            <td>INDUSTRIAL</td>
+                                                            <td>723</td>
+                                                            <td>GERDAU ACOS LONGOS S.A.</td>
+                                                            <td>GERDAU - CURADO</td>
+                                                            <td>07.358.761/0051-28</td>
+                                                            <td>AV GETULIO VARGAS, 3666, CURADO</td>
+                                                            <td>Recife</td>
+                                                            <td>PE</td>
+                                                            <td>ELUS ENGENHARIA AMBIENTAL LTDA</td>
+                                                            <td>01.459.413/0001-00</td>
+                                                            <td>VANDSON SILVA DO NASCIMENTO</td>
+                                                            <td>RZE-5H80</td>
+                                                            <td>POLIGUINDASTE DUPLO</td>
+                                                            <td></td>
+                                                            <td>01/06/2026</td>
+                                                            <td></td>
+                                                            <td>AMBIPAR ENVIRONMENTAL ECOPARQUE S/A</td>
+                                                            <td>53.172.475/0001-21</td>
+                                                            <td>RODOVIA BR 101 NORTE, S/N, AREA RURAL DE IGARASSU,  Igarassu - PE, 53659-899</td>
+                                                            <td></td>
+                                                            <td>1</td>
+                                                            <td></td>
+                                                            <td>Vai Vem</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>CAÇAMBA 5M³ ABERTA</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>LIXO COMUM -  BLENDAGEM</td>
+                                                            <td></td>
+                                                            <td>t</td>
+                                                            <td></td>
+                                                            <td>BLENDAGEM PARA COPROCESSAMENTO</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>REALIZAÇÃO DE MOVIMENTAÇÃO NA UNIDADE</td>
+                                                    </tr>
+                                                                    <tr>
+                                                            <td>549687</td>
+                                                            <td></td>
+                                                            <td>105623</td>
+                                                            <td>ROTA</td>
+                                                            <td>COLETA</td>
+                                                            <td>628</td>
+                                                            <td></td>
+                                                            <td>GERDAU ACOS LONGOS S.A.</td>
+                                                            <td>GERDAU - CURADO</td>
+                                                            <td>07.358.761/0051-28</td>
+                                                            <td>--</td>
+                                                            <td>AV GETULIO VARGAS, 3666, CURADO</td>
+                                                            <td>-8.0751978</td>
+                                                            <td>-34.9677578</td>
+                                                            <td>Recife</td>
+                                                            <td>PE</td>
+                                                            <td>INDUSTRIAL</td>
+                                                            <td>723</td>
+                                                            <td>GERDAU ACOS LONGOS S.A.</td>
+                                                            <td>GERDAU - CURADO</td>
+                                                            <td>07.358.761/0051-28</td>
+                                                            <td>AV GETULIO VARGAS, 3666, CURADO</td>
+                                                            <td>Recife</td>
+                                                            <td>PE</td>
+                                                            <td>ELUS ENGENHARIA AMBIENTAL LTDA</td>
+                                                            <td>01.459.413/0001-00</td>
+                                                            <td>VANDSON SILVA DO NASCIMENTO</td>
+                                                            <td>RZE-5H80</td>
+                                                            <td>POLIGUINDASTE DUPLO</td>
+                                                            <td></td>
+                                                            <td>01/06/2026</td>
+                                                            <td></td>
+                                                            <td>AMBIPAR ENVIRONMENTAL ECOPARQUE S/A</td>
+                                                            <td>53.172.475/0001-21</td>
+                                                            <td>RODOVIA BR 101 NORTE, S/N, AREA RURAL DE IGARASSU,  Igarassu - PE, 53659-899</td>
+                                                            <td></td>
+                                                            <td>1</td>
+                                                            <td></td>
+                                                            <td>Vai Vem</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>CAÇAMBA 5M³ ABERTA</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>SÓLIDOS CONTAMINADOS - BLENDAGEM</td>
+                                                            <td></td>
+                                                            <td>t</td>
+                                                            <td></td>
+                                                            <td>BLENDAGEM PARA COPROCESSAMENTO</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>REALIZAÇÃO DE MOVIMENTAÇÃO NA UNIDADE</td>
+                                                    </tr>
+                    
+                                                                    
+                                                                                    <tr>
+                                                            <td>549633</td>
+                                                            <td></td>
+                                                            <td>105671</td>
+                                                            <td>ROTA</td>
+                                                            <td>COLETA</td>
+                                                            <td>586</td>
+                                                            <td></td>
+                                                            <td>BRF S.A. (FÁBRICA)</td>
+                                                            <td>BRF - FÁBRICA</td>
+                                                            <td>01.838.723/0346-17</td>
+                                                            <td>--</td>
+                                                            <td>ROD. PE 050, S/N - KM 02 ALA 02, DISTRITO INDUSTRIAL (PREFEITO JOSE AUGUSTO FERRER)</td>
+                                                            <td>-8.0941985</td>
+                                                            <td>-35.2571224</td>
+                                                            <td>Vitória de Santo Antão</td>
+                                                            <td>PE</td>
+                                                            <td>INDUSTRIAL</td>
+                                                            <td>696</td>
+                                                            <td>BRF S.A.</td>
+                                                            <td>BRF - CLASSE II - FÁBRICA</td>
+                                                            <td>01.838.723/0346-17</td>
+                                                            <td>ROD PE-050 S/N, S/N - KM 02 ALA 02, DISTRITO INDUSTRIAL </td>
+                                                            <td>Vitória de Santo Antão</td>
+                                                            <td>PE</td>
+                                                            <td>ELUS ENGENHARIA AMBIENTAL LTDA</td>
+                                                            <td>01.459.413/0001-00</td>
+                                                            <td>ANDERSON INACIO DE OLIVEIRA</td>
+                                                            <td>PEC-4163</td>
+                                                            <td>ROLL ON ROLL OFF</td>
+                                                            <td></td>
+                                                            <td>01/06/2026</td>
+                                                            <td></td>
+                                                            <td>ORIZON MEIO AMBIENTE S.A.</td>
+                                                            <td>03.279.285/0027-79</td>
+                                                            <td>ROD EMPRESARIO JOAO SANTOS FILHO, 1000, MURIBECA,  Jaboatão dos Guararapes - PE, 54350-100</td>
+                                                            <td></td>
+                                                            <td>1</td>
+                                                            <td></td>
+                                                            <td>Vai Vem</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>CAÇAMBÃO 38 M³</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>LIXO COMUM - ATERRO</td>
+                                                            <td></td>
+                                                            <td>t</td>
+                                                            <td></td>
+                                                            <td>ATERRO</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>873,4</td>
+                                                            <td>0</td>
+                                                            <td>1</td>
+                                                            <td>EQUIPAMENTO</td>
+                                                            <td>873,4</td>
+                                                            <td>0</td>
+                                                            <td>873,4</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                    </tr>
+                    
+                                                                    
+                                                                                    <tr>
+                                                            <td>549632</td>
+                                                            <td></td>
+                                                            <td>105622</td>
+                                                            <td>ROTA</td>
+                                                            <td>COLETA</td>
+                                                            <td>586</td>
+                                                            <td></td>
+                                                            <td>BRF S.A. (FÁBRICA)</td>
+                                                            <td>BRF - FÁBRICA</td>
+                                                            <td>01.838.723/0346-17</td>
+                                                            <td>--</td>
+                                                            <td>ROD. PE 050, S/N - KM 02 ALA 02, DISTRITO INDUSTRIAL (PREFEITO JOSE AUGUSTO FERRER)</td>
+                                                            <td>-8.0941985</td>
+                                                            <td>-35.2571224</td>
+                                                            <td>Vitória de Santo Antão</td>
+                                                            <td>PE</td>
+                                                            <td>INDUSTRIAL</td>
+                                                            <td>696</td>
+                                                            <td>BRF S.A.</td>
+                                                            <td>BRF - CLASSE II - FÁBRICA</td>
+                                                            <td>01.838.723/0346-17</td>
+                                                            <td>ROD PE-050 S/N, S/N - KM 02 ALA 02, DISTRITO INDUSTRIAL </td>
+                                                            <td>Vitória de Santo Antão</td>
+                                                            <td>PE</td>
+                                                            <td>ELUS ENGENHARIA AMBIENTAL LTDA</td>
+                                                            <td>01.459.413/0001-00</td>
+                                                            <td>FABIANO MONTENEGRO DA SILVA</td>
+                                                            <td>KGC-4A49</td>
+                                                            <td>POLIGUINDASTE DUPLO</td>
+                                                            <td></td>
+                                                            <td>01/06/2026</td>
+                                                            <td></td>
+                                                            <td>ORIZON MEIO AMBIENTE S.A.</td>
+                                                            <td>03.279.285/0027-79</td>
+                                                            <td>ROD EMPRESARIO JOAO SANTOS FILHO, 1000, MURIBECA,  Jaboatão dos Guararapes - PE, 54350-100</td>
+                                                            <td></td>
+                                                            <td>2</td>
+                                                            <td></td>
+                                                            <td>Vai Vem</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>CAÇAMBA 5M³ ABERTA</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>IMPRÓPRIO PARA CONSUMO - ATERRO</td>
+                                                            <td></td>
+                                                            <td>t</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>780,23</td>
+                                                            <td>0</td>
+                                                            <td>1</td>
+                                                            <td>EQUIPAMENTO</td>
+                                                            <td>780,23</td>
+                                                            <td>0</td>
+                                                            <td>780,23</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                    </tr>
+                    
+                                                                    
+                                                                                    <tr>
+                                                            <td>549631</td>
+                                                            <td></td>
+                                                            <td>105671</td>
+                                                            <td>ROTA</td>
+                                                            <td>COLETA</td>
+                                                            <td>586</td>
+                                                            <td></td>
+                                                            <td>BRF S.A. (FÁBRICA)</td>
+                                                            <td>BRF - FÁBRICA</td>
+                                                            <td>01.838.723/0346-17</td>
+                                                            <td>--</td>
+                                                            <td>ROD. PE 050, S/N - KM 02 ALA 02, DISTRITO INDUSTRIAL (PREFEITO JOSE AUGUSTO FERRER)</td>
+                                                            <td>-8.0941985</td>
+                                                            <td>-35.2571224</td>
+                                                            <td>Vitória de Santo Antão</td>
+                                                            <td>PE</td>
+                                                            <td>INDUSTRIAL</td>
+                                                            <td>695</td>
+                                                            <td>BRF S.A.</td>
+                                                            <td>BRF - RECICLÁVEIS - FÁBRICA</td>
+                                                            <td>01.838.723/0346-17</td>
+                                                            <td>ROD PE-050, S/N - KM 02 , DISTRITO INDUSTRIAL </td>
+                                                            <td>Vitória de Santo Antão</td>
+                                                            <td>PE</td>
+                                                            <td>ELUS ENGENHARIA AMBIENTAL LTDA</td>
+                                                            <td>01.459.413/0001-00</td>
+                                                            <td>ANDERSON INACIO DE OLIVEIRA</td>
+                                                            <td>PEC-4163</td>
+                                                            <td>ROLL ON ROLL OFF</td>
+                                                            <td></td>
+                                                            <td>01/06/2026</td>
+                                                            <td></td>
+                                                            <td>REUSE AMBIENTAL COMÉRCIO DE RESÍDUOS LTDA</td>
+                                                            <td>33.983.294/0001-78</td>
+                                                            <td>RUA ARARENDA, 211, COMPORTAS,  Jaboatão dos Guararapes - PE</td>
+                                                            <td></td>
+                                                            <td>1</td>
+                                                            <td></td>
+                                                            <td>Vai Vem</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>CAÇAMBÃO 38 M³</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>RECICLÁVEIS (T)</td>
+                                                            <td></td>
+                                                            <td>t</td>
+                                                            <td>SUCATA DE MADEIRA</td>
+                                                            <td>RECICLAGEM</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>0</td>
+                                                            <td>0</td>
+                                                            <td>1</td>
+                                                            <td>VIAGEM</td>
+                                                            <td>0</td>
+                                                            <td>0</td>
+                                                            <td>0</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                    </tr>
+                    
+                                                                    
+                                                                                    <tr>
+                                                            <td>549630</td>
+                                                            <td></td>
+                                                            <td>105622</td>
+                                                            <td>ROTA</td>
+                                                            <td>COLETA</td>
+                                                            <td>586</td>
+                                                            <td></td>
+                                                            <td>BRF S.A. (FÁBRICA)</td>
+                                                            <td>BRF - FÁBRICA</td>
+                                                            <td>01.838.723/0346-17</td>
+                                                            <td>--</td>
+                                                            <td>ROD. PE 050, S/N - KM 02 ALA 02, DISTRITO INDUSTRIAL (PREFEITO JOSE AUGUSTO FERRER)</td>
+                                                            <td>-8.0941985</td>
+                                                            <td>-35.2571224</td>
+                                                            <td>Vitória de Santo Antão</td>
+                                                            <td>PE</td>
+                                                            <td>INDUSTRIAL</td>
+                                                            <td>696</td>
+                                                            <td>BRF S.A.</td>
+                                                            <td>BRF - CLASSE II - FÁBRICA</td>
+                                                            <td>01.838.723/0346-17</td>
+                                                            <td>ROD PE-050 S/N, S/N - KM 02 ALA 02, DISTRITO INDUSTRIAL </td>
+                                                            <td>Vitória de Santo Antão</td>
+                                                            <td>PE</td>
+                                                            <td>ELUS ENGENHARIA AMBIENTAL LTDA</td>
+                                                            <td>01.459.413/0001-00</td>
+                                                            <td>FABIANO MONTENEGRO DA SILVA</td>
+                                                            <td>KGC-4A49</td>
+                                                            <td>POLIGUINDASTE DUPLO</td>
+                                                            <td></td>
+                                                            <td>01/06/2026</td>
+                                                            <td></td>
+                                                            <td>ORIZON MEIO AMBIENTE S.A.</td>
+                                                            <td>03.279.285/0027-79</td>
+                                                            <td>ROD EMPRESARIO JOAO SANTOS FILHO, 1000, MURIBECA,  Jaboatão dos Guararapes - PE, 54350-100</td>
+                                                            <td></td>
+                                                            <td>2</td>
+                                                            <td></td>
+                                                            <td>Vai Vem</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>CAÇAMBA 5M³ ABERTA</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>LIXO COMUM - ATERRO</td>
+                                                            <td></td>
+                                                            <td>t</td>
+                                                            <td></td>
+                                                            <td>ATERRO</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>780,23</td>
+                                                            <td>0</td>
+                                                            <td>1</td>
+                                                            <td>EQUIPAMENTO</td>
+                                                            <td>780,23</td>
+                                                            <td>0</td>
+                                                            <td>780,23</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                    </tr>
+                    
+                                                                    
+                                                                                    <tr>
+                                                            <td>549517</td>
+                                                            <td></td>
+                                                            <td>105623</td>
+                                                            <td>ROTA</td>
+                                                            <td>COLETA</td>
+                                                            <td>628</td>
+                                                            <td></td>
+                                                            <td>GERDAU ACOS LONGOS S.A.</td>
+                                                            <td>GERDAU - CURADO</td>
+                                                            <td>07.358.761/0051-28</td>
+                                                            <td>--</td>
+                                                            <td>AV GETULIO VARGAS, 3666, CURADO</td>
+                                                            <td>-8.0751978</td>
+                                                            <td>-34.9677578</td>
+                                                            <td>Recife</td>
+                                                            <td>PE</td>
+                                                            <td>INDUSTRIAL</td>
+                                                            <td>723</td>
+                                                            <td>GERDAU ACOS LONGOS S.A.</td>
+                                                            <td>GERDAU - CURADO</td>
+                                                            <td>07.358.761/0051-28</td>
+                                                            <td>AV GETULIO VARGAS, 3666, CURADO</td>
+                                                            <td>Recife</td>
+                                                            <td>PE</td>
+                                                            <td>ELUS ENGENHARIA AMBIENTAL LTDA</td>
+                                                            <td>01.459.413/0001-00</td>
+                                                            <td>VANDSON SILVA DO NASCIMENTO</td>
+                                                            <td>RZE-5H80</td>
+                                                            <td>POLIGUINDASTE DUPLO</td>
+                                                            <td></td>
+                                                            <td>01/06/2026</td>
+                                                            <td></td>
+                                                            <td>AMBIPAR ENVIRONMENTAL ECOPARQUE S/A</td>
+                                                            <td>53.172.475/0001-21</td>
+                                                            <td>RODOVIA BR 101 NORTE, S/N, AREA RURAL DE IGARASSU,  Igarassu - PE, 53659-899</td>
+                                                            <td></td>
+                                                            <td>1</td>
+                                                            <td></td>
+                                                            <td>Vai Vem</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>CAÇAMBA 5M³ ABERTA</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>LIXO COMUM -  BLENDAGEM</td>
+                                                            <td></td>
+                                                            <td>t</td>
+                                                            <td></td>
+                                                            <td>BLENDAGEM PARA COPROCESSAMENTO</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>REALIZAÇÃO DE MOVIMENTAÇÃO NA UNIDADE</td>
+                                                    </tr>
+                                                                    <tr>
+                                                            <td>549517</td>
+                                                            <td></td>
+                                                            <td>105623</td>
+                                                            <td>ROTA</td>
+                                                            <td>COLETA</td>
+                                                            <td>628</td>
+                                                            <td></td>
+                                                            <td>GERDAU ACOS LONGOS S.A.</td>
+                                                            <td>GERDAU - CURADO</td>
+                                                            <td>07.358.761/0051-28</td>
+                                                            <td>--</td>
+                                                            <td>AV GETULIO VARGAS, 3666, CURADO</td>
+                                                            <td>-8.0751978</td>
+                                                            <td>-34.9677578</td>
+                                                            <td>Recife</td>
+                                                            <td>PE</td>
+                                                            <td>INDUSTRIAL</td>
+                                                            <td>723</td>
+                                                            <td>GERDAU ACOS LONGOS S.A.</td>
+                                                            <td>GERDAU - CURADO</td>
+                                                            <td>07.358.761/0051-28</td>
+                                                            <td>AV GETULIO VARGAS, 3666, CURADO</td>
+                                                            <td>Recife</td>
+                                                            <td>PE</td>
+                                                            <td>ELUS ENGENHARIA AMBIENTAL LTDA</td>
+                                                            <td>01.459.413/0001-00</td>
+                                                            <td>VANDSON SILVA DO NASCIMENTO</td>
+                                                            <td>RZE-5H80</td>
+                                                            <td>POLIGUINDASTE DUPLO</td>
+                                                            <td></td>
+                                                            <td>01/06/2026</td>
+                                                            <td></td>
+                                                            <td>AMBIPAR ENVIRONMENTAL ECOPARQUE S/A</td>
+                                                            <td>53.172.475/0001-21</td>
+                                                            <td>RODOVIA BR 101 NORTE, S/N, AREA RURAL DE IGARASSU,  Igarassu - PE, 53659-899</td>
+                                                            <td></td>
+                                                            <td>1</td>
+                                                            <td></td>
+                                                            <td>Vai Vem</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>CAÇAMBA 5M³ ABERTA</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>SÓLIDOS CONTAMINADOS - BLENDAGEM</td>
+                                                            <td></td>
+                                                            <td>t</td>
+                                                            <td></td>
+                                                            <td>BLENDAGEM PARA COPROCESSAMENTO</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>REALIZAÇÃO DE MOVIMENTAÇÃO NA UNIDADE</td>
+                                                    </tr>
+                    
+                                                                                        </tbody>
+    </table>
+
+    </body>
+</html>
