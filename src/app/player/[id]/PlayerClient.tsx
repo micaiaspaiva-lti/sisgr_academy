@@ -43,6 +43,7 @@ interface PlayerClientProps {
   currentModule: Module;
   completedLessonIds: string[];
   studentId: string;
+  studentTipo: "normal" | "vip";
 }
 
 export default function PlayerClient({
@@ -51,6 +52,7 @@ export default function PlayerClient({
   currentModule,
   completedLessonIds,
   studentId,
+  studentTipo,
 }: PlayerClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -148,20 +150,36 @@ export default function PlayerClient({
           
           {/* Player Container */}
           <div className="aspect-video bg-black relative group">
-            <video
-              src={currentLesson.videoUrl}
-              controls
-              className="w-full h-full object-contain"
-              aria-label={`Player de vídeo para a aula: ${currentLesson.titulo}`}
-            />
-            {/* Botão de Modo Cinema no Overlay */}
-            <button
-              onClick={() => setCinemaMode(!cinemaMode)}
-              className="absolute top-4 right-4 p-2.5 rounded-lg bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80 flex items-center justify-center"
-              title={cinemaMode ? "Sair do Modo Cinema" : "Modo Cinema / Teatro"}
-            >
-              {cinemaMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-            </button>
+            {studentTipo === "normal" && !currentLesson.demonstrative ? (
+              <div className="absolute inset-0 bg-slate-950 flex flex-col items-center justify-center p-6 text-center gap-4">
+                <div className="p-4 bg-amber-500/10 border border-amber-500/20 text-amber-500 rounded-full shadow-inner">
+                  <Lock className="h-10 w-10 text-amber-500" />
+                </div>
+                <div className="flex flex-col gap-2 max-w-sm">
+                  <h3 className="text-white font-extrabold text-sm tracking-tight">Conteúdo VIP Exclusivo</h3>
+                  <p className="text-slate-400 text-3xs leading-relaxed font-semibold">
+                    Esta aula faz parte do conteúdo avançado para parceiros e clientes do ERP SISGR. Entre em contato conosco para assinar e liberar.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <video
+                  src={currentLesson.videoUrl}
+                  controls
+                  className="w-full h-full object-contain"
+                  aria-label={`Player de vídeo para a aula: ${currentLesson.titulo}`}
+                />
+                {/* Botão de Modo Cinema no Overlay */}
+                <button
+                  onClick={() => setCinemaMode(!cinemaMode)}
+                  className="absolute top-4 right-4 p-2.5 rounded-lg bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80 flex items-center justify-center cursor-pointer"
+                  title={cinemaMode ? "Sair do Modo Cinema" : "Modo Cinema / Teatro"}
+                >
+                  {cinemaMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                </button>
+              </>
+            )}
           </div>
 
           {/* Área de Controle e Descrição */}
@@ -336,6 +354,9 @@ export default function PlayerClient({
                             )}
                             <span className="truncate">{aula.titulo}</span>
                           </div>
+                          {studentTipo === "normal" && !aula.demonstrative && (
+                            <Lock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                          )}
                         </Link>
                       );
                     })}
@@ -394,6 +415,9 @@ export default function PlayerClient({
                             )}
                             <span className="truncate">{aula.titulo}</span>
                           </div>
+                          {studentTipo === "normal" && !aula.demonstrative && (
+                            <Lock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                          )}
                         </Link>
                       );
                     })}

@@ -233,6 +233,7 @@ export async function resetDatabaseToSeedAction() {
       email: "arthur.sso@residuosparceiro.com",
       telefone: "(11) 99999-1111",
       tipo: "vip",
+      senha: "123456",
       empresaId: empresa.id,
     }).returning();
 
@@ -242,6 +243,7 @@ export async function resetDatabaseToSeedAction() {
       email: "beatriz@ecorecicla.com",
       telefone: "(11) 99999-2222",
       tipo: "vip",
+      senha: "123456",
       empresaId: empresa.id,
     }).returning();
 
@@ -251,6 +253,7 @@ export async function resetDatabaseToSeedAction() {
       email: "carlos@ecorecicla.com",
       telefone: "(11) 99999-3333",
       tipo: "vip",
+      senha: "123456",
       empresaId: empresa.id,
     }).returning();
 
@@ -260,6 +263,7 @@ export async function resetDatabaseToSeedAction() {
       email: "diana@ecorecicla.com",
       telefone: "(11) 99999-4444",
       tipo: "vip",
+      senha: "123456",
       empresaId: empresa.id,
     }).returning();
 
@@ -385,7 +389,8 @@ export async function createAlunoAction(
   email: string,
   telefone: string,
   tipo: "normal" | "vip",
-  empresaId?: string | null
+  empresaId?: string | null,
+  senha?: string
 ) {
   try {
     if (!nome.trim()) return { success: false, error: "O campo Nome é obrigatório." };
@@ -409,6 +414,8 @@ export async function createAlunoAction(
       return { success: false, error: "Um aluno VIP precisa estar associado a uma empresa." };
     }
 
+    const password = senha?.trim() || "123456";
+
     const [newAluno] = await db
       .insert(alunos)
       .values({
@@ -416,6 +423,7 @@ export async function createAlunoAction(
         email: formattedEmail,
         telefone: telefone.trim(),
         tipo,
+        senha: password,
         empresaId: tipo === "vip" ? empresaId : null,
       })
       .returning();
@@ -468,6 +476,7 @@ export async function simularSessaoAlunoAction(alunoId: string) {
       nome: aluno.nome,
       email: aluno.email,
       empresaId: aluno.empresaId || undefined,
+      tipo: aluno.tipo || "normal",
       role: "aluno",
     });
 
@@ -505,5 +514,53 @@ export async function limparSessaoSimuladaAction() {
   } catch (error) {
     console.error("Erro ao limpar sessão simulada:", error);
     return { success: false, error: "Falha ao limpar sessão simulada." };
+  }
+}
+
+// 14. Autenticar aluno via e-mail e senha no EAD
+export async function alunoLoginAction(email: string, senhaInserida: string) {
+  try {
+    const formattedEmail = email.trim().toLowerCase();
+    const [aluno] = await db
+      .select()
+      .from(alunos)
+      .where(eq(alunos.email, formattedEmail))
+      .limit(1);
+
+    if (!aluno) {
+      return { 
+        success: false, 
+        error: "Este e-mail não está cadastrado em nosso EAD. Caso seja nosso cliente, entre em contato com o suporte." 
+      };
+    }
+
+    if ((aluno.senha || "123456") !== senhaInserida.trim()) {
+      return { success: false, error: "Senha incorreta." };
+    }
+
+    const token = signTestToken({
+      sub: aluno.id,
+      nome: aluno.nome,
+      email: aluno.email,
+      empresaId: aluno.empresaId || undefined,
+      tipo: aluno.tipo || "normal",
+      role: "aluno",
+    });
+
+    const cookieStore = await cookies();
+    cookieStore.set("sso_token", token, {
+      maxAge: 30 * 24 * 60 * 60, // 30 dias
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    revalidatePath("/");
+    revalidatePath("/dashboard");
+    return { success: true };
+  } catch (error) {
+    console.error("Erro ao autenticar aluno:", error);
+    return { success: false, error: "Ocorreu um erro interno de login." };
   }
 }

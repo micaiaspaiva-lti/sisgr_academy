@@ -16,7 +16,8 @@ import {
   Mail,
   Shield,
   Sparkles,
-  BarChart3
+  BarChart3,
+  Key
 } from "lucide-react";
 import { toast } from "sonner";
 import { 
@@ -62,6 +63,7 @@ export default function AlunosClient({ initialAlunos, empresas, activeSessionId 
   const [telefone, setTelefone] = useState("");
   const [tipo, setTipo] = useState<"normal" | "vip">("normal");
   const [empresaId, setEmpresaId] = useState("");
+  const [senha, setSenha] = useState("");
 
   // Formatação de telefone em tempo real
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,7 +101,14 @@ export default function AlunosClient({ initialAlunos, empresas, activeSessionId 
 
     setIsSubmitting(true);
     try {
-      const res = await createAlunoAction(nome, email, telefone, tipo, tipo === "vip" ? empresaId : null);
+      const res = await createAlunoAction(
+        nome, 
+        email, 
+        telefone, 
+        tipo, 
+        tipo === "vip" ? empresaId : null,
+        senha.trim() ? senha : undefined
+      );
       if (res.success && res.aluno) {
         const empresaObj = tipo === "vip" 
           ? empresas.find(e => e.id === empresaId) || null 
@@ -124,6 +133,7 @@ export default function AlunosClient({ initialAlunos, empresas, activeSessionId 
         setTelefone("");
         setTipo("normal");
         setEmpresaId("");
+        setSenha("");
       } else {
         toast.error(res.error || "Erro ao cadastrar aluno.");
       }
@@ -460,6 +470,21 @@ export default function AlunosClient({ initialAlunos, empresas, activeSessionId 
                     placeholder="(99) 99999-9999"
                     value={telefone}
                     onChange={handlePhoneChange}
+                    className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              {/* Campo Senha */}
+              <div className="flex flex-col gap-1">
+                <label className="text-3xs font-extrabold text-slate-400 uppercase tracking-wider">Senha de Acesso</label>
+                <div className="relative">
+                  <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                  <input
+                    type="password"
+                    placeholder="Se vazio, padrão será 123456"
+                    value={senha}
+                    onChange={(e) => setSenha(e.target.value)}
                     className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
                   />
                 </div>

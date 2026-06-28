@@ -14,6 +14,7 @@ export const alunos = pgTable("alunos", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   telefone: varchar("telefone", { length: 20 }),
   tipo: varchar("tipo", { length: 20 }).default("normal").notNull(),
+  senha: varchar("senha", { length: 255 }),
   empresaId: uuid("empresa_id").references(() => empresas.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

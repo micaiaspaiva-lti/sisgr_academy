@@ -29,6 +29,7 @@ async function main() {
     email: "arthur.sso@residuosparceiro.com",
     telefone: "(11) 99999-1111",
     tipo: "vip",
+    senha: "123456",
     empresaId: empresa.id,
   }).returning();
 
@@ -38,6 +39,7 @@ async function main() {
     email: "beatriz@ecorecicla.com",
     telefone: "(11) 99999-2222",
     tipo: "vip",
+    senha: "123456",
     empresaId: empresa.id,
   }).returning();
 
@@ -47,6 +49,7 @@ async function main() {
     email: "carlos@ecorecicla.com",
     telefone: "(11) 99999-3333",
     tipo: "vip",
+    senha: "123456",
     empresaId: empresa.id,
   }).returning();
 
@@ -56,6 +59,7 @@ async function main() {
     email: "diana@ecorecicla.com",
     telefone: "(11) 99999-4444",
     tipo: "vip",
+    senha: "123456",
     empresaId: empresa.id,
   }).returning();
 

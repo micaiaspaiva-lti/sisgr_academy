@@ -5,6 +5,7 @@ export interface UserSession {
   nome: string;
   email: string;
   empresaId?: string;
+  tipo: "normal" | "vip";
   role: "aluno" | "admin" | "instrutor";
 }
 
@@ -30,6 +31,7 @@ export function verifySSOToken(token: string): UserSession | null {
       nome: decoded.nome,
       email: decoded.email,
       empresaId: decoded.empresaId,
+      tipo: decoded.tipo || "normal",
       role: decoded.role || "aluno"
     };
   } catch (error) {
@@ -48,6 +50,7 @@ export function getMockSession(): UserSession {
     nome: "Arthur Pendragon (SSO Teste)",
     email: "arthur.sso@residuosparceiro.com",
     empresaId: "empresa-parceira-id",
+    tipo: "vip",
     role: "aluno"
   };
 }

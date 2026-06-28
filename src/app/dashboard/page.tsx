@@ -4,9 +4,10 @@ import { verifySSOToken } from "@/lib/auth";
 import { db } from "@/db";
 import { cursos, progressoAulas } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
+import { redirect } from "next/navigation";
 import { 
   Play, BookOpen, Award, CheckCircle2, 
-  Sparkles, LogOut, Clock 
+  Sparkles, LogOut, Clock, Lock 
 } from "lucide-react";
 
 export const metadata = {
@@ -18,14 +19,11 @@ export default async function Dashboard() {
   // Lógica SSO: Tenta decodificar o token a partir de cookies
   const cookieStore = await cookies();
   const token = cookieStore.get("sso_token")?.value || "";
+  const session = verifySSOToken(token);
   
-  // Se não houver token, usa o mock cadastrado no banco durante o seed
-  const session = verifySSOToken(token) || {
-    id: "22222222-2222-4222-b222-222222222222", // ID do Arthur Pendragon cadastrado no seed
-    nome: "Arthur Pendragon (SSO)",
-    email: "arthur.sso@residuosparceiro.com",
-    role: "aluno"
-  };
+  if (!session) {
+    redirect("/login");
+  }
 
   // 1. Buscar todos os cursos ativos, módulos e aulas
   const allCourses = await db.query.cursos.findMany({
@@ -61,11 +59,13 @@ export default async function Dashboard() {
     let completedLessonsCount = 0;
     let firstIncompleteLessonId: string | null = null;
     let firstLessonId: string | null = null;
+    let hasDemoLesson = false;
 
     course.modulos.forEach(modulo => {
       modulo.aulas.forEach(aula => {
         totalLessons++;
         if (!firstLessonId) firstLessonId = aula.id;
+        if (aula.demonstrative) hasDemoLesson = true;
         
         if (completedSet.has(aula.id)) {
           completedLessonsCount++;
@@ -76,12 +76,14 @@ export default async function Dashboard() {
     });
 
     const progresso = totalLessons > 0 ? Math.round((completedLessonsCount / totalLessons) * 100) : 0;
+    const isLocked = session.tipo === "normal" && !hasDemoLesson;
     
     return {
       ...course,
       progresso,
       totalLessons,
       completedLessonsCount,
+      isLocked,
       // Aula para continuar: primeira incompleta, ou a primeira se nada concluído, ou a última se tudo concluído
       proximaAulaId: firstIncompleteLessonId || firstLessonId,
     };
@@ -193,7 +195,15 @@ export default async function Dashboard() {
                     alt={course.titulo}
                     className="object-cover w-full h-full"
                   />
-                  {course.progresso === 100 && (
+                  {course.isLocked && (
+                    <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center">
+                      <div className="bg-slate-900/95 text-white px-4 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 border border-slate-800 shadow-lg">
+                        <Lock className="h-4 w-4 text-amber-500" />
+                        Conteúdo VIP
+                      </div>
+                    </div>
+                  )}
+                  {course.progresso === 100 && !course.isLocked && (
                     <div className="absolute top-4 right-4 bg-emerald-500 text-white p-2 rounded-full shadow-lg" title="Curso concluído!">
                       <CheckCircle2 className="h-5 w-5" />
                     </div>
@@ -226,7 +236,16 @@ export default async function Dashboard() {
 
                   {/* Botões de Ação */}
                   <div className="flex flex-col sm:flex-row gap-3 border-t border-slate-100 pt-6">
-                    {course.progresso === 100 ? (
+                    {course.isLocked ? (
+                      <button
+                        disabled
+                        className="flex-grow inline-flex items-center justify-center gap-2 rounded-lg bg-slate-200 px-4 py-2.5 text-xs font-bold text-slate-450 cursor-not-allowed w-full"
+                        title="Este curso é exclusivo para clientes VIP"
+                      >
+                        <Lock className="h-3.5 w-3.5 text-slate-400" />
+                        Bloqueado para Visitantes
+                      </button>
+                    ) : course.progresso === 100 ? (
                       <Link
                         href={`/api/certificados/emitir?cursoId=${course.id}`} // Passa o ID do curso para o certificado
                         className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2.5 text-xs font-bold text-white hover:opacity-90 transition-opacity"

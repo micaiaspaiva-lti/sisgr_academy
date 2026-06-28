@@ -20,12 +20,11 @@ export default async function PlayerPage({ params }: PageProps) {
   // 1. SSO Session validation
   const cookieStore = await cookies();
   const token = cookieStore.get("sso_token")?.value || "";
-  const session = verifySSOToken(token) || {
-    id: "22222222-2222-4222-b222-222222222222", // Fallback para Arthur Pendragon
-    nome: "Arthur Pendragon (SSO)",
-    email: "arthur.sso@residuosparceiro.com",
-    role: "aluno",
-  };
+  const session = verifySSOToken(token);
+
+  if (!session) {
+    redirect("/login");
+  }
 
   // 2. Fetch the active lesson
   const currentLesson = await db.query.aulas.findFirst({
@@ -135,6 +134,7 @@ export default async function PlayerPage({ params }: PageProps) {
       currentModule={mappedModule}
       completedLessonIds={completedLessonIds}
       studentId={session.id}
+      studentTipo={session.tipo}
     />
   );
 }
