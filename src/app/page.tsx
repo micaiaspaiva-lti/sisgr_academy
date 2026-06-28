@@ -163,87 +163,88 @@ export default async function Home() {
       <HeroCarousel courses={featuredCoursesData} />
 
       {/* Courses Grid */}
-      <main className="flex-grow py-20 px-6 md:px-12 w-full max-w-7xl mx-auto flex flex-col gap-24">
+      <main className="flex-grow py-12 px-6 md:px-12 w-full max-w-7xl mx-auto flex flex-col gap-16">
         
-        {/* Seção Como Funciona e Público-Alvo */}
-        <section className="scroll-mt-24">
+        {/* Seção Como Funciona e Público-Alvo (Compacta) */}
+        <section className="grid lg:grid-cols-12 gap-8 scroll-mt-24">
           
-          {/* Bloco de Público-Alvo: Público Geral vs SISGR SSO */}
-          <div className="grid md:grid-cols-2 gap-8 mb-20">
-            <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col gap-4 hover:shadow-md transition-shadow">
-              <div className="h-12 w-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 shadow-2xs">
-                <Users className="h-6 w-6" />
+          {/* Lado Esquerdo: Público e Integração (5 cols) */}
+          <div className="lg:col-span-5 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between gap-5">
+            <div>
+              <span className="text-4xs font-extrabold text-emerald-600 uppercase tracking-widest block mb-1">Acesso à Plataforma</span>
+              <h2 className="text-lg font-black text-slate-950 mb-3">Para Quem é?</h2>
+              
+              <div className="flex flex-col gap-4">
+                <div className="flex gap-3 items-start">
+                  <div className="h-7 w-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                    <Users className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-extrabold text-slate-800">Público Geral</h4>
+                    <p className="text-[11px] font-semibold text-slate-500 leading-relaxed">
+                      Acesso livre a cursos públicos e aulas demonstrativas gratuitas.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 items-start">
+                  <div className="h-7 w-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                    <ShieldCheck className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-extrabold text-slate-800 flex items-center gap-1.5 flex-wrap">
+                      Clientes ERP SISGR
+                      <span className="bg-amber-500 text-[8px] font-black text-white px-1.5 py-0.5 rounded-xs uppercase tracking-wide">SSO</span>
+                    </h4>
+                    <p className="text-[11px] font-semibold text-slate-500 leading-relaxed">
+                      Login unificado integrado para liberar cursos corporativos VIP.
+                    </p>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-lg font-black text-slate-900">Público Geral</h3>
-              <p className="text-xs font-semibold text-slate-550 leading-relaxed">
-                Quer alavancar sua carreira ou se especializar no setor de sustentabilidade? Explore nossos cursos públicos de alta qualidade e assista a aulas demonstrativas gratuitamente para começar imediatamente.
-              </p>
-            </div>
-            
-            <div className="bg-white rounded-3xl border border-amber-200 p-8 shadow-sm flex flex-col gap-4 relative overflow-hidden hover:shadow-md transition-shadow">
-              <div className="absolute top-0 right-0 bg-amber-500 text-[9px] font-black text-white px-3 py-1 rounded-bl-xl uppercase tracking-wider">
-                Corporativo SSO
-              </div>
-              <div className="h-12 w-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-705 shadow-2xs">
-                <ShieldCheck className="h-6 w-6" />
-              </div>
-              <h3 className="text-lg font-black text-slate-900">Clientes ERP SISGR</h3>
-              <p className="text-xs font-semibold text-slate-555 leading-relaxed">
-                Aproveite a integração nativa com o <strong>SISGR - Sistema de Gestão de Resíduos</strong>. Faça login unificado via SSO corporativo para liberar capacitações VIP e treinamentos exclusivos para sua equipe.
-              </p>
             </div>
           </div>
 
-          {/* Bloco de Etapas / Como Funciona */}
-          <div className="text-center max-w-xl mx-auto mb-14">
-            <span className="text-3xs font-extrabold text-emerald-600 uppercase tracking-widest block mb-2">Simples & Direto</span>
-            <h2 className="text-3xl font-black text-slate-950 leading-tight mb-4">Qualifique-se em 3 Etapas</h2>
-            <p className="text-xs font-bold text-slate-500 leading-relaxed">
-              Uma trilha de aprendizado focada em resultados rápidos, materiais complementares e emissão de certificados válidos.
-            </p>
-          </div>
+          {/* Lado Direito: Etapas de Certificação (7 cols) */}
+          <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between gap-4">
+            <div>
+              <span className="text-4xs font-extrabold text-emerald-600 uppercase tracking-widest block mb-1">Passo a Passo</span>
+              <h2 className="text-lg font-black text-slate-950 mb-4">Como Funciona?</h2>
+              
+              <div className="grid sm:grid-cols-3 gap-4">
+                {/* Passo 1 */}
+                <div className="flex flex-col gap-2 p-3.5 bg-slate-50/50 rounded-2xl border border-slate-150">
+                  <div className="flex items-center gap-2">
+                    <span className="h-5 w-5 bg-emerald-600 text-[10px] font-black text-white rounded-full flex items-center justify-center shrink-0">1</span>
+                    <span className="text-xs font-extrabold text-slate-800">Escolha o Curso</span>
+                  </div>
+                  <p className="text-[10px] font-semibold text-slate-500 leading-relaxed">
+                    Navegue ou conecte via SSO se for cliente corporativo.
+                  </p>
+                </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Passo 1 */}
-            <div className="flex flex-col items-center text-center p-6 bg-white rounded-3xl border border-slate-200 shadow-3xs relative">
-              <div className="absolute -top-4 bg-emerald-600 text-xs font-black text-white h-8 w-8 rounded-full flex items-center justify-center shadow-md">
-                1
-              </div>
-              <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center text-emerald-650 mb-4 mt-2">
-                <UserCheck className="h-5 w-5" />
-              </div>
-              <h4 className="text-sm font-extrabold text-slate-900 mb-2">1. Escolha ou Faça Login</h4>
-              <p className="text-3xs font-semibold text-slate-500 leading-relaxed max-w-[220px]">
-                Navegue pelas especializações públicas ou faça login corporativo (SSO) caso sua organização seja parceira do ERP SISGR.
-              </p>
-            </div>
+                {/* Passo 2 */}
+                <div className="flex flex-col gap-2 p-3.5 bg-slate-50/50 rounded-2xl border border-slate-150">
+                  <div className="flex items-center gap-2">
+                    <span className="h-5 w-5 bg-emerald-600 text-[10px] font-black text-white rounded-full flex items-center justify-center shrink-0">2</span>
+                    <span className="text-xs font-extrabold text-slate-800">Estude e Pratique</span>
+                  </div>
+                  <p className="text-[10px] font-semibold text-slate-500 leading-relaxed">
+                    Assista às aulas e baixe os arquivos de apoio.
+                  </p>
+                </div>
 
-            {/* Passo 2 */}
-            <div className="flex flex-col items-center text-center p-6 bg-white rounded-3xl border border-slate-205 shadow-3xs relative">
-              <div className="absolute -top-4 bg-emerald-600 text-xs font-black text-white h-8 w-8 rounded-full flex items-center justify-center shadow-md">
-                2
+                {/* Passo 3 */}
+                <div className="flex items-center sm:items-start flex-col gap-2 p-3.5 bg-slate-50/50 rounded-2xl border border-slate-150">
+                  <div className="flex items-center gap-2">
+                    <span className="h-5 w-5 bg-emerald-600 text-[10px] font-black text-white rounded-full flex items-center justify-center shrink-0">3</span>
+                    <span className="text-xs font-extrabold text-slate-800">Certifique-se</span>
+                  </div>
+                  <p className="text-[10px] font-semibold text-slate-500 leading-relaxed">
+                    Conclua as aulas e emita seu certificado digital.
+                  </p>
+                </div>
               </div>
-              <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center text-emerald-655 mb-4 mt-2">
-                <Tv className="h-5 w-5" />
-              </div>
-              <h4 className="text-sm font-extrabold text-slate-900 mb-2">2. Estude e Baixe Anexos</h4>
-              <p className="text-3xs font-semibold text-slate-500 leading-relaxed max-w-[220px]">
-                Assista às videoaulas em alta resolução no player integrado e baixe materiais e apostilas de apoio para aprofundar.
-              </p>
-            </div>
-
-            {/* Passo 3 */}
-            <div className="flex flex-col items-center text-center p-6 bg-white rounded-3xl border border-slate-200 shadow-3xs relative">
-              <div className="absolute -top-4 bg-emerald-600 text-xs font-black text-white h-8 w-8 rounded-full flex items-center justify-center shadow-md">
-                3
-              </div>
-              <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center text-emerald-660 mb-4 mt-2">
-                <Award className="h-5 w-5" />
-              </div>
-              <h4 className="text-sm font-extrabold text-slate-900 mb-2">3. Emita o Certificado</h4>
-              <p className="text-3xs font-semibold text-slate-500 leading-relaxed max-w-[220px]">
-                Conclua todas as aulas do curso para liberar o download do seu certificado digital de conclusão reconhecido pelo mercado.
-              </p>
             </div>
           </div>
         </section>
