@@ -3,7 +3,7 @@
 import React, { useState, useRef } from "react";
 import Link from "next/link";
 import { 
-  Plus, Folder, PlayCircle, Sparkles, 
+  Plus, Folder, PlayCircle, Sparkles, Search,
   UserCheck, BarChart3, GripVertical, CheckCircle, 
   Trash2, Loader2, ArrowLeft, Users, LogOut, Pencil, Eye, EyeOff, Upload, Image, FileText, Paperclip, Link as LinkIcon
 } from "lucide-react";
@@ -233,6 +233,7 @@ function ImageUploadZone({ value, onChange, label, accept, placeholderText, comp
 export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) {
   const [courses, setCourses] = useState<Course[]>(initialCourses);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(initialCourses[0] || null);
+  const [sidebarSearch, setSidebarSearch] = useState("");
   const [draggedLessonId, setDraggedLessonId] = useState<string | null>(null);
   const [processingIAId, setProcessingIAId] = useState<string | null>(null);
 
@@ -828,82 +829,148 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
               </button>
             </div>
 
-            <div className="flex flex-col gap-2">
-              {courses.map((c, idx) => (
-                <div key={c.id} className="flex items-center gap-1.5 w-full group">
-                  <button
-                    onClick={() => setSelectedCourse(c)}
-                    className={`flex-grow text-left p-3 rounded-xl border text-xs font-bold transition-all flex gap-3 items-center min-w-0 ${
-                      selectedCourse?.id === c.id
-                        ? "border-duet-brand bg-duet-brand-light text-emerald-800"
-                        : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-                    }`}
-                  >
-                    {c.imagemCapa && (
-                      <img 
-                        src={c.imagemCapa} 
-                        alt="" 
-                        className="h-10 w-16 object-cover rounded-lg border border-slate-200 shrink-0 shadow-2xs"
-                      />
-                    )}
-                    <div className="flex flex-col gap-1 flex-grow min-w-0">
-                      <div className="flex justify-between items-center w-full gap-2">
-                        <span className={`line-clamp-1 flex-grow ${!c.ativo ? "text-slate-400 line-through decoration-slate-300" : ""}`}>{c.titulo}</span>
-                        <div className="flex gap-1 items-center shrink-0">
-                          {c.destaque && (
-                            <span className="inline-flex shrink-0 items-center rounded-md bg-purple-50 px-1 py-0.5 text-[8px] font-bold text-purple-700 ring-1 ring-inset ring-purple-600/10 uppercase tracking-wider">
-                              ★
-                            </span>
-                          )}
-                          {!c.ativo && (
-                            <span className="inline-flex shrink-0 items-center rounded-md bg-slate-100 px-1.5 py-0.5 text-[8px] font-bold text-slate-550 border border-slate-200 uppercase tracking-wider">
-                              Rascunho
-                            </span>
-                          )}
-                          {c.tipo === "vip" ? (
-                            <span className="inline-flex shrink-0 items-center rounded-md bg-amber-50 px-1 py-0.5 text-[8px] font-bold text-amber-700 ring-1 ring-inset ring-amber-600/10 uppercase tracking-wider">
-                              VIP
-                            </span>
-                          ) : (
-                            <span className="inline-flex shrink-0 items-center rounded-md bg-emerald-50 px-1 py-0.5 text-[8px] font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/10 uppercase tracking-wider">
-                              Púb
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <span className="text-3xs font-medium text-slate-400">
-                        {c.modulos?.length || 0} Módulos • {c.modulos?.reduce((acc, curr) => acc + (curr.aulas?.length || 0), 0) || 0} Aulas
-                      </span>
-                    </div>
-                  </button>
-                  <div className="flex flex-col gap-1 shrink-0">
-                    <button
-                      type="button"
-                      disabled={idx === 0}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleMoveCourse(c.id, "up");
-                      }}
-                      className="p-1 rounded-md border border-slate-200 hover:bg-slate-50 text-slate-400 hover:text-slate-700 disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer transition-colors bg-white shadow-3xs"
-                      title="Mover Curso para Cima"
-                    >
-                      <span className="text-[10px] block leading-none select-none">▲</span>
-                    </button>
-                    <button
-                      type="button"
-                      disabled={idx === courses.length - 1}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleMoveCourse(c.id, "down");
-                      }}
-                      className="p-1 rounded-md border border-slate-200 hover:bg-slate-50 text-slate-400 hover:text-slate-700 disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer transition-colors bg-white shadow-3xs"
-                      title="Mover Curso para Baixo"
-                    >
-                      <span className="text-[10px] block leading-none select-none">▼</span>
-                    </button>
+            {/* Campo de Pesquisa do Sidebar */}
+            <div className="relative mb-2 shrink-0">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Pesquisar curso..."
+                value={sidebarSearch}
+                onChange={(e) => setSidebarSearch(e.target.value)}
+                className="w-full rounded-xl border border-slate-205 pl-9 pr-3 py-2 text-[11px] text-slate-800 placeholder-slate-405 focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 bg-slate-50/50 shadow-3xs"
+              />
+            </div>
+
+            <div className="flex flex-col gap-5 overflow-y-auto max-h-[620px] pr-1 scrollbar-thin">
+              {/* Seção Cursos em Destaque (Se houver e se não estiver buscando) */}
+              {!sidebarSearch && courses.filter(c => c.destaque).length > 0 && (
+                <div className="flex flex-col gap-2">
+                  <h3 className="text-[10px] font-black text-purple-700 uppercase tracking-wider flex items-center gap-1">
+                    <Sparkles className="h-3 w-3 fill-purple-100" />
+                    Cursos em Destaque
+                  </h3>
+                  <div className="flex flex-col gap-1.5">
+                    {courses.filter(c => c.destaque).map((c) => (
+                      <button
+                        key={`featured-${c.id}`}
+                        onClick={() => setSelectedCourse(c)}
+                        className={`text-left p-2.5 rounded-xl border text-[11px] font-extrabold transition-all flex gap-2.5 items-center min-w-0 ${
+                          selectedCourse?.id === c.id
+                            ? "border-purple-400 bg-purple-50 text-purple-900 shadow-2xs"
+                            : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                        }`}
+                      >
+                        {c.imagemCapa && (
+                          <img 
+                            src={c.imagemCapa} 
+                            alt="" 
+                            className="h-8 w-12 object-cover rounded-lg border border-slate-200 shrink-0 shadow-3xs"
+                          />
+                        )}
+                        <span className="truncate flex-grow">{c.titulo}</span>
+                        <span className="bg-purple-100 text-[9px] font-black text-purple-700 px-1.5 py-0.5 rounded-sm uppercase tracking-wide shrink-0">Destaque</span>
+                      </button>
+                    ))}
                   </div>
                 </div>
-              ))}
+              )}
+
+              {/* Todos os Cursos */}
+              <div className="flex flex-col gap-2">
+                <h3 className="text-[10px] font-black text-slate-450 uppercase tracking-wider">
+                  {!sidebarSearch ? "Todos os Cursos" : "Resultado da Busca"}
+                </h3>
+                
+                <div className="flex flex-col gap-2">
+                  {courses
+                    .filter(c => c.titulo.toLowerCase().includes(sidebarSearch.toLowerCase()))
+                    .map((c, idx, filteredArr) => (
+                      <div key={c.id} className="flex items-center gap-1.5 w-full group">
+                        <button
+                          onClick={() => setSelectedCourse(c)}
+                          className={`flex-grow text-left p-3 rounded-xl border text-xs font-bold transition-all flex gap-3 items-center min-w-0 ${
+                            selectedCourse?.id === c.id
+                              ? "border-emerald-500 bg-emerald-50 text-emerald-800"
+                              : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                          }`}
+                        >
+                          {c.imagemCapa && (
+                            <img 
+                              src={c.imagemCapa} 
+                              alt="" 
+                              className="h-10 w-16 object-cover rounded-lg border border-slate-200 shrink-0 shadow-2xs"
+                            />
+                          )}
+                          <div className="flex flex-col gap-1 flex-grow min-w-0">
+                            <div className="flex justify-between items-center w-full gap-2">
+                              <span className={`line-clamp-1 flex-grow ${!c.ativo ? "text-slate-400 line-through decoration-slate-350" : ""}`}>{c.titulo}</span>
+                              <div className="flex gap-1 items-center shrink-0">
+                                {c.destaque && (
+                                  <span className="inline-flex shrink-0 items-center rounded-md bg-purple-50 px-1 py-0.5 text-[8px] font-bold text-purple-700 ring-1 ring-inset ring-purple-600/10 uppercase tracking-wider">
+                                    ★
+                                  </span>
+                                )}
+                                {!c.ativo && (
+                                  <span className="inline-flex shrink-0 items-center rounded-md bg-slate-100 px-1.5 py-0.5 text-[8px] font-bold text-slate-550 border border-slate-200 uppercase tracking-wider">
+                                    Rascunho
+                                  </span>
+                                )}
+                                {c.tipo === "vip" ? (
+                                  <span className="inline-flex shrink-0 items-center rounded-md bg-amber-50 px-1 py-0.5 text-[8px] font-bold text-amber-700 ring-1 ring-inset ring-amber-600/10 uppercase tracking-wider">
+                                    VIP
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex shrink-0 items-center rounded-md bg-emerald-50 px-1 py-0.5 text-[8px] font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/10 uppercase tracking-wider">
+                                    Púb
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <span className="text-3xs font-medium text-slate-400">
+                              {c.modulos?.length || 0} Módulos • {c.modulos?.reduce((acc, curr) => acc + (curr.aulas?.length || 0), 0) || 0} Aulas
+                            </span>
+                          </div>
+                        </button>
+                        
+                        {/* Botões de Reordenação: exibidos apenas quando não há busca ativa */}
+                        {!sidebarSearch && (
+                          <div className="flex flex-col gap-1 shrink-0">
+                            <button
+                              type="button"
+                              disabled={idx === 0}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMoveCourse(c.id, "up");
+                              }}
+                              className="p-1 rounded-md border border-slate-200 hover:bg-slate-50 text-slate-400 hover:text-slate-700 disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer transition-colors bg-white shadow-3xs"
+                              title="Mover Curso para Cima"
+                            >
+                              <span className="text-[10px] block leading-none select-none">▲</span>
+                            </button>
+                            <button
+                              type="button"
+                              disabled={idx === filteredArr.length - 1}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMoveCourse(c.id, "down");
+                              }}
+                              className="p-1 rounded-md border border-slate-200 hover:bg-slate-50 text-slate-400 hover:text-slate-700 disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer transition-colors bg-white shadow-3xs"
+                              title="Mover Curso para Baixo"
+                            >
+                              <span className="text-[10px] block leading-none select-none">▼</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  
+                  {courses.filter(c => c.titulo.toLowerCase().includes(sidebarSearch.toLowerCase())).length === 0 && (
+                    <div className="text-center py-6 text-slate-400 text-xs font-semibold">
+                      Nenhum curso encontrado.
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </aside>
