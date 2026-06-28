@@ -14,6 +14,28 @@ function getYouTubeEmbedUrl(url: string): string | null {
   return null;
 }
 
+function getYouTubeVideoId(url: string): string | null {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  if (match && match[2].length === 11) {
+    return match[2];
+  }
+  return null;
+}
+
+function getCourseImage(course: any): string {
+  for (const m of course.modulos || []) {
+    for (const a of m.aulas || []) {
+      const ytid = getYouTubeVideoId(a.videoUrl);
+      if (ytid) {
+        return `https://img.youtube.com/vi/${ytid}/hqdefault.jpg`;
+      }
+    }
+  }
+  return course.imagemCapa || "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=600&auto=format&fit=crop";
+}
+
 export const metadata = {
   title: "SISGR Academy - Plataforma EAD de Gestão de Resíduos",
   description: "Capacite seus colaboradores e domine a gestão de resíduos sólidos. Cursos especializados em conformidade ambiental, PNRS e emissão de MTR.",
@@ -193,7 +215,7 @@ export default async function Home() {
           <div className="grid md:grid-cols-12 rounded-3xl border border-emerald-100 bg-white overflow-hidden shadow-xl shadow-emerald-500/5 hover:shadow-2xl transition-shadow">
             <div className="md:col-span-5 relative aspect-video md:aspect-auto">
               <img
-                src={featuredCourse.imagemCapa || undefined}
+                src={getCourseImage(featuredCourse)}
                 alt={featuredCourse.titulo}
                 className="object-cover w-full h-full"
               />
@@ -254,7 +276,7 @@ export default async function Home() {
               >
                 <div className="relative aspect-video">
                   <img
-                    src={course.imagemCapa || undefined}
+                    src={getCourseImage(course)}
                     alt={course.titulo}
                     className="object-cover w-full h-full"
                   />
