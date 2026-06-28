@@ -680,21 +680,24 @@ export async function alunoLoginAction(email: string, senhaInserida: string) {
   }
 }
 
-// 12. Definir curso em destaque
-export async function setCursoDestaqueAction(cursoId: string) {
+// 12. Alternar (toggle) curso em destaque
+export async function toggleCursoDestaqueAction(cursoId: string) {
   try {
-    await db.transaction(async (tx) => {
-      await tx.update(cursos).set({ destaque: false });
-      await tx.update(cursos).set({ destaque: true }).where(eq(cursos.id, cursoId));
+    const course = await db.query.cursos.findFirst({
+      where: eq(cursos.id, cursoId),
     });
+    if (!course) return { success: false, error: "Curso não encontrado" };
+
+    const newDestaqueVal = !course.destaque;
+    await db.update(cursos).set({ destaque: newDestaqueVal }).where(eq(cursos.id, cursoId));
 
     revalidatePath("/admin/cursos");
     revalidatePath("/");
     revalidatePath("/dashboard");
-    return { success: true };
+    return { success: true, destaque: newDestaqueVal };
   } catch (error) {
-    console.error("Erro ao definir curso em destaque:", error);
-    return { success: false, error: "Falha ao definir destaque" };
+    console.error("Erro ao alterar destaque do curso:", error);
+    return { success: false, error: "Falha ao alterar destaque" };
   }
 }
 

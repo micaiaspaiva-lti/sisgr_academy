@@ -19,7 +19,7 @@ import {
   updateCursoAction,
   updateAulaAction,
   createModuloAction,
-  setCursoDestaqueAction,
+  toggleCursoDestaqueAction,
   moveCursoAction,
   moveModuloAction
 } from "@/app/actions";
@@ -960,18 +960,16 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                   <button
                     onClick={async () => {
                       try {
-                        const res = await setCursoDestaqueAction(selectedCourse.id);
+                        const res = await toggleCursoDestaqueAction(selectedCourse.id);
                         if (res.success) {
-                          toast.success("Curso definido como destaque na Landing Page!");
+                          const newDestaque = !!res.destaque;
+                          toast.success(newDestaque ? "Curso destacado com sucesso!" : "Destaque removido!");
                           setCourses(prev =>
-                            prev.map(c => ({
-                              ...c,
-                              destaque: c.id === selectedCourse.id,
-                            }))
+                            prev.map(c => c.id === selectedCourse.id ? { ...c, destaque: newDestaque } : c)
                           );
-                          setSelectedCourse(prev => prev ? { ...prev, destaque: true } : null);
+                          setSelectedCourse(prev => prev ? { ...prev, destaque: newDestaque } : null);
                         } else {
-                          toast.error(res.error || "Erro ao definir destaque");
+                          toast.error(res.error || "Erro ao alterar destaque");
                         }
                       } catch (err) {
                         toast.error("Erro de conexão");
