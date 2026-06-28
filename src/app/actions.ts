@@ -675,9 +675,9 @@ export async function alunoLoginAction(email: string, senhaInserida: string) {
     revalidatePath("/");
     revalidatePath("/dashboard");
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Erro ao autenticar aluno:", error);
-    return { success: false, error: "Ocorreu um erro interno de login." };
+    return { success: false, error: `Erro interno de login: ${error?.message || error}` };
   }
 }
 

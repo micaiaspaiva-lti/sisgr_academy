@@ -116,7 +116,7 @@ export default function AlunoLoginPage() {
 
       {/* Login / Register Card */}
       <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-8 md:p-10 shadow-xl flex flex-col gap-6 relative z-10">
-        
+
         {/* Logo/Header */}
         <div className="flex flex-col items-center gap-3 text-center">
           <div className="bg-emerald-50 p-3.5 rounded-2xl border border-emerald-100 text-emerald-600">
@@ -128,10 +128,10 @@ export default function AlunoLoginPage() {
           </div>
           <div>
             <h1 className="text-2xl font-black text-slate-800 tracking-tight">
-              {activeMode === "forgot" ? "Recuperar Senha" : "EAD SISGR Academy"}
+              {activeMode === "forgot" ? "Recuperar Senha" : "SISGR Academy"}
             </h1>
             <p className="text-3xs font-extrabold text-emerald-600 uppercase tracking-widest mt-1">
-              {activeMode === "forgot" ? "Redefinição Instantânea" : "Portal do Aluno & Visitante"}
+              {activeMode === "forgot" ? "Redefinição Instantânea" : "Portal do Aluno"}
             </p>
           </div>
         </div>
@@ -145,11 +145,10 @@ export default function AlunoLoginPage() {
                 setActiveMode("login");
                 setError(null);
               }}
-              className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-                activeMode === "login"
-                  ? "bg-white text-slate-800 shadow-sm"
-                  : "text-slate-500 hover:text-slate-800"
-              }`}
+              className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${activeMode === "login"
+                ? "bg-white text-slate-800 shadow-sm"
+                : "text-slate-500 hover:text-slate-800"
+                }`}
             >
               Entrar
             </button>
@@ -159,11 +158,10 @@ export default function AlunoLoginPage() {
                 setActiveMode("register");
                 setError(null);
               }}
-              className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-                activeMode === "register"
-                  ? "bg-white text-slate-800 shadow-sm"
-                  : "text-slate-500 hover:text-slate-800"
-              }`}
+              className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${activeMode === "register"
+                ? "bg-white text-slate-800 shadow-sm"
+                : "text-slate-500 hover:text-slate-800"
+                }`}
             >
               Cadastrar-se
             </button>
@@ -249,8 +247,8 @@ export default function AlunoLoginPage() {
                 type="password"
                 required
                 placeholder={
-                  activeMode === "forgot" 
-                    ? "Nova senha (mín. 4 caracteres)" 
+                  activeMode === "forgot"
+                    ? "Nova senha (mín. 4 caracteres)"
                     : (activeMode === "register" ? "Escolha uma senha" : "Digite sua senha")
                 }
                 value={password}
@@ -283,8 +281,8 @@ export default function AlunoLoginPage() {
             className="w-full mt-2 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
           >
             <LogIn className="h-4 w-4" />
-            {loading 
-              ? (activeMode === "login" ? "Entrando..." : (activeMode === "register" ? "Criando conta..." : "Redefinindo...")) 
+            {loading
+              ? (activeMode === "login" ? "Entrando..." : (activeMode === "register" ? "Criando conta..." : "Redefinindo..."))
               : (activeMode === "login" ? "Acessar Plataforma" : (activeMode === "register" ? "Criar Conta & Acessar" : "Redefinir Senha & Entrar"))
             }
           </button>
