@@ -64,9 +64,10 @@ interface ImageUploadZoneProps {
   label: string;
   accept?: string;
   placeholderText?: string;
+  compact?: boolean;
 }
 
-function ImageUploadZone({ value, onChange, label, accept, placeholderText }: ImageUploadZoneProps) {
+function ImageUploadZone({ value, onChange, label, accept, placeholderText, compact }: ImageUploadZoneProps) {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -77,7 +78,6 @@ function ImageUploadZone({ value, onChange, label, accept, placeholderText }: Im
   };
 
   const uploadFile = async (file: File) => {
-    // Se o accept for apenas imagem/*
     if (accept === "image/*" && !file.type.startsWith("image/")) {
       toast.error("Por favor, selecione um arquivo de imagem.");
       return;
@@ -123,16 +123,17 @@ function ImageUploadZone({ value, onChange, label, accept, placeholderText }: Im
     }
   };
 
-  // Determina se o valor atual é uma imagem
   const isImage = value ? value.match(/\.(jpeg|jpg|gif|png|webp|svg)/i) !== null : false;
 
   return (
-    <div className="flex flex-col gap-1.5 w-full">
-      <label className="text-xs font-bold text-slate-700">{label}</label>
+    <div className="flex flex-col gap-1 w-full">
+      {label && <label className="text-xs font-bold text-slate-700">{label}</label>}
       <div
         onDragOver={handleDragOver}
         onDrop={handleDrop}
-        className={`relative aspect-video rounded-xl border-2 border-dashed flex flex-col items-center justify-center p-4 transition-all overflow-hidden bg-slate-50 ${
+        className={`relative rounded-xl border-2 border-dashed flex flex-col items-center justify-center transition-all overflow-hidden bg-slate-50 ${
+          compact ? "h-14 py-2 px-3 cursor-pointer" : "aspect-video p-4"
+        } ${
           value 
             ? "border-slate-205 hover:border-slate-350" 
             : "border-slate-300 hover:border-emerald-500 hover:bg-emerald-50/10 cursor-pointer"
@@ -148,9 +149,9 @@ function ImageUploadZone({ value, onChange, label, accept, placeholderText }: Im
         />
 
         {isUploading ? (
-          <div className="flex flex-col items-center gap-2">
-            <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
-            <span className="text-3xs font-black text-slate-500 uppercase tracking-wider animate-pulse">Enviando...</span>
+          <div className="flex flex-col items-center gap-1">
+            <Loader2 className={`animate-spin text-emerald-600 ${compact ? "h-4 w-4" : "h-6 w-6"}`} />
+            <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider animate-pulse">Enviando...</span>
           </div>
         ) : value ? (
           isImage ? (
@@ -178,26 +179,26 @@ function ImageUploadZone({ value, onChange, label, accept, placeholderText }: Im
               </div>
             </div>
           ) : (
-            <div className="absolute inset-0 bg-slate-100 flex flex-col items-center justify-center p-6 text-center gap-2 group">
-              <FileText className="h-10 w-10 text-slate-400 group-hover:text-slate-500 transition-colors" />
+            <div className="absolute inset-0 bg-slate-100 flex flex-col items-center justify-center p-3 text-center gap-1 group">
+              <FileText className={`${compact ? "h-5 w-5" : "h-10 w-10"} text-slate-400 group-hover:text-slate-500 transition-colors`} />
               <div className="flex flex-col max-w-[80%]">
-                <span className="text-xs font-extrabold text-slate-800 truncate" title={value.split("/").pop()}>
+                <span className="text-[10px] font-extrabold text-slate-800 truncate" title={value.split("/").pop()}>
                   {value.split("/").pop()}
                 </span>
-                <span className="text-4xs font-bold text-slate-450 uppercase tracking-wider">Documento Anexado</span>
+                {!compact && <span className="text-4xs font-bold text-slate-455 uppercase tracking-wider">Documento Anexado</span>}
               </div>
-              <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-3 transition-opacity duration-200">
+              <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition-opacity duration-200">
                 <button
                   type="button"
                   onClick={triggerSelectFile}
-                  className="px-3 py-1.5 rounded-lg bg-white/95 text-slate-800 text-xs font-black hover:bg-white transition-colors shadow-sm cursor-pointer"
+                  className="px-2 py-1 rounded bg-white/95 text-slate-800 text-[10px] font-black hover:bg-white transition-colors shadow-sm cursor-pointer"
                 >
-                  Alterar Arquivo
+                  Alterar
                 </button>
                 <button
                   type="button"
                   onClick={() => onChange("")}
-                  className="px-3 py-1.5 rounded-lg bg-red-650/90 text-white text-xs font-black hover:bg-red-650 transition-colors shadow-sm cursor-pointer"
+                  className="px-2 py-1 rounded bg-red-650/90 text-white text-[10px] font-black hover:bg-red-650 transition-colors shadow-sm cursor-pointer"
                 >
                   Remover
                 </button>
@@ -205,15 +206,15 @@ function ImageUploadZone({ value, onChange, label, accept, placeholderText }: Im
             </div>
           )
         ) : (
-          <div className="flex flex-col items-center gap-2 text-center pointer-events-none">
-            <div className="p-2.5 bg-slate-100 rounded-full text-slate-400 animate-in fade-in duration-300">
-              <Upload className="h-5 w-5 text-slate-450" /> 
+          <div className={`flex ${compact ? "flex-row gap-3" : "flex-col gap-2"} items-center text-center pointer-events-none`}>
+            <div className={`${compact ? "p-1.5" : "p-2.5"} bg-slate-100 rounded-full text-slate-400`}>
+              <Upload className={`${compact ? "h-3.5 w-3.5" : "h-5 w-5"} text-slate-455`} /> 
             </div>
-            <div className="flex flex-col gap-0.5">
+            <div className={`flex flex-col ${compact ? "text-left" : "text-center"}`}>
               <span className="text-xs font-bold text-slate-800">
-                {placeholderText || "Arraste o arquivo ou clique para selecionar"}
+                {placeholderText || "Selecione um arquivo"}
               </span>
-              <span className="text-4xs font-bold text-slate-455 uppercase tracking-wider">
+              <span className="text-[9px] font-bold text-slate-450 uppercase tracking-wider">
                 {accept ? "Formatos comuns até 25MB" : "PNG, JPG ou WEBP"}
               </span>
             </div>
@@ -1185,188 +1186,198 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
           </div>
         </div>
       )}
+
       {/* Modal de Criação de Aula */}
       {isCreatingLesson && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto p-6 border border-slate-200 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
-            <h2 className="text-lg font-black text-slate-900 border-b border-slate-100 pb-2">Nova Aula</h2>
-            <form onSubmit={handleCreateLesson} className="flex flex-col gap-4">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                
-                {/* Coluna Esquerda (lg:col-span-5): Detalhes e Arquivos */}
-                <div className="lg:col-span-5 flex flex-col gap-4">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs font-bold text-slate-700">Título da Aula</label>
-                    <input
-                      type="text"
-                      required
-                      value={newLessonTitle}
-                      onChange={e => setNewLessonTitle(e.target.value)}
-                      placeholder="Ex: 1.3 Práticas de Coleta Seletiva"
-                      className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs font-bold text-slate-700">URL do Vídeo (MP4)</label>
-                    <input
-                      type="text"
-                      required
-                      value={newLessonUrl}
-                      onChange={e => setNewLessonUrl(e.target.value)}
-                      placeholder="Ex: https://exemplo.com/video.mp4"
-                      className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
-                    />
-                  </div>
-                  <ImageUploadZone
-                    value={newLessonImage}
-                    onChange={setNewLessonImage}
-                    label="Imagem de Capa / Thumbnail (Aula)"
-                  />
-                  {selectedCourse?.tipo === "vip" && (
-                    <div className="flex items-center gap-2 mt-1">
-                      <input
-                        type="checkbox"
-                        id="demonstrative"
-                        checked={newLessonDemo}
-                        onChange={e => setNewLessonDemo(e.target.checked)}
-                        className="rounded-xs border-slate-300 text-emerald-600 focus:ring-emerald-600"
-                      />
-                      <label htmlFor="demonstrative" className="text-xs font-bold text-slate-700 cursor-pointer">
-                        Aula Demonstrativa (Acesso Gratuito)
-                      </label>
-                    </div>
-                  )}
+          <div className="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] border border-slate-200 shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <form onSubmit={handleCreateLesson} className="flex flex-col max-h-[90vh] w-full">
+              
+              {/* Header */}
+              <div className="p-6 pb-3 border-b border-slate-100 shrink-0">
+                <h2 className="text-lg font-black text-slate-900">Nova Aula</h2>
+              </div>
 
-                  <div className="flex flex-col gap-2 border-t border-slate-100 pt-4 mt-2">
-                    <label className="text-xs font-bold text-slate-700">Materiais de Apoio (Anexos)</label>
-                    {newLessonFiles.length > 0 && (
-                      <div className="flex flex-col gap-2 border border-slate-205 rounded-xl p-2 bg-slate-50/50 max-h-[120px] overflow-y-auto">
-                        {newLessonFiles.map((file, idx) => (
-                          <div key={idx} className="flex items-center justify-between gap-3 p-1.5 bg-white rounded-lg border border-slate-150 shadow-3xs">
-                            <div className="flex items-center gap-1.5 truncate">
-                              <FileText className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                              <span className="text-[11px] font-semibold text-slate-800 truncate" title={file.name}>
-                                {file.name}
-                              </span>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setNewLessonFiles(prev => prev.filter((_, i) => i !== idx));
-                              }}
-                              className="p-1 rounded-md hover:bg-red-50 text-slate-400 hover:text-red-650 transition-colors cursor-pointer"
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </button>
-                          </div>
-                        ))}
+              {/* Scrollable Body */}
+              <div className="p-6 overflow-y-auto flex-grow min-h-0">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  
+                  {/* Coluna Esquerda (lg:col-span-5): Detalhes e Arquivos */}
+                  <div className="lg:col-span-5 flex flex-col gap-4">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs font-bold text-slate-700">Título da Aula</label>
+                      <input
+                        type="text"
+                        required
+                        value={newLessonTitle}
+                        onChange={e => setNewLessonTitle(e.target.value)}
+                        placeholder="Ex: 1.3 Práticas de Coleta Seletiva"
+                        className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs font-bold text-slate-700">URL do Vídeo (MP4)</label>
+                      <input
+                        type="text"
+                        required
+                        value={newLessonUrl}
+                        onChange={e => setNewLessonUrl(e.target.value)}
+                        placeholder="Ex: https://exemplo.com/video.mp4"
+                        className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                      />
+                    </div>
+                    <ImageUploadZone
+                      value={newLessonImage}
+                      onChange={setNewLessonImage}
+                      label="Imagem de Capa / Thumbnail (Aula)"
+                    />
+                    {selectedCourse?.tipo === "vip" && (
+                      <div className="flex items-center gap-2 mt-1">
+                        <input
+                          type="checkbox"
+                          id="demonstrative"
+                          checked={newLessonDemo}
+                          onChange={e => setNewLessonDemo(e.target.checked)}
+                          className="rounded-xs border-slate-300 text-emerald-600 focus:ring-emerald-600"
+                        />
+                        <label htmlFor="demonstrative" className="text-xs font-bold text-slate-700 cursor-pointer">
+                          Aula Demonstrativa (Acesso Gratuito)
+                        </label>
                       </div>
                     )}
-                    <ImageUploadZone
-                      value=""
-                      onChange={(url) => {
-                        const fileName = url.split("/").pop() || "arquivo";
-                        const cleanName = fileName.replace(/^\d+-/, "");
-                        setNewLessonFiles(prev => [...prev, { name: cleanName, url }]);
-                        toast.success(`Arquivo ${cleanName} adicionado!`);
-                      }}
-                      label=""
-                      accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
-                      placeholderText="Clique para anexar um arquivo"
-                    />
-                  </div>
-                </div>
 
-                {/* Coluna Direita (lg:col-span-7): Editor de Descrição Formatado e Preview */}
-                <div className="lg:col-span-7 flex flex-col gap-4 border-l border-slate-100 lg:pl-6">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-700">Texto / Conteúdo da Aula (HTML)</label>
-                    
-                    {/* Barra de Ferramentas de Formatação */}
-                    <div className="flex flex-wrap items-center gap-1 p-1 bg-slate-55 border border-slate-205 rounded-t-lg shadow-3xs">
-                      <button
-                        type="button"
-                        onClick={() => insertTextAtCursor("newLessonDescTextarea", "<b>", "</b>", setNewLessonDesc)}
-                        className="px-2 py-1 rounded hover:bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer transition-colors"
-                        title="Negrito"
-                      >
-                        B
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => insertTextAtCursor("newLessonDescTextarea", "<i>", "</i>", setNewLessonDesc)}
-                        className="px-2 py-1 rounded hover:bg-slate-200 text-xs italic text-slate-700 cursor-pointer transition-colors"
-                        title="Itálico"
-                      >
-                        I
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => insertTextAtCursor("newLessonDescTextarea", '<a href="https://" target="_blank" class="text-emerald-600 hover:underline font-semibold">', '</a>', setNewLessonDesc)}
-                        className="p-1 rounded hover:bg-slate-200 text-xs text-slate-700 cursor-pointer transition-colors flex items-center"
-                        title="Inserir Link"
-                      >
-                        <LinkIcon className="h-3.5 w-3.5" />
-                      </button>
-                      <div className="h-4 w-px bg-slate-300 mx-1" />
-                      <button
-                        type="button"
-                        onClick={() => insertTextAtCursor("newLessonDescTextarea", "<li>", "</li>", setNewLessonDesc)}
-                        className="px-2 py-1 rounded hover:bg-slate-200 text-3xs text-slate-700 cursor-pointer transition-colors"
-                        title="Item de Lista"
-                      >
-                        • Item
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => insertTextAtCursor("newLessonDescTextarea", '<ul class="list-disc pl-5 flex flex-col gap-1">\n  <li>', "</li>\n</ul>", setNewLessonDesc)}
-                        className="px-2 py-1 rounded hover:bg-slate-200 text-3xs text-slate-700 cursor-pointer transition-colors"
-                        title="Lista com Marcadores"
-                      >
-                        Lista
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => insertTextAtCursor("newLessonDescTextarea", "<br />", "", setNewLessonDesc)}
-                        className="px-2 py-1 rounded hover:bg-slate-200 text-3xs text-slate-700 cursor-pointer transition-colors"
-                        title="Quebra de Linha"
-                      >
-                        Quebra ↵
-                      </button>
-                    </div>
-
-                    {/* Textarea */}
-                    <textarea
-                      id="newLessonDescTextarea"
-                      value={newLessonDesc}
-                      onChange={e => setNewLessonDesc(e.target.value)}
-                      rows={5}
-                      placeholder="Escreva a descrição, conteúdo ou links de apoio da aula utilizando HTML para formatação..."
-                      className="rounded-b-lg border-x border-b border-slate-300 p-3 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 font-mono"
-                    />
-                  </div>
-
-                  {/* Live Preview Container */}
-                  <div className="flex flex-col gap-1.5 flex-1">
-                    <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider">Visualização em Tempo Real (Aluno)</span>
-                    <div className="border border-slate-200 rounded-xl p-4 bg-slate-50 min-h-[140px] max-h-[220px] overflow-y-auto shadow-3xs prose prose-sm max-w-none">
-                      {newLessonDesc.trim() ? (
-                        <div 
-                          className="text-xs text-slate-750 font-medium leading-relaxed"
-                          style={{ whiteSpace: "pre-wrap" }}
-                          dangerouslySetInnerHTML={{ __html: newLessonDesc }} 
-                        />
-                      ) : (
-                        <p className="text-xs text-slate-400 italic">Escreva acima para visualizar a renderização formatada...</p>
+                    <div className="flex flex-col gap-2 border-t border-slate-100 pt-4 mt-2">
+                      <label className="text-xs font-bold text-slate-700">Materiais de Apoio (Anexos)</label>
+                      {newLessonFiles.length > 0 && (
+                        <div className="flex flex-col gap-2 border border-slate-205 rounded-xl p-2 bg-slate-50/50 max-h-[120px] overflow-y-auto">
+                          {newLessonFiles.map((file, idx) => (
+                            <div key={idx} className="flex items-center justify-between gap-3 p-1.5 bg-white rounded-lg border border-slate-150 shadow-3xs">
+                              <div className="flex items-center gap-1.5 truncate">
+                                <FileText className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                                <span className="text-[11px] font-semibold text-slate-800 truncate" title={file.name}>
+                                  {file.name}
+                                </span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setNewLessonFiles(prev => prev.filter((_, i) => i !== idx));
+                                }}
+                                className="p-1 rounded-md hover:bg-red-50 text-slate-400 hover:text-red-650 transition-colors cursor-pointer"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
                       )}
+                      <ImageUploadZone
+                        value=""
+                        onChange={(url) => {
+                          const fileName = url.split("/").pop() || "arquivo";
+                          const cleanName = fileName.replace(/^\d+-/, "");
+                          setNewLessonFiles(prev => [...prev, { name: cleanName, url }]);
+                          toast.success(`Arquivo ${cleanName} adicionado!`);
+                        }}
+                        label=""
+                        accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
+                        placeholderText="Anexar arquivo de apoio"
+                        compact={true}
+                      />
                     </div>
                   </div>
-                </div>
 
+                  {/* Coluna Direita (lg:col-span-7): Editor de Descrição Formatado e Preview */}
+                  <div className="lg:col-span-7 flex flex-col gap-4 border-l border-slate-100 lg:pl-6">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-bold text-slate-700">Texto / Conteúdo da Aula (HTML)</label>
+                      
+                      {/* Barra de Ferramentas de Formatação */}
+                      <div className="flex flex-wrap items-center gap-1 p-1 bg-slate-55 border border-slate-205 rounded-t-lg shadow-3xs">
+                        <button
+                          type="button"
+                          onClick={() => insertTextAtCursor("newLessonDescTextarea", "<b>", "</b>", setNewLessonDesc)}
+                          className="px-2 py-1 rounded hover:bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer transition-colors"
+                          title="Negrito"
+                        >
+                          B
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => insertTextAtCursor("newLessonDescTextarea", "<i>", "</i>", setNewLessonDesc)}
+                          className="px-2 py-1 rounded hover:bg-slate-200 text-xs italic text-slate-700 cursor-pointer transition-colors"
+                          title="Itálico"
+                        >
+                          I
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => insertTextAtCursor("newLessonDescTextarea", '<a href="https://" target="_blank" class="text-emerald-600 hover:underline font-semibold">', '</a>', setNewLessonDesc)}
+                          className="p-1 rounded hover:bg-slate-200 text-xs text-slate-700 cursor-pointer transition-colors flex items-center"
+                          title="Inserir Link"
+                        >
+                          <LinkIcon className="h-3.5 w-3.5" />
+                        </button>
+                        <div className="h-4 w-px bg-slate-300 mx-1" />
+                        <button
+                          type="button"
+                          onClick={() => insertTextAtCursor("newLessonDescTextarea", "<li>", "</li>", setNewLessonDesc)}
+                          className="px-2 py-1 rounded hover:bg-slate-200 text-3xs text-slate-700 cursor-pointer transition-colors"
+                          title="Item de Lista"
+                        >
+                          • Item
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => insertTextAtCursor("newLessonDescTextarea", '<ul class="list-disc pl-5 flex flex-col gap-1">\n  <li>', "</li>\n</ul>", setNewLessonDesc)}
+                          className="px-2 py-1 rounded hover:bg-slate-200 text-3xs text-slate-700 cursor-pointer transition-colors"
+                          title="Lista com Marcadores"
+                        >
+                          Lista
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => insertTextAtCursor("newLessonDescTextarea", "<br />", "", setNewLessonDesc)}
+                          className="px-2 py-1 rounded hover:bg-slate-200 text-3xs text-slate-700 cursor-pointer transition-colors"
+                          title="Quebra de Linha"
+                        >
+                          Quebra ↵
+                        </button>
+                      </div>
+
+                      {/* Textarea */}
+                      <textarea
+                        id="newLessonDescTextarea"
+                        value={newLessonDesc}
+                        onChange={e => setNewLessonDesc(e.target.value)}
+                        rows={4}
+                        placeholder="Escreva a descrição, conteúdo ou links de apoio da aula utilizando HTML para formatação..."
+                        className="rounded-b-lg border-x border-b border-slate-300 p-3 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 font-mono"
+                      />
+                    </div>
+
+                    {/* Live Preview Container */}
+                    <div className="flex flex-col gap-1.5 flex-1">
+                      <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider">Visualização em Tempo Real (Aluno)</span>
+                      <div className="border border-slate-200 rounded-xl p-4 bg-slate-55 min-h-[100px] max-h-[180px] overflow-y-auto shadow-3xs prose prose-sm max-w-none">
+                        {newLessonDesc.trim() ? (
+                          <div 
+                            className="text-xs text-slate-750 font-medium leading-relaxed"
+                            style={{ whiteSpace: "pre-wrap" }}
+                            dangerouslySetInnerHTML={{ __html: newLessonDesc }} 
+                          />
+                        ) : (
+                          <p className="text-xs text-slate-400 italic">Escreva acima para visualizar a renderização formatada...</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
               </div>
 
               {/* Footer */}
-              <div className="flex gap-3 justify-end mt-2 pt-3 border-t border-slate-100">
+              <div className="p-4 border-t border-slate-100 flex gap-3 justify-end shrink-0 bg-slate-50/40 rounded-b-2xl">
                 <button
                   type="button"
                   onClick={() => {
@@ -1389,6 +1400,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                   Adicionar Aula
                 </button>
               </div>
+
             </form>
           </div>
         </div>
@@ -1473,183 +1485,192 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       {/* Modal de Edição de Aula */}
       {isEditingLesson && editingLesson && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto p-6 border border-slate-200 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
-            <h2 className="text-lg font-black text-slate-900 border-b border-slate-100 pb-2">Editar Aula</h2>
-            <form onSubmit={handleUpdateLesson} className="flex flex-col gap-4">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                
-                {/* Coluna Esquerda (lg:col-span-5): Detalhes e Arquivos */}
-                <div className="lg:col-span-5 flex flex-col gap-4">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs font-bold text-slate-700">Título da Aula</label>
-                    <input
-                      type="text"
-                      required
-                      value={editLessonTitle}
-                      onChange={e => setEditLessonTitle(e.target.value)}
-                      className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs font-bold text-slate-700">URL do Vídeo</label>
-                    <input
-                      type="text"
-                      required
-                      value={editLessonUrl}
-                      onChange={e => setEditLessonUrl(e.target.value)}
-                      className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
-                    />
-                  </div>
-                  <ImageUploadZone
-                    value={editLessonImage}
-                    onChange={setEditLessonImage}
-                    label="Imagem de Capa / Thumbnail (Aula)"
-                  />
-                  {selectedCourse?.tipo === "vip" && (
-                    <div className="flex items-center gap-2 mt-1">
-                      <input
-                        type="checkbox"
-                        id="edit-demonstrative"
-                        checked={editLessonDemo}
-                        onChange={e => setEditLessonDemo(e.target.checked)}
-                        className="rounded-xs border-slate-300 text-emerald-600 focus:ring-emerald-600"
-                      />
-                      <label htmlFor="edit-demonstrative" className="text-xs font-bold text-slate-700 cursor-pointer">
-                        Aula Demonstrativa (Acesso Gratuito)
-                      </label>
-                    </div>
-                  )}
+          <div className="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] border border-slate-200 shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <form onSubmit={handleUpdateLesson} className="flex flex-col max-h-[90vh] w-full">
+              
+              {/* Header */}
+              <div className="p-6 pb-3 border-b border-slate-100 shrink-0">
+                <h2 className="text-lg font-black text-slate-900">Editar Aula</h2>
+              </div>
 
-                  <div className="flex flex-col gap-2 border-t border-slate-100 pt-4 mt-2">
-                    <label className="text-xs font-bold text-slate-700">Materiais de Apoio (Anexos)</label>
-                    {editLessonFiles.length > 0 && (
-                      <div className="flex flex-col gap-2 border border-slate-205 rounded-xl p-2 bg-slate-50/50 max-h-[120px] overflow-y-auto">
-                        {editLessonFiles.map((file, idx) => (
-                          <div key={idx} className="flex items-center justify-between gap-3 p-1.5 bg-white rounded-lg border border-slate-150 shadow-3xs">
-                            <div className="flex items-center gap-1.5 truncate">
-                              <FileText className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                              <span className="text-[11px] font-semibold text-slate-800 truncate" title={file.name}>
-                                {file.name}
-                              </span>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setEditLessonFiles(prev => prev.filter((_, i) => i !== idx));
-                              }}
-                              className="p-1 rounded-md hover:bg-red-50 text-slate-400 hover:text-red-650 transition-colors cursor-pointer"
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </button>
-                          </div>
-                        ))}
+              {/* Scrollable Body */}
+              <div className="p-6 overflow-y-auto flex-grow min-h-0">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  
+                  {/* Coluna Esquerda (lg:col-span-5): Detalhes e Arquivos */}
+                  <div className="lg:col-span-5 flex flex-col gap-4">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs font-bold text-slate-700">Título da Aula</label>
+                      <input
+                        type="text"
+                        required
+                        value={editLessonTitle}
+                        onChange={e => setEditLessonTitle(e.target.value)}
+                        className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs font-bold text-slate-700">URL do Vídeo</label>
+                      <input
+                        type="text"
+                        required
+                        value={editLessonUrl}
+                        onChange={e => setEditLessonUrl(e.target.value)}
+                        className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                      />
+                    </div>
+                    <ImageUploadZone
+                      value={editLessonImage}
+                      onChange={setEditLessonImage}
+                      label="Imagem de Capa / Thumbnail (Aula)"
+                    />
+                    {selectedCourse?.tipo === "vip" && (
+                      <div className="flex items-center gap-2 mt-1">
+                        <input
+                          type="checkbox"
+                          id="edit-demonstrative"
+                          checked={editLessonDemo}
+                          onChange={e => setEditLessonDemo(e.target.checked)}
+                          className="rounded-xs border-slate-300 text-emerald-600 focus:ring-emerald-600"
+                        />
+                        <label htmlFor="edit-demonstrative" className="text-xs font-bold text-slate-700 cursor-pointer">
+                          Aula Demonstrativa (Acesso Gratuito)
+                        </label>
                       </div>
                     )}
-                    <ImageUploadZone
-                      value=""
-                      onChange={(url) => {
-                        const fileName = url.split("/").pop() || "arquivo";
-                        const cleanName = fileName.replace(/^\d+-/, "");
-                        setEditLessonFiles(prev => [...prev, { name: cleanName, url }]);
-                        toast.success(`Arquivo ${cleanName} adicionado!`);
-                      }}
-                      label=""
-                      accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
-                      placeholderText="Clique para anexar um arquivo"
-                    />
-                  </div>
-                </div>
 
-                {/* Coluna Direita (lg:col-span-7): Editor de Descrição Formatado e Preview */}
-                <div className="lg:col-span-7 flex flex-col gap-4 border-l border-slate-100 lg:pl-6">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-700">Texto / Conteúdo da Aula (HTML)</label>
-                    
-                    {/* Barra de Ferramentas de Formatação */}
-                    <div className="flex flex-wrap items-center gap-1 p-1 bg-slate-55 border border-slate-205 rounded-t-lg shadow-3xs">
-                      <button
-                        type="button"
-                        onClick={() => insertTextAtCursor("editLessonDescTextarea", "<b>", "</b>", setEditLessonDesc)}
-                        className="px-2 py-1 rounded hover:bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer transition-colors"
-                        title="Negrito"
-                      >
-                        B
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => insertTextAtCursor("editLessonDescTextarea", "<i>", "</i>", setEditLessonDesc)}
-                        className="px-2 py-1 rounded hover:bg-slate-200 text-xs italic text-slate-700 cursor-pointer transition-colors"
-                        title="Itálico"
-                      >
-                        I
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => insertTextAtCursor("editLessonDescTextarea", '<a href="https://" target="_blank" class="text-emerald-600 hover:underline font-semibold">', '</a>', setEditLessonDesc)}
-                        className="p-1 rounded hover:bg-slate-200 text-xs text-slate-700 cursor-pointer transition-colors flex items-center"
-                        title="Inserir Link"
-                      >
-                        <LinkIcon className="h-3.5 w-3.5" />
-                      </button>
-                      <div className="h-4 w-px bg-slate-300 mx-1" />
-                      <button
-                        type="button"
-                        onClick={() => insertTextAtCursor("editLessonDescTextarea", "<li>", "</li>", setEditLessonDesc)}
-                        className="px-2 py-1 rounded hover:bg-slate-200 text-3xs text-slate-700 cursor-pointer transition-colors"
-                        title="Item de Lista"
-                      >
-                        • Item
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => insertTextAtCursor("editLessonDescTextarea", '<ul class="list-disc pl-5 flex flex-col gap-1">\n  <li>', "</li>\n</ul>", setEditLessonDesc)}
-                        className="px-2 py-1 rounded hover:bg-slate-200 text-3xs text-slate-700 cursor-pointer transition-colors"
-                        title="Lista com Marcadores"
-                      >
-                        Lista
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => insertTextAtCursor("editLessonDescTextarea", "<br />", "", setEditLessonDesc)}
-                        className="px-2 py-1 rounded hover:bg-slate-200 text-3xs text-slate-700 cursor-pointer transition-colors"
-                        title="Quebra de Linha"
-                      >
-                        Quebra ↵
-                      </button>
-                    </div>
-
-                    {/* Textarea */}
-                    <textarea
-                      id="editLessonDescTextarea"
-                      value={editLessonDesc}
-                      onChange={e => setEditLessonDesc(e.target.value)}
-                      rows={5}
-                      placeholder="Escreva a descrição, conteúdo ou links de apoio da aula utilizando HTML para formatação..."
-                      className="rounded-b-lg border-x border-b border-slate-300 p-3 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 font-mono"
-                    />
-                  </div>
-
-                  {/* Live Preview Container */}
-                  <div className="flex flex-col gap-1.5 flex-1">
-                    <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider">Visualização em Tempo Real (Aluno)</span>
-                    <div className="border border-slate-200 rounded-xl p-4 bg-slate-50 min-h-[140px] max-h-[220px] overflow-y-auto shadow-3xs prose prose-sm max-w-none">
-                      {editLessonDesc.trim() ? (
-                        <div 
-                          className="text-xs text-slate-750 font-medium leading-relaxed"
-                          style={{ whiteSpace: "pre-wrap" }}
-                          dangerouslySetInnerHTML={{ __html: editLessonDesc }} 
-                        />
-                      ) : (
-                        <p className="text-xs text-slate-400 italic">Escreva acima para visualizar a renderização formatada...</p>
+                    <div className="flex flex-col gap-2 border-t border-slate-100 pt-4 mt-2">
+                      <label className="text-xs font-bold text-slate-700">Materiais de Apoio (Anexos)</label>
+                      {editLessonFiles.length > 0 && (
+                        <div className="flex flex-col gap-2 border border-slate-205 rounded-xl p-2 bg-slate-50/50 max-h-[120px] overflow-y-auto">
+                          {editLessonFiles.map((file, idx) => (
+                            <div key={idx} className="flex items-center justify-between gap-3 p-1.5 bg-white rounded-lg border border-slate-150 shadow-3xs">
+                              <div className="flex items-center gap-1.5 truncate">
+                                <FileText className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                                <span className="text-[11px] font-semibold text-slate-800 truncate" title={file.name}>
+                                  {file.name}
+                                </span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditLessonFiles(prev => prev.filter((_, i) => i !== idx));
+                                }}
+                                className="p-1 rounded-md hover:bg-red-50 text-slate-400 hover:text-red-650 transition-colors cursor-pointer"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
                       )}
+                      <ImageUploadZone
+                        value=""
+                        onChange={(url) => {
+                          const fileName = url.split("/").pop() || "arquivo";
+                          const cleanName = fileName.replace(/^\d+-/, "");
+                          setEditLessonFiles(prev => [...prev, { name: cleanName, url }]);
+                          toast.success(`Arquivo ${cleanName} adicionado!`);
+                        }}
+                        label=""
+                        accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
+                        placeholderText="Anexar arquivo de apoio"
+                        compact={true}
+                      />
                     </div>
                   </div>
-                </div>
 
+                  {/* Coluna Direita (lg:col-span-7): Editor de Descrição Formatado e Preview */}
+                  <div className="lg:col-span-7 flex flex-col gap-4 border-l border-slate-100 lg:pl-6">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-bold text-slate-700">Texto / Conteúdo da Aula (HTML)</label>
+                      
+                      {/* Barra de Ferramentas de Formatação */}
+                      <div className="flex flex-wrap items-center gap-1 p-1 bg-slate-55 border border-slate-205 rounded-t-lg shadow-3xs">
+                        <button
+                          type="button"
+                          onClick={() => insertTextAtCursor("editLessonDescTextarea", "<b>", "</b>", setEditLessonDesc)}
+                          className="px-2 py-1 rounded hover:bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer transition-colors"
+                          title="Negrito"
+                        >
+                          B
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => insertTextAtCursor("editLessonDescTextarea", "<i>", "</i>", setEditLessonDesc)}
+                          className="px-2 py-1 rounded hover:bg-slate-200 text-xs italic text-slate-700 cursor-pointer transition-colors"
+                          title="Itálico"
+                        >
+                          I
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => insertTextAtCursor("editLessonDescTextarea", '<a href="https://" target="_blank" class="text-emerald-600 hover:underline font-semibold">', '</a>', setEditLessonDesc)}
+                          className="p-1 rounded hover:bg-slate-200 text-xs text-slate-700 cursor-pointer transition-colors flex items-center"
+                          title="Inserir Link"
+                        >
+                          <LinkIcon className="h-3.5 w-3.5" />
+                        </button>
+                        <div className="h-4 w-px bg-slate-300 mx-1" />
+                        <button
+                          type="button"
+                          onClick={() => insertTextAtCursor("editLessonDescTextarea", "<li>", "</li>", setEditLessonDesc)}
+                          className="px-2 py-1 rounded hover:bg-slate-200 text-3xs text-slate-700 cursor-pointer transition-colors"
+                          title="Item de Lista"
+                        >
+                          • Item
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => insertTextAtCursor("editLessonDescTextarea", '<ul class="list-disc pl-5 flex flex-col gap-1">\n  <li>', "</li>\n</ul>", setEditLessonDesc)}
+                          className="px-2 py-1 rounded hover:bg-slate-200 text-3xs text-slate-700 cursor-pointer transition-colors"
+                          title="Lista com Marcadores"
+                        >
+                          Lista
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => insertTextAtCursor("editLessonDescTextarea", "<br />", "", setEditLessonDesc)}
+                          className="px-2 py-1 rounded hover:bg-slate-200 text-3xs text-slate-700 cursor-pointer transition-colors"
+                          title="Quebra de Linha"
+                        >
+                          Quebra ↵
+                        </button>
+                      </div>
+
+                      {/* Textarea */}
+                      <textarea
+                        id="editLessonDescTextarea"
+                        value={editLessonDesc}
+                        onChange={e => setEditLessonDesc(e.target.value)}
+                        rows={4}
+                        placeholder="Escreva a descrição, conteúdo ou links de apoio da aula utilizando HTML para formatação..."
+                        className="rounded-b-lg border-x border-b border-slate-300 p-3 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 font-mono"
+                      />
+                    </div>
+
+                    {/* Live Preview Container */}
+                    <div className="flex flex-col gap-1.5 flex-1">
+                      <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider">Visualização em Tempo Real (Aluno)</span>
+                      <div className="border border-slate-200 rounded-xl p-4 bg-slate-55 min-h-[100px] max-h-[180px] overflow-y-auto shadow-3xs prose prose-sm max-w-none">
+                        {editLessonDesc.trim() ? (
+                          <div 
+                            className="text-xs text-slate-750 font-medium leading-relaxed"
+                            style={{ whiteSpace: "pre-wrap" }}
+                            dangerouslySetInnerHTML={{ __html: editLessonDesc }} 
+                          />
+                        ) : (
+                          <p className="text-xs text-slate-400 italic">Escreva acima para visualizar a renderização formatada...</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
               </div>
 
               {/* Footer */}
-              <div className="flex gap-3 justify-end mt-2 pt-3 border-t border-slate-100">
+              <div className="p-4 border-t border-slate-100 flex gap-3 justify-end shrink-0 bg-slate-50/40 rounded-b-2xl">
                 <button
                   type="button"
                   onClick={() => {
@@ -1667,6 +1688,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                   Salvar Alterações
                 </button>
               </div>
+
             </form>
           </div>
         </div>
