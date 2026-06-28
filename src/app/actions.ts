@@ -160,8 +160,42 @@ export async function createCursoAction(titulo: string, descricao: string, tipo:
   }
 }
 
+// 6.1. Criar um novo módulo
+export async function createModuloAction(cursoId: string, titulo: string) {
+  try {
+    const existingModulos = await db
+      .select()
+      .from(modulos)
+      .where(eq(modulos.cursoId, cursoId));
+
+    const [newModule] = await db
+      .insert(modulos)
+      .values({
+        cursoId,
+        titulo,
+        ordem: existingModulos.length + 1,
+      })
+      .returning();
+
+    revalidatePath("/admin/cursos");
+    revalidatePath("/");
+    revalidatePath("/dashboard");
+    return { success: true, module: newModule };
+  } catch (error) {
+    console.error("Erro ao criar módulo:", error);
+    return { success: false, error: "Falha ao criar módulo" };
+  }
+}
+
 // 7. Criar uma nova aula em um módulo
-export async function createAulaAction(moduloId: string, titulo: string, videoUrl: string, demonstrative: boolean, imagemCapa?: string) {
+export async function createAulaAction(
+  moduloId: string,
+  titulo: string,
+  videoUrl: string,
+  demonstrative: boolean,
+  imagemCapa?: string,
+  materialUrl?: string
+) {
   try {
     const existingAulas = await db
       .select()
@@ -176,6 +210,7 @@ export async function createAulaAction(moduloId: string, titulo: string, videoUr
         videoUrl,
         demonstrative,
         imagemCapa: imagemCapa?.trim() || null,
+        materialUrl: materialUrl?.trim() || null,
         ordem: existingAulas.length + 1,
       })
       .returning();
@@ -229,6 +264,7 @@ export async function updateAulaAction(
   videoUrl: string,
   demonstrative: boolean,
   imagemCapa: string | null,
+  materialUrl: string | null,
   ativo: boolean
 ) {
   try {
@@ -239,6 +275,7 @@ export async function updateAulaAction(
         videoUrl,
         demonstrative,
         imagemCapa: imagemCapa?.trim() || null,
+        materialUrl: materialUrl?.trim() || null,
         ativo,
       })
       .where(eq(aulas.id, aulaId))

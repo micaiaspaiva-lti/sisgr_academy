@@ -45,6 +45,7 @@ export const aulas = pgTable("aulas", {
   videoUrl: varchar("video_url", { length: 512 }).notNull(),
   legendasUrl: varchar("legendas_url", { length: 512 }),
   imagemCapa: varchar("imagem_capa", { length: 512 }),
+  materialUrl: varchar("material_url", { length: 512 }),
   demonstrative: boolean("demonstrative").default(false).notNull(),
   ativo: boolean("ativo").default(true).notNull(),
   ordem: integer("ordem").default(0).notNull(),

@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { 
-  ChevronRight, Lock, Sparkles, User, Bot, Send, Award, Loader2, ArrowLeft, Key, Play
+  ChevronRight, Lock, Sparkles, User, Bot, Send, Award, Loader2, ArrowLeft, Key, Play, BookOpen, Download
 } from "lucide-react";
 import { toast, Toaster } from "sonner";
 declare global {
@@ -40,6 +40,7 @@ interface Lesson {
   descricaoApoio: string;
   videoUrl: string;
   imagemCapa: string | null;
+  materialUrl: string | null;
 }
 
 interface VisibleLesson {
@@ -47,6 +48,7 @@ interface VisibleLesson {
   titulo: string;
   videoUrl: string;
   imagemCapa?: string | null;
+  materialUrl?: string | null;
 }
 
 interface DemonstrativoClientProps {
@@ -394,6 +396,32 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
               <p className="text-slate-650 leading-relaxed font-medium text-sm">
                 {lesson.descricaoApoio}
               </p>
+
+              {/* Material de Apoio */}
+              {lesson.materialUrl && (
+                <div className="mt-2 p-4 rounded-xl border border-slate-200 bg-white shadow-2xs flex justify-between items-center group">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-emerald-50 text-emerald-700 rounded-lg">
+                      <BookOpen className="h-5 w-5" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-slate-800 truncate max-w-[200px] sm:max-w-xs" title={lesson.materialUrl.split("/").pop()}>
+                        {lesson.materialUrl.split("/").pop()}
+                      </span>
+                      <span className="text-3xs text-slate-400">Material de apoio da aula</span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      toast.info("Cadastre-se gratuitamente respondendo o quiz para baixar o material de apoio!");
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors text-3xs font-extrabold cursor-pointer uppercase tracking-wider"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Baixar
+                  </button>
+                </div>
+              )}
   
               {/* Banner de Aviso de Área Privada */}
               <div className="mt-6 flex items-start gap-4 rounded-2xl bg-amber-50/20 border border-amber-250 p-4">

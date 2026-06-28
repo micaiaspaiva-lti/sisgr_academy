@@ -29,6 +29,7 @@ interface Lesson {
   videoUrl: string;
   legendasUrl: string | null;
   imagemCapa: string | null;
+  materialUrl: string | null;
   demonstrative: boolean;
   ordem: number;
 }
@@ -318,23 +319,34 @@ export default function PlayerClient({
                 )}
 
                 {activeTab === "downloads" && (
-                  <div className="flex flex-col gap-4 text-xs font-semibold">
-                    <a
-                      href="#"
-                      className="border border-slate-200 rounded-xl p-4 flex justify-between items-center bg-white hover:bg-slate-50 transition-colors"
-                      title="Baixar Manual em PDF"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-red-100 text-red-700 rounded-lg">
-                          <BookOpen className="h-5 w-5" />
+                  <div className="flex flex-col gap-4 text-xs font-semibold animate-in fade-in duration-200">
+                    {currentLesson.materialUrl ? (
+                      <a
+                        href={currentLesson.materialUrl}
+                        download
+                        target="_blank"
+                        rel="noreferrer"
+                        className="border border-slate-200 rounded-xl p-4 flex justify-between items-center bg-white hover:bg-slate-50 transition-colors shadow-2xs group"
+                        title="Baixar material de apoio"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-emerald-50 text-emerald-700 rounded-lg group-hover:bg-emerald-100 transition-colors">
+                            <BookOpen className="h-5 w-5" />
+                          </div>
+                          <div className="text-left">
+                            <h4 className="font-extrabold text-slate-800 text-sm truncate max-w-xs sm:max-w-md">
+                              {currentLesson.materialUrl.split("/").pop() || "material_apoio"}
+                            </h4>
+                            <span className="text-3xs text-slate-450 uppercase font-black tracking-wider">Clique para baixar o material</span>
+                          </div>
                         </div>
-                        <div className="text-left">
-                          <h4 className="font-bold text-slate-800 text-sm">Manual_Gestao_Residuos.pdf</h4>
-                          <span className="text-2xs text-slate-400">PDF (2.4 MB)</span>
-                        </div>
-                      </div>
-                      <Download className="h-4 w-4 text-slate-400" />
-                    </a>
+                        <Download className="h-4 w-4 text-slate-450 group-hover:text-emerald-600 transition-colors" />
+                      </a>
+                    ) : (
+                      <p className="text-slate-500 text-sm font-semibold p-4 text-center border border-dashed border-slate-205 rounded-xl bg-slate-50/50">
+                        Nenhum arquivo para download anexado a esta aula.
+                      </p>
+                    )}
                   </div>
                 )}
               </div>

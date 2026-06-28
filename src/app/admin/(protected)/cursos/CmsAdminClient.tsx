@@ -5,7 +5,7 @@ import Link from "next/link";
 import { 
   Plus, Folder, PlayCircle, Sparkles, 
   UserCheck, BarChart3, GripVertical, CheckCircle, 
-  Trash2, Loader2, ArrowLeft, Users, LogOut, Pencil, Eye, EyeOff, Upload, Image
+  Trash2, Loader2, ArrowLeft, Users, LogOut, Pencil, Eye, EyeOff, Upload, Image, FileText
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { 
@@ -17,7 +17,8 @@ import {
   clearDatabaseAction,
   resetDatabaseToSeedAction,
   updateCursoAction,
-  updateAulaAction
+  updateAulaAction,
+  createModuloAction
 } from "@/app/actions";
 import { logoutAdminAction } from "@/lib/auth-admin";
 
@@ -29,6 +30,7 @@ interface Lesson {
   videoUrl: string;
   legendasUrl: string | null;
   imagemCapa: string | null;
+  materialUrl: string | null;
   demonstrative: boolean;
   ativo: boolean;
   ordem: number;
@@ -60,9 +62,11 @@ interface ImageUploadZoneProps {
   value: string;
   onChange: (url: string) => void;
   label: string;
+  accept?: string;
+  placeholderText?: string;
 }
 
-function ImageUploadZone({ value, onChange, label }: ImageUploadZoneProps) {
+function ImageUploadZone({ value, onChange, label, accept, placeholderText }: ImageUploadZoneProps) {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -73,7 +77,8 @@ function ImageUploadZone({ value, onChange, label }: ImageUploadZoneProps) {
   };
 
   const uploadFile = async (file: File) => {
-    if (!file.type.startsWith("image/")) {
+    // Se o accept for apenas imagem/*
+    if (accept === "image/*" && !file.type.startsWith("image/")) {
       toast.error("Por favor, selecione um arquivo de imagem.");
       return;
     }
@@ -90,9 +95,9 @@ function ImageUploadZone({ value, onChange, label }: ImageUploadZoneProps) {
       const data = await response.json();
       if (response.ok && data.url) {
         onChange(data.url);
-        toast.success("Imagem carregada com sucesso!");
+        toast.success("Arquivo carregado com sucesso!");
       } else {
-        toast.error(data.error || "Erro ao fazer upload da imagem.");
+        toast.error(data.error || "Erro ao fazer upload do arquivo.");
       }
     } catch (err) {
       console.error(err);
@@ -118,6 +123,9 @@ function ImageUploadZone({ value, onChange, label }: ImageUploadZoneProps) {
     }
   };
 
+  // Determina se o valor atual é uma imagem
+  const isImage = value ? value.match(/\.(jpeg|jpg|gif|png|webp|svg)/i) !== null : false;
+
   return (
     <div className="flex flex-col gap-1.5 w-full">
       <label className="text-xs font-bold text-slate-700">{label}</label>
@@ -135,7 +143,7 @@ function ImageUploadZone({ value, onChange, label }: ImageUploadZoneProps) {
           type="file"
           ref={fileInputRef}
           onChange={handleFileChange}
-          accept="image/*"
+          accept={accept || "image/*"}
           className="hidden"
         />
 
@@ -145,37 +153,69 @@ function ImageUploadZone({ value, onChange, label }: ImageUploadZoneProps) {
             <span className="text-3xs font-black text-slate-500 uppercase tracking-wider animate-pulse">Enviando...</span>
           </div>
         ) : value ? (
-          <div className="absolute inset-0 group">
-            <img
-              src={value}
-              alt="Imagem de Capa"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-3 transition-opacity duration-200">
-              <button
-                type="button"
-                onClick={triggerSelectFile}
-                className="px-3 py-1.5 rounded-lg bg-white/95 text-slate-800 text-xs font-black hover:bg-white transition-colors shadow-sm cursor-pointer"
-              >
-                Alterar Imagem
-              </button>
-              <button
-                type="button"
-                onClick={() => onChange("")}
-                className="px-3 py-1.5 rounded-lg bg-red-600/90 text-white text-xs font-black hover:bg-red-650 transition-colors shadow-sm cursor-pointer"
-              >
-                Remover
-              </button>
+          isImage ? (
+            <div className="absolute inset-0 group">
+              <img
+                src={value}
+                alt="Imagem"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-3 transition-opacity duration-200">
+                <button
+                  type="button"
+                  onClick={triggerSelectFile}
+                  className="px-3 py-1.5 rounded-lg bg-white/95 text-slate-800 text-xs font-black hover:bg-white transition-colors shadow-sm cursor-pointer"
+                >
+                  Alterar Imagem
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onChange("")}
+                  className="px-3 py-1.5 rounded-lg bg-red-650/90 text-white text-xs font-black hover:bg-red-650 transition-colors shadow-sm cursor-pointer"
+                >
+                  Remover
+                </button>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="absolute inset-0 bg-slate-100 flex flex-col items-center justify-center p-6 text-center gap-2 group">
+              <FileText className="h-10 w-10 text-slate-400 group-hover:text-slate-500 transition-colors" />
+              <div className="flex flex-col max-w-[80%]">
+                <span className="text-xs font-extrabold text-slate-800 truncate" title={value.split("/").pop()}>
+                  {value.split("/").pop()}
+                </span>
+                <span className="text-4xs font-bold text-slate-450 uppercase tracking-wider">Documento Anexado</span>
+              </div>
+              <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-3 transition-opacity duration-200">
+                <button
+                  type="button"
+                  onClick={triggerSelectFile}
+                  className="px-3 py-1.5 rounded-lg bg-white/95 text-slate-800 text-xs font-black hover:bg-white transition-colors shadow-sm cursor-pointer"
+                >
+                  Alterar Arquivo
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onChange("")}
+                  className="px-3 py-1.5 rounded-lg bg-red-650/90 text-white text-xs font-black hover:bg-red-650 transition-colors shadow-sm cursor-pointer"
+                >
+                  Remover
+                </button>
+              </div>
+            </div>
+          )
         ) : (
           <div className="flex flex-col items-center gap-2 text-center pointer-events-none">
             <div className="p-2.5 bg-slate-100 rounded-full text-slate-400 animate-in fade-in duration-300">
               <Upload className="h-5 w-5 text-slate-450" /> 
             </div>
             <div className="flex flex-col gap-0.5">
-              <span className="text-xs font-bold text-slate-800">Arraste a imagem ou clique para selecionar</span>
-              <span className="text-4xs font-bold text-slate-450 uppercase tracking-wider">PNG, JPG ou WEBP</span>
+              <span className="text-xs font-bold text-slate-800">
+                {placeholderText || "Arraste o arquivo ou clique para selecionar"}
+              </span>
+              <span className="text-4xs font-bold text-slate-455 uppercase tracking-wider">
+                {accept ? "Formatos comuns até 25MB" : "PNG, JPG ou WEBP"}
+              </span>
             </div>
           </div>
         )}
@@ -200,7 +240,11 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
   const [newLessonUrl, setNewLessonUrl] = useState("");
   const [newLessonDemo, setNewLessonDemo] = useState(false);
   const [newLessonImage, setNewLessonImage] = useState("");
+  const [newLessonMaterial, setNewLessonMaterial] = useState("");
   const [targetModuleId, setTargetModuleId] = useState("");
+
+  const [isCreatingModule, setIsCreatingModule] = useState(false);
+  const [newModuleTitle, setNewModuleTitle] = useState("");
 
   const [isEditingCourse, setIsEditingCourse] = useState(false);
   const [editCourseTitle, setEditCourseTitle] = useState("");
@@ -215,6 +259,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
   const [editLessonUrl, setEditLessonUrl] = useState("");
   const [editLessonDemo, setEditLessonDemo] = useState(false);
   const [editLessonImage, setEditLessonImage] = useState("");
+  const [editLessonMaterial, setEditLessonMaterial] = useState("");
   const [editLessonAtivo, setEditLessonAtivo] = useState(true);
 
   const [isClearingDb, setIsClearingDb] = useState(false);
@@ -368,6 +413,38 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
     }
   };
 
+  // Cria um novo módulo
+  const handleCreateModule = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedCourse || !newModuleTitle.trim()) return;
+
+    toast.info("Criando módulo...");
+    const res = await createModuloAction(selectedCourse.id, newModuleTitle);
+    if (res.success && res.module) {
+      toast.success("Módulo criado com sucesso!");
+      
+      const newModule: Module = {
+        id: res.module.id,
+        cursoId: res.module.cursoId,
+        titulo: res.module.titulo,
+        ordem: res.module.ordem,
+        aulas: []
+      };
+
+      const updatedCourse = {
+        ...selectedCourse,
+        modulos: [...(selectedCourse.modulos || []), newModule]
+      };
+
+      setSelectedCourse(updatedCourse);
+      setCourses(prev => prev.map(c => c.id === updatedCourse.id ? updatedCourse : c));
+      setIsCreatingModule(false);
+      setNewModuleTitle("");
+    } else {
+      toast.error(res.error || "Erro ao criar módulo.");
+    }
+  };
+
   const handleCreateLesson = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newLessonTitle.trim() || !newLessonUrl.trim()) return;
@@ -375,7 +452,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
 
     toast.info("Criando aula...");
     const isDemo = selectedCourse.tipo === "publico" ? true : newLessonDemo;
-    const res = await createAulaAction(targetModuleId, newLessonTitle, newLessonUrl, isDemo, newLessonImage);
+    const res = await createAulaAction(targetModuleId, newLessonTitle, newLessonUrl, isDemo, newLessonImage, newLessonMaterial);
     if (res.success && res.aula) {
       toast.success("Aula criada com sucesso!");
       
@@ -392,6 +469,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
               videoUrl: res.aula.videoUrl,
               legendasUrl: res.aula.legendasUrl,
               imagemCapa: res.aula.imagemCapa,
+              materialUrl: res.aula.materialUrl,
               demonstrative: res.aula.demonstrative,
               ativo: res.aula.ativo,
               ordem: res.aula.ordem
@@ -408,6 +486,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       setNewLessonTitle("");
       setNewLessonUrl("");
       setNewLessonImage("");
+      setNewLessonMaterial("");
       setNewLessonDemo(false);
       setTargetModuleId("");
     } else {
@@ -481,6 +560,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       editLessonUrl,
       editLessonDemo,
       editLessonImage,
+      editLessonMaterial,
       editLessonAtivo
     );
 
@@ -497,6 +577,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
               videoUrl: res.aula!.videoUrl,
               demonstrative: res.aula!.demonstrative,
               imagemCapa: res.aula!.imagemCapa,
+              materialUrl: res.aula!.materialUrl,
               ativo: res.aula!.ativo
             } : a)
           };
@@ -522,6 +603,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       lesson.videoUrl,
       lesson.demonstrative,
       lesson.imagemCapa,
+      lesson.materialUrl,
       newAtivo
     );
 
@@ -802,6 +884,20 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
 
               {/* Lista de Módulos */}
               <div className="flex flex-col gap-6">
+                <div className="flex justify-between items-center border-b border-slate-150 pb-3">
+                  <h3 className="text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                    <Folder className="h-4.5 w-4.5 text-emerald-600" />
+                    Módulos do Curso ({selectedCourse.modulos?.length || 0})
+                  </h3>
+                  <button
+                    onClick={() => setIsCreatingModule(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-750 text-3xs font-bold bg-white transition-colors cursor-pointer shadow-2xs uppercase tracking-wider"
+                  >
+                    <Plus className="h-3 w-3" />
+                    Novo Módulo
+                  </button>
+                </div>
+
                 {selectedCourse.modulos?.map((modulo) => (
                   <div key={modulo.id} className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
                     {/* Módulo Header */}
@@ -889,6 +985,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                                 setEditLessonUrl(aula.videoUrl);
                                 setEditLessonDemo(aula.demonstrative);
                                 setEditLessonImage(aula.imagemCapa || "");
+                                setEditLessonMaterial(aula.materialUrl || "");
                                 setEditLessonAtivo(aula.ativo);
                                 setIsEditingLesson(true);
                               }}
@@ -1030,6 +1127,45 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
           </div>
         </div>
       )}
+      {/* Modal de Criação de Módulo */}
+      {isCreatingModule && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 border border-slate-200 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
+            <h2 className="text-lg font-black text-slate-900">Novo Módulo</h2>
+            <form onSubmit={handleCreateModule} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-slate-700">Título do Módulo</label>
+                <input
+                  type="text"
+                  required
+                  value={newModuleTitle}
+                  onChange={e => setNewModuleTitle(e.target.value)}
+                  placeholder="Ex: Módulo 2: Gestão Avançada"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                />
+              </div>
+              <div className="flex gap-3 justify-end mt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsCreatingModule(false);
+                    setNewModuleTitle("");
+                  }}
+                  className="px-4 py-2 border border-slate-350 rounded-lg text-xs font-bold text-slate-650 hover:bg-slate-50 cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 cursor-pointer"
+                >
+                  Criar Módulo
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
       {/* Modal de Criação de Aula */}
       {isCreatingLesson && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
@@ -1063,6 +1199,13 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                 value={newLessonImage}
                 onChange={setNewLessonImage}
                 label="Imagem de Capa / Thumbnail (Aula)"
+              />
+              <ImageUploadZone
+                value={newLessonMaterial}
+                onChange={setNewLessonMaterial}
+                label="Material de Apoio (PDF, Planilha, etc.)"
+                accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
+                placeholderText="Arraste o documento ou clique para selecionar"
               />
               {selectedCourse?.tipo === "vip" && (
                 <div className="flex items-center gap-2 mt-1">
@@ -1210,6 +1353,13 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                 value={editLessonImage}
                 onChange={setEditLessonImage}
                 label="Imagem de Capa / Thumbnail (Aula)"
+              />
+              <ImageUploadZone
+                value={editLessonMaterial}
+                onChange={setEditLessonMaterial}
+                label="Material de Apoio (PDF, Planilha, etc.)"
+                accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
+                placeholderText="Arraste o documento ou clique para selecionar"
               />
               {selectedCourse?.tipo === "vip" && (
                 <div className="flex items-center gap-2 mt-1">

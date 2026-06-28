@@ -11,15 +11,29 @@ export async function POST(req: NextRequest) {
 
     if (!file) {
       return NextResponse.json(
-        { error: "Nenhum arquivo de imagem foi enviado." },
+        { error: "Nenhum arquivo foi enviado." },
         { status: 400 }
       );
     }
 
-    // Validação básica do tipo do arquivo (apenas imagens)
-    if (!file.type.startsWith("image/")) {
+    // Limite de tamanho de 25MB
+    const MAX_SIZE = 25 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
       return NextResponse.json(
-        { error: "O arquivo enviado precisa ser uma imagem (PNG, JPG, etc.)." },
+        { error: "O arquivo excede o limite máximo permitido de 25MB." },
+        { status: 400 }
+      );
+    }
+
+    // Bloqueio de arquivos executáveis ou scripts perigosos
+    const ext = path.extname(file.name).toLowerCase();
+    const dangerousExtensions = [
+      ".exe", ".bat", ".sh", ".cmd", ".scr", ".js", ".vbs", 
+      ".html", ".htm", ".php", ".py", ".pl", ".jar", ".msi"
+    ];
+    if (dangerousExtensions.includes(ext)) {
+      return NextResponse.json(
+        { error: "Tipo de arquivo não permitido por motivos de segurança." },
         { status: 400 }
       );
     }
