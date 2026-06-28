@@ -7,6 +7,22 @@ import {
   ChevronRight, Lock, Sparkles, User, Bot, Send, Award, Loader2, ArrowLeft, Key, Play
 } from "lucide-react";
 import { toast, Toaster } from "sonner";
+declare global {
+  interface Window {
+    YT: any;
+    onYouTubeIframeAPIReady: (() => void) | undefined;
+  }
+}
+
+function getYouTubeVideoId(url: string): string | null {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  if (match && match[2].length === 11) {
+    return match[2];
+  }
+  return null;
+}
 
 function getYouTubeEmbedUrl(url: string): string | null {
   if (!url) return null;
@@ -49,6 +65,7 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
   const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
   const [isSubmittingLead, setIsSubmittingLead] = useState(false);
   const [activeRightTab, setActiveRightTab] = useState<"aulas" | "chat">("aulas");
+  const [hasStarted, setHasStarted] = useState(false);
 
   // Form de Captura de Leads com campo Senha
   const [leadForm, setLeadForm] = useState({
@@ -97,6 +114,8 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
 
   // Mensagem inicial da IA
   useEffect(() => {
+    setVideoEnded(false);
+    setHasStarted(false);
     setChatMessages([
       {
         sender: "bot",
@@ -104,6 +123,71 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
       }
     ]);
   }, [lesson.id]);
+
+  // Carrega e gerencia a API do YouTube para monitorar o vídeo
+  useEffect(() => {
+    if (!window.YT) {
+      const tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      const firstScriptTag = document.getElementsByTagName("script")[0];
+      firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+    }
+  }, []);
+
+  useEffect(() => {
+    let player: any;
+    let mounted = true;
+
+    const initPlayer = () => {
+      const videoId = getYouTubeVideoId(lesson.videoUrl);
+      if (!videoId || !mounted) return;
+
+      const el = document.getElementById("youtube-player");
+      if (!el) {
+        setTimeout(initPlayer, 100);
+        return;
+      }
+
+      player = new window.YT.Player("youtube-player", {
+        height: "100%",
+        width: "100%",
+        videoId: videoId,
+        playerVars: {
+          rel: 0,
+          modestbranding: 1,
+        },
+        events: {
+          onStateChange: (event: any) => {
+            // YT.PlayerState.PLAYING === 1
+            if (event.data === 1) {
+              setHasStarted(true);
+            }
+            // YT.PlayerState.ENDED === 0
+            if (event.data === 0) {
+              handleVideoEnded();
+            }
+          },
+        },
+      });
+    };
+
+    if (window.YT && window.YT.Player) {
+      initPlayer();
+    } else {
+      const previousCallback = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => {
+        if (previousCallback) previousCallback();
+        initPlayer();
+      };
+    }
+
+    return () => {
+      mounted = false;
+      if (player && player.destroy) {
+        player.destroy();
+      }
+    };
+  }, [lesson.id, lesson.videoUrl]);
 
   const handleVideoEnded = () => {
     setVideoEnded(true);
@@ -269,20 +353,14 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
             {/* Player de Vídeo */}
             <div className="aspect-video bg-black relative">
               {(() => {
-                const youtubeEmbedUrl = getYouTubeEmbedUrl(lesson.videoUrl);
-                return youtubeEmbedUrl ? (
+                const isYouTube = !!getYouTubeVideoId(lesson.videoUrl);
+                return isYouTube ? (
                   <div className="w-full h-full relative">
-                    <iframe
-                      src={youtubeEmbedUrl}
-                      className="w-full h-full object-contain"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      title={lesson.titulo}
-                    />
-                    {!videoEnded && (
+                    <div id="youtube-player" className="w-full h-full" />
+                    {hasStarted && !videoEnded && (
                       <button
                         onClick={handleVideoEnded}
-                        className="absolute bottom-4 right-4 z-10 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-lg transition-transform hover:scale-105 cursor-pointer"
+                        className="absolute bottom-4 right-4 z-10 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-lg transition-transform hover:scale-105 cursor-pointer animate-in fade-in zoom-in duration-200"
                       >
                         Liberar Quiz de Fixação
                       </button>
@@ -293,6 +371,7 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
                     ref={videoRef}
                     src={lesson.videoUrl}
                     controls
+                    onPlay={() => setHasStarted(true)}
                     onEnded={handleVideoEnded}
                     className="w-full h-full object-contain"
                     aria-label={`Player de vídeo para a aula: ${lesson.titulo}`}
