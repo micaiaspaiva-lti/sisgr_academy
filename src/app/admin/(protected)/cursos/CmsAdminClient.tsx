@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
 import { 
   Plus, Folder, PlayCircle, Sparkles, 
   UserCheck, BarChart3, GripVertical, CheckCircle, 
-  Trash2, Loader2, ArrowLeft, Users, LogOut, Pencil, Eye, EyeOff
+  Trash2, Loader2, ArrowLeft, Users, LogOut, Pencil, Eye, EyeOff, Upload, Image
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { 
@@ -54,6 +54,134 @@ interface Course {
 
 interface CmsAdminClientProps {
   initialCourses: Course[];
+}
+
+interface ImageUploadZoneProps {
+  value: string;
+  onChange: (url: string) => void;
+  label: string;
+}
+
+function ImageUploadZone({ value, onChange, label }: ImageUploadZoneProps) {
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await uploadFile(file);
+  };
+
+  const uploadFile = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Por favor, selecione um arquivo de imagem.");
+      return;
+    }
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      if (response.ok && data.url) {
+        onChange(data.url);
+        toast.success("Imagem carregada com sucesso!");
+      } else {
+        toast.error(data.error || "Erro ao fazer upload da imagem.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro na comunicação com o servidor.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const triggerSelectFile = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      await uploadFile(file);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-1.5 w-full">
+      <label className="text-xs font-bold text-slate-700">{label}</label>
+      <div
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        className={`relative aspect-video rounded-xl border-2 border-dashed flex flex-col items-center justify-center p-4 transition-all overflow-hidden bg-slate-50 ${
+          value 
+            ? "border-slate-205 hover:border-slate-350" 
+            : "border-slate-300 hover:border-emerald-500 hover:bg-emerald-50/10 cursor-pointer"
+        }`}
+        onClick={value ? undefined : triggerSelectFile}
+      >
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          accept="image/*"
+          className="hidden"
+        />
+
+        {isUploading ? (
+          <div className="flex flex-col items-center gap-2">
+            <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+            <span className="text-3xs font-black text-slate-500 uppercase tracking-wider animate-pulse">Enviando...</span>
+          </div>
+        ) : value ? (
+          <div className="absolute inset-0 group">
+            <img
+              src={value}
+              alt="Imagem de Capa"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-3 transition-opacity duration-200">
+              <button
+                type="button"
+                onClick={triggerSelectFile}
+                className="px-3 py-1.5 rounded-lg bg-white/95 text-slate-800 text-xs font-black hover:bg-white transition-colors shadow-sm cursor-pointer"
+              >
+                Alterar Imagem
+              </button>
+              <button
+                type="button"
+                onClick={() => onChange("")}
+                className="px-3 py-1.5 rounded-lg bg-red-600/90 text-white text-xs font-black hover:bg-red-650 transition-colors shadow-sm cursor-pointer"
+              >
+                Remover
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-2 text-center pointer-events-none">
+            <div className="p-2.5 bg-slate-100 rounded-full text-slate-400 animate-in fade-in duration-300">
+              <Upload className="h-5 w-5 text-slate-450" /> 
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-xs font-bold text-slate-800">Arraste a imagem ou clique para selecionar</span>
+              <span className="text-4xs font-bold text-slate-450 uppercase tracking-wider">PNG, JPG ou WEBP</span>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) {
@@ -833,16 +961,11 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                   className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                 />
               </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-slate-700">Imagem de Capa (URL)</label>
-                <input
-                  type="text"
-                  value={newCourseImage}
-                  onChange={e => setNewCourseImage(e.target.value)}
-                  placeholder="https://images.unsplash.com/... ou outro link"
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
-                />
-              </div>
+              <ImageUploadZone
+                value={newCourseImage}
+                onChange={setNewCourseImage}
+                label="Imagem de Capa (Curso)"
+              />
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-bold text-slate-700">Classificação</label>
                 <div className="grid grid-cols-2 gap-2 mt-1">
@@ -918,16 +1041,11 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                 />
                 <span className="text-3xs text-slate-400">Pode ser uma URL HTTP de vídeo real ou um caminho local.</span>
               </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-slate-700">Imagem de Capa / Thumbnail (URL)</label>
-                <input
-                  type="text"
-                  value={newLessonImage}
-                  onChange={e => setNewLessonImage(e.target.value)}
-                  placeholder="Ex: https://imagens.unsplash.com/foto... (opcional)"
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
-                />
-              </div>
+              <ImageUploadZone
+                value={newLessonImage}
+                onChange={setNewLessonImage}
+                label="Imagem de Capa / Thumbnail (Aula)"
+              />
               {selectedCourse?.tipo === "vip" && (
                 <div className="flex items-center gap-2 mt-1">
                   <input
@@ -992,16 +1110,11 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                   className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                 />
               </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-slate-700">Imagem de Capa (URL)</label>
-                <input
-                  type="text"
-                  value={editCourseImage}
-                  onChange={e => setEditCourseImage(e.target.value)}
-                  placeholder="https://images.unsplash.com/... ou outro link"
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
-                />
-              </div>
+              <ImageUploadZone
+                value={editCourseImage}
+                onChange={setEditCourseImage}
+                label="Imagem de Capa (Curso)"
+              />
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-bold text-slate-700">Classificação</label>
                 <div className="grid grid-cols-2 gap-2 mt-1">
@@ -1075,16 +1188,11 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                   className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                 />
               </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-slate-700">Imagem de Capa / Thumbnail (URL)</label>
-                <input
-                  type="text"
-                  value={editLessonImage}
-                  onChange={e => setEditLessonImage(e.target.value)}
-                  placeholder="Ex: https://imagens.unsplash.com/foto... (opcional)"
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
-                />
-              </div>
+              <ImageUploadZone
+                value={editLessonImage}
+                onChange={setEditLessonImage}
+                label="Imagem de Capa / Thumbnail (Aula)"
+              />
               {selectedCourse?.tipo === "vip" && (
                 <div className="flex items-center gap-2 mt-1">
                   <input
