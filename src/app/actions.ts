@@ -127,7 +127,13 @@ export async function triggerIAAutomationAction(aulaId: string) {
 }
 
 // 6. Criar um novo curso demonstrativo
-export async function createCursoAction(titulo: string, descricao: string, tipo: "publico" | "vip" = "publico", imagemCapa?: string) {
+export async function createCursoAction(
+  titulo: string, 
+  descricao: string, 
+  tipo: "publico" | "vip" = "publico", 
+  imagemCapa?: string,
+  cargaHoraria?: number
+) {
   try {
     const existingCursos = await db.select().from(cursos);
     const [newCourse] = await db
@@ -139,6 +145,7 @@ export async function createCursoAction(titulo: string, descricao: string, tipo:
         ativo: true,
         tipo,
         ordem: existingCursos.length + 1,
+        cargaHoraria: cargaHoraria || 20,
         destaque: false,
       })
       .returning();
@@ -237,7 +244,8 @@ export async function updateCursoAction(
   descricao: string,
   tipo: "publico" | "vip",
   imagemCapa: string,
-  ativo: boolean
+  ativo: boolean,
+  cargaHoraria?: number
 ) {
   try {
     const [updatedCourse] = await db
@@ -248,6 +256,7 @@ export async function updateCursoAction(
         tipo,
         imagemCapa: imagemCapa?.trim() || "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=600&auto=format&fit=crop",
         ativo,
+        cargaHoraria: cargaHoraria || 20,
         updatedAt: new Date()
       })
       .where(eq(cursos.id, cursoId))
@@ -389,6 +398,7 @@ export async function resetDatabaseToSeedAction() {
       imagemCapa: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=600&auto=format&fit=crop",
       ativo: true,
       tipo: "publico",
+      cargaHoraria: 20,
     }).returning();
 
     const [modulo1_1] = await db.insert(modulos).values({
@@ -445,6 +455,7 @@ export async function resetDatabaseToSeedAction() {
       imagemCapa: "https://images.unsplash.com/photo-1591189863430-ab87e120f312?q=80&w=600&auto=format&fit=crop",
       ativo: true,
       tipo: "vip",
+      cargaHoraria: 10,
     }).returning();
 
     const [modulo2_1] = await db.insert(modulos).values({

@@ -74,6 +74,7 @@ async function main() {
     imagemCapa: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=600&auto=format&fit=crop",
     ativo: true,
     tipo: "publico",
+    cargaHoraria: 20,
   }).returning();
 
   const [modulo1_1] = await db.insert(modulos).values({
@@ -131,6 +132,7 @@ async function main() {
     imagemCapa: "https://images.unsplash.com/photo-1591189863430-ab87e120f312?q=80&w=600&auto=format&fit=crop",
     ativo: true,
     tipo: "vip",
+    cargaHoraria: 10,
   }).returning();
 
   const [modulo2_1] = await db.insert(modulos).values({

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifySSOToken } from "@/lib/auth";
 import { db } from "@/db";
-import { cursos, progressoAulas } from "@/db/schema";
+import { cursos, progressoAulas, certificados, alunos } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import * as crypto from "crypto";
 
@@ -90,13 +90,31 @@ export async function GET(request: Request) {
       );
     }
 
+    // 4.5 Registrar ou obter o certificado no banco de dados
+    let cert = await db.query.certificados.findFirst({
+      where: and(
+        eq(certificados.alunoId, session.id),
+        eq(certificados.cursoId, course.id)
+      )
+    });
+
+    if (!cert) {
+      const codigoAutenticidade = `SISGR-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
+      const [newCert] = await db.insert(certificados).values({
+        alunoId: session.id,
+        cursoId: course.id,
+        codigoAutenticidade,
+      }).returning();
+      cert = newCert;
+    }
+
     // 5. Dados do Certificado
     const dadosCertificado = {
       aluno: session.nome,
       email: session.email,
       curso: course.titulo,
-      cargaHoraria: "20 Horas",
-      dataEmissao: new Date().toLocaleDateString("pt-BR"),
+      cargaHoraria: `${course.cargaHoraria} Horas`,
+      dataEmissao: cert.emitidoEm.toLocaleDateString("pt-BR"),
     };
 
     // 6. Assinatura Digital Criptográfica (RSA SHA256)
@@ -112,6 +130,12 @@ export async function GET(request: Request) {
       sign.end();
       signatureHex = sign.sign(privateKey, "hex");
     }
+
+    // Gerar link de validação dinâmico
+    const host = request.headers.get("host") || "localhost:3000";
+    const protocol = host.includes("localhost") ? "http" : "https";
+    const validationUrl = `${protocol}://${host}/validar?codigo=${cert.codigoAutenticidade}`;
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(validationUrl)}`;
 
     // 7. Retornar layout HTML preparado para impressão PDF no navegador.
     const htmlContent = `
@@ -164,13 +188,10 @@ export async function GET(request: Request) {
             align-items: center;
             z-index: 2;
           }
-          .logo {
-            font-size: 24px;
-            font-weight: 900;
-            color: #0f172a;
-          }
-          .logo span {
-            color: #10b981;
+          .logo-img {
+            height: 48px;
+            width: auto;
+            object-fit: contain;
           }
           .badge {
             font-size: 12px;
@@ -223,7 +244,7 @@ export async function GET(request: Request) {
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            border-t: 1px solid #e2e8f0;
+            border-top: 1px solid #e2e8f0;
             padding-top: 30px;
             z-index: 2;
           }
@@ -242,17 +263,18 @@ export async function GET(request: Request) {
           }
           .authenticity-block {
             text-align: right;
-            max-width: 450px;
+            max-width: 420px;
           }
           .auth-label {
-            font-size: 10px;
+            font-size: 9px;
             color: #94a3b8;
             margin-bottom: 4px;
             font-weight: 600;
+            letter-spacing: 0.5px;
           }
           .auth-hash {
             font-family: monospace;
-            font-size: 9px;
+            font-size: 8px;
             color: #64748b;
             word-break: break-all;
             line-height: 1.4;
@@ -273,7 +295,7 @@ export async function GET(request: Request) {
           <div class="watermark">SISGR ACADEMY</div>
           
           <div class="header">
-            <div class="logo">SISGR <span>Academy</span></div>
+            <img src="/logo.png" alt="SISGR Academy" class="logo-img" />
             <div class="badge">Certificado Oficial</div>
           </div>
           
@@ -294,9 +316,13 @@ export async function GET(request: Request) {
               <div class="signature-label">Diretoria de Ensino SISGR</div>
             </div>
             
-            <div class="authenticity-block">
-              <div class="auth-label">VERIFICAÇÃO DE AUTENTICIDADE CRIPTOGRÁFICA (RSA-SHA256)</div>
-              <div class="auth-hash">${signatureHex}</div>
+            <div style="display: flex; gap: 16px; align-items: center; text-align: left;">
+              <img src="${qrCodeUrl}" alt="QR Code de Validação" style="width: 80px; height: 80px; border: 1px solid #e2e8f0; padding: 4px; border-radius: 8px; background: white;" />
+              <div class="authenticity-block">
+                <div class="auth-label">VERIFICAÇÃO DE AUTENTICIDADE CRIPTOGRÁFICA (RSA-SHA256)</div>
+                <div style="font-size: 11px; font-weight: 800; color: #0f172a; margin-bottom: 2px;">CÓDIGO: ${cert.codigoAutenticidade}</div>
+                <div class="auth-hash">ASSINATURA: ${signatureHex.substring(0, 64)}...</div>
+              </div>
             </div>
           </div>
         </div>

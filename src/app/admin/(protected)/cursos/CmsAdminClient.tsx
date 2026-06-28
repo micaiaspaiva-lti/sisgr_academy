@@ -56,6 +56,7 @@ interface Course {
   tipo: "publico" | "vip";
   destaque: boolean;
   ordem: number;
+  cargaHoraria: number;
   createdAt: Date;
   updatedAt: Date;
   modulos: Module[];
@@ -270,6 +271,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
   const [newCourseDesc, setNewCourseDesc] = useState("");
   const [newCourseTipo, setNewCourseTipo] = useState<"publico" | "vip">("publico");
   const [newCourseImage, setNewCourseImage] = useState("");
+  const [newCourseCargaHoraria, setNewCourseCargaHoraria] = useState(20);
 
    const [isCreatingLesson, setIsCreatingLesson] = useState(false);
   const [newLessonTitle, setNewLessonTitle] = useState("");
@@ -289,6 +291,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
   const [editCourseTipo, setEditCourseTipo] = useState<"publico" | "vip">("publico");
   const [editCourseImage, setEditCourseImage] = useState("");
   const [editCourseAtivo, setEditCourseAtivo] = useState(true);
+  const [editCourseCargaHoraria, setEditCourseCargaHoraria] = useState(20);
 
   const [isEditingLesson, setIsEditingLesson] = useState(false);
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
@@ -417,7 +420,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
     e.preventDefault();
     if (!newCourseTitle.trim()) return;
 
-    const res = await createCursoAction(newCourseTitle, newCourseDesc, newCourseTipo, newCourseImage);
+    const res = await createCursoAction(newCourseTitle, newCourseDesc, newCourseTipo, newCourseImage, newCourseCargaHoraria);
     if (res.success && res.course) {
       toast.success("Curso criado com sucesso!");
       
@@ -430,6 +433,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
         tipo: (res.course.tipo || "publico") as "publico" | "vip",
         destaque: res.course.destaque || false,
         ordem: res.course.ordem || 1,
+        cargaHoraria: res.course.cargaHoraria || 20,
         createdAt: res.course.createdAt ? new Date(res.course.createdAt) : new Date(),
         updatedAt: res.course.updatedAt ? new Date(res.course.updatedAt) : new Date(),
         modulos: [
@@ -450,6 +454,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       setNewCourseDesc("");
       setNewCourseImage("");
       setNewCourseTipo("publico");
+      setNewCourseCargaHoraria(20);
     } else {
       toast.error("Erro ao criar curso.");
     }
@@ -547,7 +552,8 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       editCourseDesc,
       editCourseTipo,
       editCourseImage,
-      editCourseAtivo
+      editCourseAtivo,
+      editCourseCargaHoraria
     );
 
     if (res.success && res.course) {
@@ -558,6 +564,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
         descricao: res.course.descricao || "",
         imagemCapa: res.course.imagemCapa || "",
         tipo: (res.course.tipo || "publico") as "publico" | "vip",
+        cargaHoraria: res.course.cargaHoraria || 20,
         ativo: res.course.ativo
       };
       setSelectedCourse(updated);
@@ -577,7 +584,8 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       course.descricao,
       course.tipo,
       course.imagemCapa,
-      newAtivo
+      newAtivo,
+      course.cargaHoraria
     );
 
     if (res.success && res.course) {
@@ -1123,6 +1131,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                       setEditCourseTipo(selectedCourse.tipo);
                       setEditCourseImage(selectedCourse.imagemCapa || "");
                       setEditCourseAtivo(selectedCourse.ativo);
+                      setEditCourseCargaHoraria(selectedCourse.cargaHoraria || 20);
                       setIsEditingCourse(true);
                     }}
                     className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold bg-white transition-colors cursor-pointer animate-in fade-in duration-200"
@@ -1388,6 +1397,18 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                      VIP (Clientes)
                   </button>
                 </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-slate-700">Carga Horária (horas)</label>
+                <input
+                  type="number"
+                  required
+                  min={1}
+                  value={newCourseCargaHoraria}
+                  onChange={e => setNewCourseCargaHoraria(parseInt(e.target.value) || 20)}
+                  placeholder="Ex: 20"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                />
               </div>
               <div className="flex gap-3 justify-end mt-2">
                 <button
@@ -1706,6 +1727,17 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                      VIP (Clientes)
                   </button>
                 </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-slate-700">Carga Horária (horas)</label>
+                <input
+                  type="number"
+                  required
+                  min={1}
+                  value={editCourseCargaHoraria}
+                  onChange={e => setEditCourseCargaHoraria(parseInt(e.target.value) || 20)}
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                />
               </div>
               <div className="flex gap-3 justify-end mt-2">
                 <button

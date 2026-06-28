@@ -28,6 +28,7 @@ export const cursos = pgTable("cursos", {
   tipo: varchar("tipo", { length: 20 }).default("publico").notNull(),
   destaque: boolean("destaque").default(false).notNull(),
   ordem: integer("ordem").default(0).notNull(),
+  cargaHoraria: integer("carga_horaria").default(20).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

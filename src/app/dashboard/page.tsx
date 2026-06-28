@@ -9,6 +9,7 @@ import {
   Play, BookOpen, Award, CheckCircle2, 
   Sparkles, LogOut, Clock, Lock 
 } from "lucide-react";
+import DashboardClient from "./DashboardClient";
 function getYouTubeVideoId(url: string): string | null {
   if (!url) return null;
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -211,100 +212,8 @@ export default async function Dashboard() {
           </section>
         )}
 
-        {/* Grade de Cursos */}
-        <section>
-          <h2 className="text-xl font-extrabold text-slate-800 mb-6 flex items-center gap-2">
-            <BookOpen className="h-6 w-6 text-emerald-600" />
-            Meus Cursos Matriculados
-          </h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            {studentCourses.map((course) => (
-              <div 
-                key={course.id}
-                className="flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="relative aspect-video">
-                  <img
-                    src={getCourseImage(course)}
-                    alt={course.titulo}
-                    className="object-cover w-full h-full"
-                  />
-                  {course.isLocked && (
-                    <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center">
-                      <div className="bg-slate-900/95 text-white px-4 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 border border-slate-800 shadow-lg">
-                        <Lock className="h-4 w-4 text-amber-500" />
-                        Conteúdo VIP
-                      </div>
-                    </div>
-                  )}
-                  {course.progresso === 100 && !course.isLocked && (
-                    <div className="absolute top-4 right-4 bg-emerald-500 text-white p-2 rounded-full shadow-lg" title="Curso concluído!">
-                      <CheckCircle2 className="h-5 w-5" />
-                    </div>
-                  )}
-                </div>
-                
-                <div className="p-6 flex-1 flex flex-col justify-between gap-6">
-                  <div className="flex flex-col gap-4">
-                    <h3 className="text-lg font-bold text-slate-850">
-                      {course.titulo}
-                    </h3>
-                    <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">
-                      {course.descricao}
-                    </p>
-                  </div>
-
-                  {/* Barra de Progresso */}
-                  <div className="flex flex-col gap-2">
-                    <div className="flex justify-between items-center text-xs font-bold">
-                      <span className="text-slate-500">Progresso</span>
-                      <span className="text-emerald-600">{course.progresso}% concluído</span>
-                    </div>
-                    <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                      <div 
-                        className="bg-emerald-600 h-2 rounded-full transition-all duration-500" 
-                        style={{ width: `${course.progresso}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Botões de Ação */}
-                  <div className="flex flex-col sm:flex-row gap-3 border-t border-slate-100 pt-6">
-                    {course.isLocked ? (
-                      <button
-                        disabled
-                        className="flex-grow inline-flex items-center justify-center gap-2 rounded-lg bg-slate-200 px-4 py-2.5 text-xs font-bold text-slate-450 cursor-not-allowed w-full"
-                        title="Este curso é exclusivo para clientes VIP"
-                      >
-                        <Lock className="h-3.5 w-3.5 text-slate-400" />
-                        Bloqueado para Visitantes
-                      </button>
-                    ) : course.progresso === 100 ? (
-                      <Link
-                        href={`/api/certificados/emitir?cursoId=${course.id}`} // Passa o ID do curso para o certificado
-                        className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2.5 text-xs font-bold text-white hover:opacity-90 transition-opacity"
-                        target="_blank"
-                        title="Baixar Certificado"
-                      >
-                        <Award className="h-4 w-4" />
-                        Baixar Certificado
-                      </Link>
-                    ) : (
-                      <Link
-                        href={`/player/${course.proximaAulaId || course.modulos[0]?.aulas[0]?.id}`}
-                        className="flex-grow inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-emerald-700 transition-colors"
-                        title="Ir para Player do Curso"
-                      >
-                        <Play className="h-3.5 w-3.5 fill-current" />
-                        Acessar Curso
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+        {/* Painel Interativo com Abas, Filtros e Busca */}
+        <DashboardClient session={session} courses={studentCourses} />
 
         {/* Banner de Dúvidas / Suporte */}
         <section className="bg-slate-100 rounded-xl p-6 border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">

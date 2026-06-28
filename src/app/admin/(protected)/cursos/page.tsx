@@ -34,6 +34,7 @@ export default async function CMSAdminPage() {
     tipo: course.tipo as "publico" | "vip",
     destaque: course.destaque,
     ordem: course.ordem,
+    cargaHoraria: course.cargaHoraria,
     createdAt: course.createdAt,
     updatedAt: course.updatedAt,
     modulos: course.modulos.map(m => ({

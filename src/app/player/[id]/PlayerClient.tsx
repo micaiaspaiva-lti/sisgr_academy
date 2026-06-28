@@ -134,21 +134,21 @@ export default function PlayerClient({
   };
 
   return (
-    <div className="flex-grow flex flex-col min-h-screen bg-slate-50 font-sans">
+    <div className="flex-grow flex flex-col min-h-screen bg-slate-950 font-sans text-slate-100">
       {/* Header Logado */}
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-md py-4 px-4 md:px-12 flex justify-between items-center shadow-xs">
+      <header className="sticky top-0 z-40 border-b border-slate-900 bg-slate-950/80 backdrop-blur-md py-4 px-4 md:px-12 flex justify-between items-center shadow-xs">
         <div className="flex items-center gap-2 md:gap-3 min-w-0">
-          <Link href="/dashboard" className="p-2 -ml-2 rounded-lg text-slate-400 hover:text-slate-600 transition-colors shrink-0" title="Voltar ao Dashboard">
+          <Link href="/dashboard" className="p-2 -ml-2 rounded-lg text-slate-400 hover:text-slate-200 transition-colors shrink-0" title="Voltar ao Dashboard">
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <span className="text-sm font-bold text-slate-800 hidden md:inline truncate max-w-[150px] md:max-w-xs">{currentCourse.titulo}</span>
-          <ChevronRight className="h-4 w-4 text-slate-400 hidden md:inline shrink-0" />
-          <span className="text-xs font-semibold text-slate-500 truncate max-w-[140px] md:max-w-xs">{currentLesson.titulo}</span>
+          <span className="text-sm font-bold text-slate-100 hidden md:inline truncate max-w-[150px] md:max-w-xs">{currentCourse.titulo}</span>
+          <ChevronRight className="h-4 w-4 text-slate-500 hidden md:inline shrink-0" />
+          <span className="text-xs font-semibold text-slate-400 truncate max-w-[140px] md:max-w-xs">{currentLesson.titulo}</span>
         </div>
         
         <button
           onClick={() => setMobileSidebarOpen(true)}
-          className="md:hidden rounded-lg border border-slate-300 p-2 text-slate-700 hover:bg-slate-50 transition-colors"
+          className="lg:hidden rounded-lg border border-slate-800 p-2 text-slate-300 hover:bg-slate-900 transition-colors"
           title="Ver Módulos"
         >
           <Menu className="h-5 w-5" />
@@ -159,7 +159,7 @@ export default function PlayerClient({
       <div className={`flex-1 grid ${cinemaMode ? "grid-cols-1" : "lg:grid-cols-12"} w-full`}>
         
         {/* Lado Esquerdo / Vídeo e Abas */}
-        <main className={`${cinemaMode ? "lg:col-span-12" : "lg:col-span-8"} flex flex-col bg-white border-r border-slate-200 overflow-y-auto`}>
+        <main className={`${cinemaMode ? "lg:col-span-12" : "lg:col-span-8"} flex flex-col bg-slate-950 border-r border-slate-900 overflow-y-auto`}>
           
           {/* Player Container */}
           <div className="aspect-video bg-black relative group">
@@ -211,23 +211,23 @@ export default function PlayerClient({
 
           {/* Área de Controle e Descrição */}
           <div className="p-6 md:p-8 flex flex-col gap-6">
-            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-100 pb-6">
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-900 pb-6">
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-bold text-emerald-600">{currentModule.titulo}</span>
-                <h1 className="text-xl md:text-2xl font-black text-slate-950">{currentLesson.titulo}</h1>
+                <span className="text-xs font-bold text-emerald-400">{currentModule.titulo}</span>
+                <h1 className="text-xl md:text-2xl font-black text-slate-100">{currentLesson.titulo}</h1>
               </div>
               <button
                 onClick={handleConcluirEAvançar}
                 disabled={optimisticConcluidas.includes(currentLesson.id) || isPending}
-                className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 font-semibold text-sm transition-all shadow-xs shrink-0 ${
+                className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 font-semibold text-sm transition-all shadow-xs shrink-0 cursor-pointer ${
                   optimisticConcluidas.includes(currentLesson.id)
-                    ? "bg-emerald-100 text-emerald-855 border border-emerald-200"
+                    ? "bg-emerald-955/20 text-emerald-400 border border-emerald-500/20"
                     : "bg-emerald-600 text-white hover:bg-emerald-700"
                 }`}
               >
                 {optimisticConcluidas.includes(currentLesson.id) ? (
                   <>
-                    <CheckCircle className="h-4 w-4 fill-current text-emerald-600" />
+                    <CheckCircle className="h-4 w-4 fill-current text-emerald-500" />
                     Aula Concluída
                   </>
                 ) : (
@@ -241,13 +241,13 @@ export default function PlayerClient({
 
             {/* Abas Pedagógicas */}
             <div>
-              <div className="flex border-b border-slate-200">
+              <div className="flex border-b border-slate-900">
                 <button
                   onClick={() => setActiveTab("apoio")}
-                  className={`flex items-center gap-2 border-b-2 py-3 px-6 text-sm font-semibold transition-all -mb-px ${
+                  className={`flex items-center gap-2 border-b-2 py-3 px-6 text-sm font-semibold transition-all -mb-px cursor-pointer ${
                     activeTab === "apoio"
-                      ? "border-emerald-600 text-emerald-600"
-                      : "border-transparent text-slate-500 hover:text-slate-800"
+                      ? "border-emerald-500 text-emerald-400"
+                      : "border-transparent text-slate-400 hover:text-slate-200"
                   }`}
                 >
                   <BookOpen className="h-4 w-4" />
@@ -255,10 +255,10 @@ export default function PlayerClient({
                 </button>
                 <button
                   onClick={() => setActiveTab("forum")}
-                  className={`flex items-center gap-2 border-b-2 py-3 px-6 text-sm font-semibold transition-all -mb-px ${
+                  className={`flex items-center gap-2 border-b-2 py-3 px-6 text-sm font-semibold transition-all -mb-px cursor-pointer ${
                     activeTab === "forum"
-                      ? "border-emerald-600 text-emerald-600"
-                      : "border-transparent text-slate-500 hover:text-slate-800"
+                      ? "border-emerald-500 text-emerald-400"
+                      : "border-transparent text-slate-400 hover:text-slate-200"
                   }`}
                 >
                   <MessageSquare className="h-4 w-4" />
@@ -266,10 +266,10 @@ export default function PlayerClient({
                 </button>
                 <button
                   onClick={() => setActiveTab("downloads")}
-                  className={`flex items-center gap-2 border-b-2 py-3 px-6 text-sm font-semibold transition-all -mb-px ${
+                  className={`flex items-center gap-2 border-b-2 py-3 px-6 text-sm font-semibold transition-all -mb-px cursor-pointer ${
                     activeTab === "downloads"
-                      ? "border-emerald-600 text-emerald-600"
-                      : "border-transparent text-slate-500 hover:text-slate-800"
+                      ? "border-emerald-500 text-emerald-400"
+                      : "border-transparent text-slate-400 hover:text-slate-200"
                   }`}
                 >
                   <Download className="h-4 w-4" />
@@ -280,40 +280,40 @@ export default function PlayerClient({
               {/* Conteúdo das Abas */}
               <div className="py-6">
                 {activeTab === "apoio" && (
-                  <div className="prose max-w-none text-sm text-slate-650 leading-relaxed">
+                  <div className="prose prose-invert max-w-none text-sm text-slate-300 leading-relaxed">
                     {currentLesson.descricaoApoio ? (
                       <div 
                         style={{ whiteSpace: "pre-wrap" }}
                         dangerouslySetInnerHTML={{ __html: currentLesson.descricaoApoio }} 
                       />
                     ) : (
-                      <p className="text-slate-400 italic">Nenhum texto de apoio cadastrado para esta aula.</p>
+                      <p className="text-slate-500 italic">Nenhum texto de apoio cadastrado para esta aula.</p>
                     )}
                   </div>
                 )}
 
                 {activeTab === "forum" && (
                   <div className="flex flex-col gap-6 text-sm">
-                    <div className="border border-slate-200 rounded-xl p-4 flex gap-4 bg-slate-50">
-                      <div className="h-8 w-8 rounded-full bg-slate-400 text-white flex items-center justify-center font-bold">J</div>
-                      <div className="flex flex-col gap-1.5">
+                    <div className="border border-slate-800 rounded-xl p-4 flex gap-4 bg-slate-900/40">
+                      <div className="h-8 w-8 rounded-full bg-slate-700 text-white flex items-center justify-center font-bold shrink-0">J</div>
+                      <div className="flex flex-col gap-1.5 text-left">
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-slate-800">Júlio Martins</span>
-                          <span className="text-xs text-slate-400">há 2 dias</span>
+                          <span className="font-bold text-slate-200">Júlio Martins</span>
+                          <span className="text-xs text-slate-500">há 2 dias</span>
                         </div>
-                        <p className="text-slate-600">Como gerador de resíduos, eu preciso emitir MTR mesmo se for transportar dentro do próprio município com veículo próprio?</p>
+                        <p className="text-slate-350 leading-relaxed">Como gerador de resíduos, eu preciso emitir MTR mesmo se for transportar dentro do próprio município com veículo próprio?</p>
                       </div>
                     </div>
 
-                    <div className="border border-slate-200 rounded-xl p-4 flex gap-4 bg-emerald-50/20 border-emerald-100">
-                      <div className="h-8 w-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold">I</div>
-                      <div className="flex flex-col gap-1.5">
+                    <div className="border border-emerald-950/40 rounded-xl p-4 flex gap-4 bg-emerald-950/10 border-emerald-800/20">
+                      <div className="h-8 w-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold shrink-0">I</div>
+                      <div className="flex flex-col gap-1.5 text-left">
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-emerald-800">Instrutor SISGR</span>
-                          <span className="inline-flex items-center rounded-md bg-emerald-100 px-1.5 py-0.5 text-2xs font-semibold text-emerald-800">Equipe</span>
-                          <span className="text-xs text-slate-400">há 1 dia</span>
+                          <span className="font-bold text-emerald-400">Instrutor SISGR</span>
+                          <span className="inline-flex items-center rounded-md bg-emerald-950 text-2xs font-semibold text-emerald-400 ring-1 ring-inset ring-emerald-500/20">Equipe</span>
+                          <span className="text-xs text-slate-500">há 1 dia</span>
                         </div>
-                        <p className="text-slate-600">Olá Júlio! Sim, a PNRS e as diretrizes do SINIR exigem a emissão de MTR para todos os resíduos industriais, comerciais e de serviços de saúde, mesmo em transportes municipais internos. O sistema nacional precisa rastrear todo o fluxo.</p>
+                        <p className="text-slate-300 leading-relaxed">Olá Júlio! Sim, a PNRS e as diretrizes do SINIR exigem a emissão de MTR para todos os resíduos industriais, comerciais e de serviços de saúde, mesmo em transportes municipais internos. O sistema nacional precisa rastrear todo o fluxo.</p>
                       </div>
                     </div>
                   </div>
@@ -329,25 +329,25 @@ export default function PlayerClient({
                           download
                           target="_blank"
                           rel="noreferrer"
-                          className="border border-slate-205 rounded-xl p-4 flex justify-between items-center bg-white hover:bg-slate-50 transition-colors shadow-2xs group w-full"
+                          className="border border-slate-800 rounded-xl p-4 flex justify-between items-center bg-slate-900/30 hover:bg-slate-900/60 transition-colors shadow-2xs group w-full"
                           title={`Baixar ${file.name}`}
                         >
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="p-2 bg-emerald-50 text-emerald-700 rounded-lg group-hover:bg-emerald-100 transition-colors shrink-0">
+                            <div className="p-2 bg-emerald-950 text-emerald-400 rounded-lg group-hover:bg-emerald-900/60 transition-colors shrink-0">
                               <BookOpen className="h-5 w-5" />
                             </div>
                             <div className="text-left min-w-0">
-                              <h4 className="font-extrabold text-slate-800 text-sm truncate max-w-[150px] sm:max-w-md">
+                              <h4 className="font-extrabold text-slate-200 text-sm truncate max-w-[150px] sm:max-w-md">
                                 {file.name}
                               </h4>
-                              <span className="text-3xs text-slate-455 uppercase font-black tracking-wider block">Clique para baixar</span>
+                              <span className="text-3xs text-slate-500 uppercase font-black tracking-wider block">Clique para baixar</span>
                             </div>
                           </div>
-                          <Download className="h-4 w-4 text-slate-455 group-hover:text-emerald-600 transition-colors shrink-0" />
+                          <Download className="h-4 w-4 text-slate-500 group-hover:text-emerald-400 transition-colors shrink-0" />
                         </a>
                       ))
                     ) : (
-                      <p className="text-slate-500 text-sm font-semibold p-4 text-center border border-dashed border-slate-205 rounded-xl bg-slate-50/50">
+                      <p className="text-slate-500 text-sm font-semibold p-4 text-center border border-dashed border-slate-800 rounded-xl bg-slate-900/10">
                         Nenhum arquivo para download anexado a esta aula.
                       </p>
                     )}
@@ -360,18 +360,20 @@ export default function PlayerClient({
 
         {/* Lado Direito / Lista de Módulos (Sidebar Ocultável no Cinema Mode) */}
         {!cinemaMode && (
-          <aside className="hidden md:flex md:col-span-4 flex-col bg-slate-900 text-white overflow-y-auto max-h-[100vh] sticky top-0">
+          <aside className="hidden lg:flex lg:col-span-4 flex-col bg-slate-950 text-white overflow-y-auto max-h-[100vh] sticky top-0 border-l border-slate-900">
             {/* Header Sidebar */}
-            <div className="p-6 border-b border-slate-800 flex items-center gap-3">
-              <img src="/icon.png" alt="" className="h-6 w-6 object-contain" />
-              <span className="font-black text-sm uppercase tracking-wider">Módulos do Curso</span>
+            <div className="p-6 border-b border-slate-900 flex items-center gap-3 shrink-0">
+              <span className="font-black text-sm uppercase tracking-wider text-slate-200 flex items-center gap-2">
+                <BookOpen className="h-4 w-4 text-emerald-500" />
+                Módulos do Curso
+              </span>
             </div>
 
             {/* Lista de Módulos e Aulas */}
             <div className="flex flex-col">
               {currentCourse.modulos.map((modulo) => (
-                <div key={modulo.id} className="border-b border-slate-800">
-                  <div className="bg-slate-950 px-6 py-3 text-xs font-black tracking-wider text-slate-400 uppercase">
+                <div key={modulo.id} className="border-b border-slate-900">
+                  <div className="bg-slate-900/40 px-6 py-3.5 text-[10px] font-black tracking-wider text-slate-400 uppercase border-y border-slate-900/50">
                     {modulo.titulo}
                   </div>
                   <div className="flex flex-col">
@@ -382,17 +384,17 @@ export default function PlayerClient({
                         <Link
                           key={aula.id}
                           href={`/player/${aula.id}`}
-                          className={`flex items-center justify-between px-6 py-4 border-b border-slate-800/40 text-xs transition-colors ${
+                          className={`flex items-center justify-between px-6 py-4 border-b border-slate-900/30 text-xs transition-colors relative ${
                             isActive 
-                              ? "bg-slate-850 text-white font-bold" 
-                              : "text-slate-300 hover:bg-slate-800/40"
+                              ? "bg-slate-900/80 text-emerald-400 font-bold border-l-4 border-emerald-500 pl-[20px]" 
+                              : "text-slate-300 hover:bg-slate-900/50 hover:text-white"
                           }`}
                         >
                           <div className="flex items-center gap-3 truncate">
                             {isConcluida ? (
-                              <CheckCircle2 className="h-4.5 w-4.5 text-emerald-500 shrink-0 fill-current bg-white rounded-full" />
+                              <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 fill-current bg-slate-950 rounded-full" />
                             ) : (
-                              <Play className={`h-4 w-4 shrink-0 ${isActive ? "text-emerald-600 fill-current" : "text-slate-500"}`} />
+                              <Play className={`h-3.5 w-3.5 shrink-0 ${isActive ? "text-emerald-500 fill-emerald-500/20" : "text-slate-500"}`} />
                             )}
                             <span className="truncate">{aula.titulo}</span>
                           </div>
@@ -410,10 +412,10 @@ export default function PlayerClient({
         )}
       </div>
 
-      {/* Drawer responsivo lateral para mobile */}
+      {/* Drawer lateral para mobile */}
       {mobileSidebarOpen && (
-        <div className="fixed inset-0 z-50 flex md:hidden bg-black/60 backdrop-blur-xs">
-          <div className="bg-slate-900 text-white w-4/5 max-w-xs h-full flex flex-col shadow-2xl relative animate-in slide-in-from-left duration-200">
+        <div className="fixed inset-0 z-50 flex lg:hidden bg-black/60 backdrop-blur-xs">
+          <div className="bg-slate-950 text-white w-4/5 max-w-xs h-full flex flex-col shadow-2xl relative border-r border-slate-900 animate-in slide-in-from-left duration-200">
             {/* Fechar */}
             <button
               onClick={() => setMobileSidebarOpen(false)}
@@ -423,15 +425,17 @@ export default function PlayerClient({
               <X className="h-5 w-5" />
             </button>
 
-            <div className="p-6 border-b border-slate-800 flex items-center gap-3">
-              <img src="/icon.png" alt="" className="h-6 w-6 object-contain" />
-              <span className="font-black text-sm uppercase tracking-wider">Módulos</span>
+            <div className="p-6 border-b border-slate-900 flex items-center gap-3 shrink-0">
+              <span className="font-black text-sm uppercase tracking-wider text-slate-200 flex items-center gap-2">
+                <BookOpen className="h-4 w-4 text-emerald-500" />
+                Módulos
+              </span>
             </div>
 
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-grow overflow-y-auto">
               {currentCourse.modulos.map((modulo) => (
-                <div key={modulo.id} className="border-b border-slate-800">
-                  <div className="bg-slate-950 px-6 py-3 text-[10px] font-black tracking-wider text-slate-400 uppercase">
+                <div key={modulo.id} className="border-b border-slate-900">
+                  <div className="bg-slate-900/40 px-6 py-3 text-[10px] font-black tracking-wider text-slate-400 uppercase border-y border-slate-900/50">
                     {modulo.titulo}
                   </div>
                   <div className="flex flex-col">
@@ -443,17 +447,17 @@ export default function PlayerClient({
                           key={aula.id}
                           href={`/player/${aula.id}`}
                           onClick={() => setMobileSidebarOpen(false)}
-                          className={`flex items-center justify-between px-6 py-4 border-b border-slate-800/40 text-xs transition-colors ${
+                          className={`flex items-center justify-between px-6 py-4 border-b border-slate-900/30 text-xs transition-colors relative ${
                             isActive 
-                              ? "bg-slate-800 text-white font-bold" 
-                              : "text-slate-300 hover:bg-slate-800/40"
+                              ? "bg-slate-900/80 text-emerald-400 font-bold border-l-4 border-emerald-500 pl-[20px]" 
+                              : "text-slate-300 hover:bg-slate-900/50 hover:text-white"
                           }`}
                         >
                           <div className="flex items-center gap-3 truncate">
                             {isConcluida ? (
-                              <CheckCircle2 className="h-4.5 w-4.5 text-emerald-500 shrink-0" />
+                              <CheckCircle2 className="h-4.5 w-4.5 text-emerald-500 shrink-0 fill-current bg-slate-950 rounded-full" />
                             ) : (
-                              <Play className={`h-4 w-4 shrink-0 ${isActive ? "text-emerald-600" : "text-slate-500"}`} />
+                              <Play className={`h-3.5 w-3.5 shrink-0 ${isActive ? "text-emerald-500 fill-emerald-500/20" : "text-slate-500"}`} />
                             )}
                             <span className="truncate">{aula.titulo}</span>
                           </div>
