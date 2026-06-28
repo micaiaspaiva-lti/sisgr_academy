@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { 
-  ChevronRight, Lock, Sparkles, User, Bot, Send, Award, Loader2, ArrowLeft, Key
+  ChevronRight, Lock, Sparkles, User, Bot, Send, Award, Loader2, ArrowLeft, Key, Play
 } from "lucide-react";
 import { toast, Toaster } from "sonner";
 
@@ -25,12 +25,19 @@ interface Lesson {
   videoUrl: string;
 }
 
+interface VisibleLesson {
+  id: string;
+  titulo: string;
+  videoUrl: string;
+}
+
 interface DemonstrativoClientProps {
   lesson: Lesson;
   courseTitle: string;
+  lessons?: VisibleLesson[];
 }
 
-export default function DemonstrativoClient({ lesson, courseTitle }: DemonstrativoClientProps) {
+export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] }: DemonstrativoClientProps) {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoEnded, setVideoEnded] = useState(false);
@@ -321,6 +328,43 @@ export default function DemonstrativoClient({ lesson, courseTitle }: Demonstrati
               </div>
             </div>
           </div>
+
+          {/* Índice de Aulas */}
+          {lessons.length > 1 && (
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col gap-4">
+              <h2 className="font-extrabold text-sm text-slate-850 flex items-center gap-2">
+                <Play className="h-4 w-4 text-emerald-600 fill-current" />
+                Aulas deste Curso ({lessons.length})
+              </h2>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {lessons.map((a, i) => (
+                  <Link
+                    key={a.id}
+                    href={`/demonstrativo/${a.id}`}
+                    className={`p-4 rounded-xl border text-xs font-bold transition-all flex items-center justify-between group ${
+                      a.id === lesson.id
+                        ? "border-emerald-600 bg-emerald-50/20 text-emerald-800"
+                        : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-350"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 truncate">
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${
+                        a.id === lesson.id ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-550 group-hover:bg-slate-200"
+                      }`}>
+                        {i + 1}
+                      </span>
+                      <span className="truncate">{a.titulo}</span>
+                    </div>
+                    {a.id === lesson.id ? (
+                      <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md uppercase shrink-0">Reproduzindo</span>
+                    ) : (
+                      <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md uppercase shrink-0 group-hover:bg-slate-200">Grátis</span>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </main>
 
         {/* Lado Direito: Assistente de IA e Quiz */}

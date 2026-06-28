@@ -44,6 +44,28 @@ export default async function DemonstrativoPage({ params }: PageProps) {
     redirect("/");
   }
 
+  // Buscar todos os módulos deste curso
+  const courseModules = await db.query.modulos.findMany({
+    where: eq(modulos.cursoId, currentCourse.id),
+  });
+
+  const moduleIds = courseModules.map(m => m.id);
+
+  // Buscar todas as aulas dos módulos e filtrar as acessíveis (demonstrativas ou todas se curso for público)
+  let visibleLessons: any[] = [];
+  if (moduleIds.length > 0) {
+    const allLessons = await db.query.aulas.findMany({
+      orderBy: (aulas, { asc }) => [asc(aulas.ordem)],
+    });
+    visibleLessons = allLessons
+      .filter(a => moduleIds.includes(a.moduloId) && (currentCourse.tipo === "publico" || a.demonstrative))
+      .map(a => ({
+        id: a.id,
+        titulo: a.titulo,
+        videoUrl: a.videoUrl,
+      }));
+  }
+
   const mappedLesson = {
     id: currentLesson.id,
     titulo: currentLesson.titulo,
@@ -55,6 +77,7 @@ export default async function DemonstrativoPage({ params }: PageProps) {
     <DemonstrativoClient
       lesson={mappedLesson}
       courseTitle={currentCourse.titulo}
+      lessons={visibleLessons}
     />
   );
 }
