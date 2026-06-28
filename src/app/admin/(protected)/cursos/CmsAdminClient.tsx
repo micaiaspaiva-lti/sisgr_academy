@@ -1188,7 +1188,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       {/* Modal de Criação de Aula */}
       {isCreatingLesson && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-5xl w-full p-6 border border-slate-200 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto p-6 border border-slate-200 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
             <h2 className="text-lg font-black text-slate-900 border-b border-slate-100 pb-2">Nova Aula</h2>
             <form onSubmit={handleCreateLesson} className="flex flex-col gap-4">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -1473,7 +1473,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       {/* Modal de Edição de Aula */}
       {isEditingLesson && editingLesson && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-5xl w-full p-6 border border-slate-200 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto p-6 border border-slate-200 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
             <h2 className="text-lg font-black text-slate-900 border-b border-slate-100 pb-2">Editar Aula</h2>
             <form onSubmit={handleUpdateLesson} className="flex flex-col gap-4">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
