@@ -948,8 +948,8 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                                   {aula.titulo}
                                 </span>
                                 {aula.demonstrative && (
-                                  <span className="inline-flex shrink-0 items-center rounded-md bg-emerald-50 px-1 py-0.5 text-[8px] font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/10 uppercase tracking-wider">
-                                    Demo
+                                  <span className="inline-flex shrink-0 items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[8px] font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/10 uppercase tracking-wider">
+                                    Demonstrativa
                                   </span>
                                 )}
                                 {aula.materiais && aula.materiais.length > 0 && (
