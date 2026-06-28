@@ -136,7 +136,6 @@ export default async function Home() {
   }
 
   const featuredCourse = activeCourses.find(c => c.destaque) || activeCourses.find(c => c.tipo === "publico") || activeCourses[0];
-  const otherCourses = activeCourses.filter(c => c.id !== featuredCourse.id);
 
   // Primeira aula demonstrativa do curso em destaque (apenas cursos Públicos possuem aulas demonstrativas para visitantes; cursos VIP exigem SSO/login)
   const demoLesson = featuredCourse.tipo === "publico"
@@ -212,69 +211,14 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Featured & Other Courses Grid */}
+      {/* Courses Grid */}
       <main className="flex-grow py-20 px-6 md:px-12 w-full max-w-7xl mx-auto">
-        {/* Featured Card */}
-        <div className="mb-16">
-          <h2 className="text-xl font-extrabold text-slate-950 mb-6 flex items-center gap-2">
-            <CheckCircle2 className="h-6 w-6 text-emerald-600" />
-            Curso em Destaque
-          </h2>
-          <div className="grid md:grid-cols-12 rounded-3xl border border-emerald-100 bg-white overflow-hidden shadow-xl shadow-emerald-500/5 hover:shadow-2xl transition-shadow">
-            <div className="md:col-span-5 relative aspect-video md:aspect-auto">
-              <img
-                src={getCourseImage(featuredCourse)}
-                alt={featuredCourse.titulo}
-                className="object-cover w-full h-full"
-              />
-            </div>
-            <div className="md:col-span-7 p-8 md:p-10 flex flex-col justify-between gap-6">
-              <div className="flex flex-col gap-4">
-                {featuredCourse.tipo === "vip" && (
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center rounded-md bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-800 ring-1 ring-inset ring-amber-600/10 uppercase tracking-wider">
-                      VIP
-                    </span>
-                  </div>
-                )}
-                <h3 className="text-2xl md:text-3xl font-extrabold text-slate-950 leading-tight">
-                  {featuredCourse.titulo}
-                </h3>
-                <p className="text-slate-600 leading-relaxed font-medium text-sm">
-                  {featuredCourse.descricao}
-                </p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-4 items-center border-t border-slate-100 pt-6">
-                {demoLesson && (
-                  <Link
-                    href={`/demonstrativo/${demoLesson.id}`}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white hover:bg-emerald-700 shadow-md shadow-emerald-500/10 transition-all"
-                    title="Iniciar Aula Demonstrativa"
-                  >
-                    <Play className="h-4 w-5 fill-current" />
-                    Experimentar Aula
-                  </Link>
-                )}
-                <Link
-                  href="/dashboard"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all"
-                  title="Acessar com Login Unificado"
-                >
-                  Matricular-se
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Other Courses Grid */}
         <div>
           <h2 className="text-xl font-extrabold text-slate-950 mb-8">
-            Outras Especializações
+            Cursos Disponíveis
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {otherCourses.map((course) => (
+            {activeCourses.map((course) => (
               <div
                 key={course.id}
                 className="flex flex-col rounded-3xl border border-slate-200 overflow-hidden bg-white shadow-xl shadow-emerald-500/3 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
@@ -288,6 +232,11 @@ export default async function Home() {
                   {course.tipo === "vip" && (
                     <span className="absolute top-3 right-3 inline-flex items-center rounded-md bg-amber-500/90 backdrop-blur-xs px-2.5 py-1 text-xs font-black text-white uppercase tracking-wider shadow-md">
                       VIP
+                    </span>
+                  )}
+                  {course.destaque && (
+                    <span className="absolute top-3 left-3 inline-flex items-center rounded-md bg-purple-600/95 backdrop-blur-xs px-2.5 py-1 text-xs font-black text-white uppercase tracking-wider shadow-md">
+                      ★ Destaque
                     </span>
                   )}
                 </div>
