@@ -770,3 +770,66 @@ export async function moveModuloAction(moduloId: string, direction: "up" | "down
     return { success: false, error: "Falha ao reordenar módulo" };
   }
 }
+
+// 15. Registrar aluno diretamente pelo portal do aluno (self-registration)
+export async function alunoRegisterAction(
+  nome: string,
+  email: string,
+  senhaInserida: string,
+  telefone?: string
+) {
+  try {
+    if (!nome.trim()) return { success: false, error: "O nome é obrigatório." };
+    if (!email.trim()) return { success: false, error: "O e-mail é obrigatório." };
+    if (!senhaInserida.trim()) return { success: false, error: "A senha é obrigatória." };
+
+    const formattedEmail = email.trim().toLowerCase();
+
+    // Validar se o e-mail já existe
+    const existing = await db
+      .select()
+      .from(alunos)
+      .where(eq(alunos.email, formattedEmail))
+      .limit(1);
+
+    if (existing.length > 0) {
+      return { success: false, error: "Este e-mail já está cadastrado. Vá na aba 'Entrar' e acesse." };
+    }
+
+    const [newAluno] = await db
+      .insert(alunos)
+      .values({
+        nome: nome.trim(),
+        email: formattedEmail,
+        senha: senhaInserida.trim(),
+        telefone: telefone?.trim() || null,
+        tipo: "normal", // Entra como aluno normal por padrão
+      })
+      .returning();
+
+    // Gerar token de sessão e efetuar login automático
+    const token = signTestToken({
+      sub: newAluno.id,
+      nome: newAluno.nome,
+      email: newAluno.email,
+      empresaId: newAluno.empresaId || undefined,
+      tipo: newAluno.tipo || "normal",
+      role: "aluno",
+    });
+
+    const cookieStore = await cookies();
+    cookieStore.set("sso_token", token, {
+      maxAge: 30 * 24 * 60 * 60, // 30 dias
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    revalidatePath("/admin/alunos");
+    return { success: true };
+  } catch (error) {
+    console.error("Erro ao registrar aluno:", error);
+    return { success: false, error: "Falha ao registrar aluno. Tente novamente mais tarde." };
+  }
+}
