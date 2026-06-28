@@ -5,7 +5,7 @@ import Link from "next/link";
 import { 
   Plus, Folder, PlayCircle, Sparkles, 
   UserCheck, BarChart3, GripVertical, CheckCircle, 
-  Trash2, Loader2, ArrowLeft, Users, LogOut, Pencil, Eye, EyeOff, Upload, Image, FileText
+  Trash2, Loader2, ArrowLeft, Users, LogOut, Pencil, Eye, EyeOff, Upload, Image, FileText, Paperclip
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { 
@@ -30,7 +30,7 @@ interface Lesson {
   videoUrl: string;
   legendasUrl: string | null;
   imagemCapa: string | null;
-  materialUrl: string | null;
+  materiais: { name: string; url: string }[];
   demonstrative: boolean;
   ativo: boolean;
   ordem: number;
@@ -240,7 +240,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
   const [newLessonUrl, setNewLessonUrl] = useState("");
   const [newLessonDemo, setNewLessonDemo] = useState(false);
   const [newLessonImage, setNewLessonImage] = useState("");
-  const [newLessonMaterial, setNewLessonMaterial] = useState("");
+  const [newLessonFiles, setNewLessonFiles] = useState<{ name: string; url: string }[]>([]);
   const [targetModuleId, setTargetModuleId] = useState("");
 
   const [isCreatingModule, setIsCreatingModule] = useState(false);
@@ -259,7 +259,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
   const [editLessonUrl, setEditLessonUrl] = useState("");
   const [editLessonDemo, setEditLessonDemo] = useState(false);
   const [editLessonImage, setEditLessonImage] = useState("");
-  const [editLessonMaterial, setEditLessonMaterial] = useState("");
+  const [editLessonFiles, setEditLessonFiles] = useState<{ name: string; url: string }[]>([]);
   const [editLessonAtivo, setEditLessonAtivo] = useState(true);
 
   const [isClearingDb, setIsClearingDb] = useState(false);
@@ -452,7 +452,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
 
     toast.info("Criando aula...");
     const isDemo = selectedCourse.tipo === "publico" ? true : newLessonDemo;
-    const res = await createAulaAction(targetModuleId, newLessonTitle, newLessonUrl, isDemo, newLessonImage, newLessonMaterial);
+    const res = await createAulaAction(targetModuleId, newLessonTitle, newLessonUrl, isDemo, newLessonImage, newLessonFiles);
     if (res.success && res.aula) {
       toast.success("Aula criada com sucesso!");
       
@@ -469,7 +469,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
               videoUrl: res.aula.videoUrl,
               legendasUrl: res.aula.legendasUrl,
               imagemCapa: res.aula.imagemCapa,
-              materialUrl: res.aula.materialUrl,
+              materiais: res.aula.materiais || [],
               demonstrative: res.aula.demonstrative,
               ativo: res.aula.ativo,
               ordem: res.aula.ordem
@@ -486,7 +486,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       setNewLessonTitle("");
       setNewLessonUrl("");
       setNewLessonImage("");
-      setNewLessonMaterial("");
+      setNewLessonFiles([]);
       setNewLessonDemo(false);
       setTargetModuleId("");
     } else {
@@ -560,7 +560,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       editLessonUrl,
       editLessonDemo,
       editLessonImage,
-      editLessonMaterial,
+      editLessonFiles,
       editLessonAtivo
     );
 
@@ -577,7 +577,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
               videoUrl: res.aula!.videoUrl,
               demonstrative: res.aula!.demonstrative,
               imagemCapa: res.aula!.imagemCapa,
-              materialUrl: res.aula!.materialUrl,
+              materiais: res.aula!.materiais || [],
               ativo: res.aula!.ativo
             } : a)
           };
@@ -603,7 +603,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       lesson.videoUrl,
       lesson.demonstrative,
       lesson.imagemCapa,
-      lesson.materialUrl,
+      lesson.materiais,
       newAtivo
     );
 
@@ -952,6 +952,12 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                                     Demo
                                   </span>
                                 )}
+                                {aula.materiais && aula.materiais.length > 0 && (
+                                  <span className="inline-flex shrink-0 items-center gap-0.5 rounded-md bg-slate-100 border border-slate-200 px-1 py-0.5 text-[8px] font-bold text-slate-700 uppercase tracking-wider">
+                                    <Paperclip className="h-2 w-2 text-slate-500" />
+                                    {aula.materiais.length} {aula.materiais.length === 1 ? "Anexo" : "Anexos"}
+                                  </span>
+                                )}
                                 {!aula.ativo && (
                                   <span className="inline-flex shrink-0 items-center rounded-md bg-slate-100 px-1 py-0.5 text-[8px] font-bold text-slate-500 border border-slate-200 uppercase tracking-wider">
                                     Rascunho
@@ -985,7 +991,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                                 setEditLessonUrl(aula.videoUrl);
                                 setEditLessonDemo(aula.demonstrative);
                                 setEditLessonImage(aula.imagemCapa || "");
-                                setEditLessonMaterial(aula.materialUrl || "");
+                                setEditLessonFiles(aula.materiais || []);
                                 setEditLessonAtivo(aula.ativo);
                                 setIsEditingLesson(true);
                               }}
@@ -1200,13 +1206,49 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                 onChange={setNewLessonImage}
                 label="Imagem de Capa / Thumbnail (Aula)"
               />
-              <ImageUploadZone
-                value={newLessonMaterial}
-                onChange={setNewLessonMaterial}
-                label="Material de Apoio (PDF, Planilha, etc.)"
-                accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
-                placeholderText="Arraste o documento ou clique para selecionar"
-              />
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold text-slate-700">Materiais de Apoio (PDF, Planilhas, etc.)</label>
+                
+                {/* Lista de materiais já adicionados */}
+                {newLessonFiles.length > 0 && (
+                  <div className="flex flex-col gap-2 border border-slate-205 rounded-xl p-3 bg-slate-50/50">
+                    {newLessonFiles.map((file, idx) => (
+                      <div key={idx} className="flex items-center justify-between gap-3 p-2 bg-white rounded-lg border border-slate-150 shadow-3xs">
+                        <div className="flex items-center gap-2 truncate">
+                          <FileText className="h-4 w-4 text-emerald-600 shrink-0" />
+                          <span className="text-xs font-semibold text-slate-800 truncate" title={file.name}>
+                            {file.name}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setNewLessonFiles(prev => prev.filter((_, i) => i !== idx));
+                          }}
+                          className="p-1 rounded-md hover:bg-red-50 text-slate-400 hover:text-red-650 transition-colors cursor-pointer"
+                          title="Remover material"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Zona de Upload para adicionar novo arquivo */}
+                <ImageUploadZone
+                  value=""
+                  onChange={(url) => {
+                    const fileName = url.split("/").pop() || "arquivo";
+                    const cleanName = fileName.replace(/^\d+-/, ""); // remove o timestamp prefixo
+                    setNewLessonFiles(prev => [...prev, { name: cleanName, url }]);
+                    toast.success(`Arquivo ${cleanName} adicionado!`);
+                  }}
+                  label=""
+                  accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
+                  placeholderText="Clique para anexar um arquivo de apoio"
+                />
+              </div>
               {selectedCourse?.tipo === "vip" && (
                 <div className="flex items-center gap-2 mt-1">
                   <input
@@ -1354,13 +1396,49 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                 onChange={setEditLessonImage}
                 label="Imagem de Capa / Thumbnail (Aula)"
               />
-              <ImageUploadZone
-                value={editLessonMaterial}
-                onChange={setEditLessonMaterial}
-                label="Material de Apoio (PDF, Planilha, etc.)"
-                accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
-                placeholderText="Arraste o documento ou clique para selecionar"
-              />
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold text-slate-700">Materiais de Apoio (PDF, Planilhas, etc.)</label>
+                
+                {/* Lista de materiais já adicionados */}
+                {editLessonFiles.length > 0 && (
+                  <div className="flex flex-col gap-2 border border-slate-205 rounded-xl p-3 bg-slate-50/50">
+                    {editLessonFiles.map((file, idx) => (
+                      <div key={idx} className="flex items-center justify-between gap-3 p-2 bg-white rounded-lg border border-slate-150 shadow-3xs">
+                        <div className="flex items-center gap-2 truncate">
+                          <FileText className="h-4 w-4 text-emerald-600 shrink-0" />
+                          <span className="text-xs font-semibold text-slate-800 truncate" title={file.name}>
+                            {file.name}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditLessonFiles(prev => prev.filter((_, i) => i !== idx));
+                          }}
+                          className="p-1 rounded-md hover:bg-red-50 text-slate-400 hover:text-red-650 transition-colors cursor-pointer"
+                          title="Remover material"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Zona de Upload para adicionar novo arquivo */}
+                <ImageUploadZone
+                  value=""
+                  onChange={(url) => {
+                    const fileName = url.split("/").pop() || "arquivo";
+                    const cleanName = fileName.replace(/^\d+-/, ""); // remove o timestamp prefixo
+                    setEditLessonFiles(prev => [...prev, { name: cleanName, url }]);
+                    toast.success(`Arquivo ${cleanName} adicionado!`);
+                  }}
+                  label=""
+                  accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
+                  placeholderText="Clique para anexar um arquivo de apoio"
+                />
+              </div>
               {selectedCourse?.tipo === "vip" && (
                 <div className="flex items-center gap-2 mt-1">
                   <input

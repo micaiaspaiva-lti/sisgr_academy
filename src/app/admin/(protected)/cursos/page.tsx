@@ -45,7 +45,7 @@ export default async function CMSAdminPage() {
         videoUrl: a.videoUrl,
         legendasUrl: a.legendasUrl,
         imagemCapa: a.imagemCapa,
-        materialUrl: a.materialUrl,
+        materiais: (a.materiais as any) || [],
         demonstrative: a.demonstrative,
         ativo: a.ativo,
         ordem: a.ordem,

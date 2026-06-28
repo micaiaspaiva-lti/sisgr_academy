@@ -99,7 +99,7 @@ export default async function PlayerPage({ params }: PageProps) {
     videoUrl: currentLesson.videoUrl,
     legendasUrl: currentLesson.legendasUrl,
     imagemCapa: currentLesson.imagemCapa,
-    materialUrl: currentLesson.materialUrl,
+    materiais: (currentLesson.materiais as any) || [],
     demonstrative: currentLesson.demonstrative,
     ordem: currentLesson.ordem,
   };
@@ -123,7 +123,7 @@ export default async function PlayerPage({ params }: PageProps) {
         videoUrl: a.videoUrl,
         legendasUrl: a.legendasUrl,
         imagemCapa: a.imagemCapa,
-        materialUrl: a.materialUrl,
+        materiais: (a.materiais as any) || [],
         demonstrative: a.demonstrative,
         ordem: a.ordem,
       })),

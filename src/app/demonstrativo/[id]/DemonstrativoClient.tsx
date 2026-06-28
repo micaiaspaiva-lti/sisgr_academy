@@ -40,7 +40,7 @@ interface Lesson {
   descricaoApoio: string;
   videoUrl: string;
   imagemCapa: string | null;
-  materialUrl: string | null;
+  materiais: { name: string; url: string }[];
 }
 
 interface VisibleLesson {
@@ -48,7 +48,7 @@ interface VisibleLesson {
   titulo: string;
   videoUrl: string;
   imagemCapa?: string | null;
-  materialUrl?: string | null;
+  materiais?: { name: string; url: string }[];
 }
 
 interface DemonstrativoClientProps {
@@ -398,28 +398,32 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
               </p>
 
               {/* Material de Apoio */}
-              {lesson.materialUrl && (
-                <div className="mt-2 p-4 rounded-xl border border-slate-200 bg-white shadow-2xs flex justify-between items-center group">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-emerald-50 text-emerald-700 rounded-lg">
-                      <BookOpen className="h-5 w-5" />
+              {lesson.materiais && lesson.materiais.length > 0 && (
+                <div className="flex flex-col gap-2 mt-2">
+                  {lesson.materiais.map((file, idx) => (
+                    <div key={idx} className="p-4 rounded-xl border border-slate-205 bg-white shadow-2xs flex justify-between items-center group">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-emerald-50 text-emerald-700 rounded-lg">
+                          <BookOpen className="h-5 w-5" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold text-slate-800 truncate max-w-[200px] sm:max-w-xs" title={file.name}>
+                            {file.name}
+                          </span>
+                          <span className="text-3xs text-slate-400">Material de apoio da aula</span>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => {
+                          toast.info("Cadastre-se gratuitamente respondendo o quiz para baixar o material de apoio!");
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors text-3xs font-extrabold cursor-pointer uppercase tracking-wider"
+                      >
+                        <Download className="h-3.5 w-3.5" />
+                        Baixar
+                      </button>
                     </div>
-                    <div className="flex flex-col">
-                      <span className="text-xs font-bold text-slate-800 truncate max-w-[200px] sm:max-w-xs" title={lesson.materialUrl.split("/").pop()}>
-                        {lesson.materialUrl.split("/").pop()}
-                      </span>
-                      <span className="text-3xs text-slate-400">Material de apoio da aula</span>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => {
-                      toast.info("Cadastre-se gratuitamente respondendo o quiz para baixar o material de apoio!");
-                    }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors text-3xs font-extrabold cursor-pointer uppercase tracking-wider"
-                  >
-                    <Download className="h-3.5 w-3.5" />
-                    Baixar
-                  </button>
+                  ))}
                 </div>
               )}
   
