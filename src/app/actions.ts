@@ -127,7 +127,7 @@ export async function triggerIAAutomationAction(aulaId: string) {
 }
 
 // 6. Criar um novo curso demonstrativo
-export async function createCursoAction(titulo: string, descricao: string) {
+export async function createCursoAction(titulo: string, descricao: string, tipo: "publico" | "vip" = "publico") {
   try {
     const [newCourse] = await db
       .insert(cursos)
@@ -136,6 +136,7 @@ export async function createCursoAction(titulo: string, descricao: string) {
         descricao,
         imagemCapa: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=600&auto=format&fit=crop",
         ativo: true,
+        tipo,
       })
       .returning();
       
@@ -274,6 +275,7 @@ export async function resetDatabaseToSeedAction() {
       descricao: "Domine os fundamentos da gestão de resíduos sólidos no setor industrial, cobrindo da coleta à destinação final e conformidade legal.",
       imagemCapa: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=600&auto=format&fit=crop",
       ativo: true,
+      tipo: "publico",
     }).returning();
 
     const [modulo1_1] = await db.insert(modulos).values({
@@ -329,6 +331,7 @@ export async function resetDatabaseToSeedAction() {
       descricao: "Aprenda a emitir o Manifesto de Transporte de Resíduos (MTR) e declarar informações ambientais no sistema nacional (SINIR).",
       imagemCapa: "https://images.unsplash.com/photo-1591189863430-ab87e120f312?q=80&w=600&auto=format&fit=crop",
       ativo: true,
+      tipo: "vip",
     }).returning();
 
     const [modulo2_1] = await db.insert(modulos).values({

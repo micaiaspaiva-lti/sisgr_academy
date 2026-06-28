@@ -8,6 +8,16 @@ import {
 } from "lucide-react";
 import { toast, Toaster } from "sonner";
 
+function getYouTubeEmbedUrl(url: string): string | null {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  if (match && match[2].length === 11) {
+    return `https://www.youtube.com/embed/${match[2]}`;
+  }
+  return null;
+}
+
 interface Lesson {
   id: string;
   titulo: string;
@@ -248,14 +258,37 @@ export default function DemonstrativoClient({ lesson, courseTitle }: Demonstrati
           <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200">
             {/* Player de Vídeo */}
             <div className="aspect-video bg-black relative">
-              <video
-                ref={videoRef}
-                src={lesson.videoUrl}
-                controls
-                onEnded={handleVideoEnded}
-                className="w-full h-full object-contain"
-                aria-label={`Player de vídeo para a aula: ${lesson.titulo}`}
-              />
+              {(() => {
+                const youtubeEmbedUrl = getYouTubeEmbedUrl(lesson.videoUrl);
+                return youtubeEmbedUrl ? (
+                  <div className="w-full h-full relative">
+                    <iframe
+                      src={youtubeEmbedUrl}
+                      className="w-full h-full object-contain"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title={lesson.titulo}
+                    />
+                    {!videoEnded && (
+                      <button
+                        onClick={handleVideoEnded}
+                        className="absolute bottom-4 right-4 z-10 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-lg transition-transform hover:scale-105 cursor-pointer"
+                      >
+                        Liberar Quiz de Fixação
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <video
+                    ref={videoRef}
+                    src={lesson.videoUrl}
+                    controls
+                    onEnded={handleVideoEnded}
+                    className="w-full h-full object-contain"
+                    aria-label={`Player de vídeo para a aula: ${lesson.titulo}`}
+                  />
+                );
+              })()}
             </div>
             
             {/* Detalhes da Aula */}

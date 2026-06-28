@@ -76,7 +76,7 @@ export default async function Dashboard() {
     });
 
     const progresso = totalLessons > 0 ? Math.round((completedLessonsCount / totalLessons) * 100) : 0;
-    const isLocked = session.tipo === "normal" && !hasDemoLesson;
+    const isLocked = session.tipo === "normal" && course.tipo === "vip";
     
     return {
       ...course,

@@ -101,6 +101,7 @@ export default async function PlayerPage({ params }: PageProps) {
     titulo: currentCourse.titulo,
     descricao: currentCourse.descricao || "",
     imagemCapa: currentCourse.imagemCapa || "",
+    tipo: currentCourse.tipo as "publico" | "vip",
     modulos: currentCourse.modulos.map(m => ({
       id: m.id,
       cursoId: m.cursoId,

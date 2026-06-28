@@ -11,6 +11,16 @@ import {
 import { toast } from "sonner";
 import { concluirAulaAction } from "@/app/actions";
 
+function getYouTubeEmbedUrl(url: string): string | null {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  if (match && match[2].length === 11) {
+    return `https://www.youtube.com/embed/${match[2]}`;
+  }
+  return null;
+}
+
 interface Lesson {
   id: string;
   moduloId: string;
@@ -35,6 +45,7 @@ interface Course {
   titulo: string;
   descricao: string;
   imagemCapa: string;
+  tipo: "publico" | "vip";
 }
 
 interface PlayerClientProps {
@@ -150,7 +161,7 @@ export default function PlayerClient({
           
           {/* Player Container */}
           <div className="aspect-video bg-black relative group">
-            {studentTipo === "normal" && !currentLesson.demonstrative ? (
+            {studentTipo === "normal" && currentCourse.tipo === "vip" && !currentLesson.demonstrative ? (
               <div className="absolute inset-0 bg-slate-950 flex flex-col items-center justify-center p-6 text-center gap-4">
                 <div className="p-4 bg-amber-500/10 border border-amber-500/20 text-amber-500 rounded-full shadow-inner">
                   <Lock className="h-10 w-10 text-amber-500" />
@@ -162,24 +173,37 @@ export default function PlayerClient({
                   </p>
                 </div>
               </div>
-            ) : (
-              <>
-                <video
-                  src={currentLesson.videoUrl}
-                  controls
-                  className="w-full h-full object-contain"
-                  aria-label={`Player de vídeo para a aula: ${currentLesson.titulo}`}
-                />
-                {/* Botão de Modo Cinema no Overlay */}
-                <button
-                  onClick={() => setCinemaMode(!cinemaMode)}
-                  className="absolute top-4 right-4 p-2.5 rounded-lg bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80 flex items-center justify-center cursor-pointer"
-                  title={cinemaMode ? "Sair do Modo Cinema" : "Modo Cinema / Teatro"}
-                >
-                  {cinemaMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                </button>
-              </>
-            )}
+            ) : (() => {
+              const youtubeEmbedUrl = getYouTubeEmbedUrl(currentLesson.videoUrl);
+              return (
+                <>
+                  {youtubeEmbedUrl ? (
+                    <iframe
+                      src={youtubeEmbedUrl}
+                      className="w-full h-full object-contain"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title={currentLesson.titulo}
+                    />
+                  ) : (
+                    <video
+                      src={currentLesson.videoUrl}
+                      controls
+                      className="w-full h-full object-contain"
+                      aria-label={`Player de vídeo para a aula: ${currentLesson.titulo}`}
+                    />
+                  )}
+                  {/* Botão de Modo Cinema no Overlay */}
+                  <button
+                    onClick={() => setCinemaMode(!cinemaMode)}
+                    className="absolute top-4 right-4 p-2.5 rounded-lg bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80 flex items-center justify-center cursor-pointer"
+                    title={cinemaMode ? "Sair do Modo Cinema" : "Modo Cinema / Teatro"}
+                  >
+                    {cinemaMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                  </button>
+                </>
+              );
+            })()}
           </div>
 
           {/* Área de Controle e Descrição */}
@@ -354,7 +378,7 @@ export default function PlayerClient({
                             )}
                             <span className="truncate">{aula.titulo}</span>
                           </div>
-                          {studentTipo === "normal" && !aula.demonstrative && (
+                          {studentTipo === "normal" && currentCourse.tipo === "vip" && !aula.demonstrative && (
                             <Lock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
                           )}
                         </Link>
@@ -415,7 +439,7 @@ export default function PlayerClient({
                             )}
                             <span className="truncate">{aula.titulo}</span>
                           </div>
-                          {studentTipo === "normal" && !aula.demonstrative && (
+                          {studentTipo === "normal" && currentCourse.tipo === "vip" && !aula.demonstrative && (
                             <Lock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
                           )}
                         </Link>

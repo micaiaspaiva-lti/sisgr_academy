@@ -177,9 +177,16 @@ export default async function Home() {
             </div>
             <div className="md:col-span-7 p-8 md:p-10 flex flex-col justify-between gap-6">
               <div className="flex flex-col gap-4">
-                <span className="text-xs font-black text-purple-600 uppercase tracking-widest">
-                  Mais Acessado
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-black text-purple-600 uppercase tracking-widest">
+                    Mais Acessado
+                  </span>
+                  {featuredCourse.tipo === "vip" && (
+                    <span className="inline-flex items-center rounded-md bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-800 ring-1 ring-inset ring-amber-600/10 uppercase tracking-wider">
+                      VIP
+                    </span>
+                  )}
+                </div>
                 <h3 className="text-2xl md:text-3xl font-extrabold text-slate-950 leading-tight">
                   {featuredCourse.titulo}
                 </h3>
@@ -228,6 +235,11 @@ export default async function Home() {
                     alt={course.titulo}
                     className="object-cover w-full h-full"
                   />
+                  {course.tipo === "vip" && (
+                    <span className="absolute top-3 right-3 inline-flex items-center rounded-md bg-amber-500/90 backdrop-blur-xs px-2.5 py-1 text-xs font-black text-white uppercase tracking-wider shadow-md">
+                      VIP
+                    </span>
+                  )}
                 </div>
                 <div className="p-6 flex-1 flex flex-col justify-between gap-6">
                   <div className="flex flex-col gap-3">

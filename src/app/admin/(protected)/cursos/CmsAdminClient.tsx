@@ -44,6 +44,7 @@ interface Course {
   descricao: string;
   imagemCapa: string;
   ativo: boolean;
+  tipo: "publico" | "vip";
   modulos: Module[];
 }
 
@@ -59,6 +60,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
   const [isCreatingCourse, setIsCreatingCourse] = useState(false);
   const [newCourseTitle, setNewCourseTitle] = useState("");
   const [newCourseDesc, setNewCourseDesc] = useState("");
+  const [newCourseTipo, setNewCourseTipo] = useState<"publico" | "vip">("publico");
 
   const [isCreatingLesson, setIsCreatingLesson] = useState(false);
   const [newLessonTitle, setNewLessonTitle] = useState("");
@@ -183,7 +185,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
     e.preventDefault();
     if (!newCourseTitle.trim()) return;
 
-    const res = await createCursoAction(newCourseTitle, newCourseDesc);
+    const res = await createCursoAction(newCourseTitle, newCourseDesc, newCourseTipo);
     if (res.success && res.course) {
       toast.success("Curso criado com sucesso!");
       
@@ -193,6 +195,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
         descricao: res.course.descricao || "",
         imagemCapa: res.course.imagemCapa || "",
         ativo: res.course.ativo,
+        tipo: (res.course.tipo || "publico") as "publico" | "vip",
         modulos: [
           {
             id: "m-dummy",
@@ -209,6 +212,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       setIsCreatingCourse(false);
       setNewCourseTitle("");
       setNewCourseDesc("");
+      setNewCourseTipo("publico");
     } else {
       toast.error("Erro ao criar curso.");
     }
@@ -386,11 +390,22 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                   onClick={() => setSelectedCourse(c)}
                   className={`w-full text-left p-4 rounded-xl border text-xs font-bold transition-all flex flex-col gap-1.5 ${
                     selectedCourse?.id === c.id
-                      ? "border-emerald-600 bg-emerald-50/20 text-emerald-800"
+                      ? "border-duet-brand bg-duet-brand-light text-emerald-800"
                       : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
                   }`}
                 >
-                  <span className="line-clamp-1">{c.titulo}</span>
+                  <div className="flex justify-between items-center w-full gap-2">
+                    <span className="line-clamp-1 flex-grow">{c.titulo}</span>
+                    {c.tipo === "vip" ? (
+                      <span className="inline-flex shrink-0 items-center rounded-md bg-amber-50 px-1.5 py-0.5 text-[9px] font-black text-amber-800 ring-1 ring-inset ring-amber-600/10 uppercase tracking-wider">
+                        VIP
+                      </span>
+                    ) : (
+                      <span className="inline-flex shrink-0 items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[9px] font-black text-emerald-700 ring-1 ring-inset ring-emerald-600/10 uppercase tracking-wider">
+                        Púb
+                      </span>
+                    )}
+                  </div>
                   <span className="text-3xs font-medium text-slate-400">
                     {c.modulos?.length || 0} Módulos • {c.modulos?.reduce((acc, curr) => acc + (curr.aulas?.length || 0), 0) || 0} Aulas
                   </span>
@@ -405,7 +420,18 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
           <main className="lg:col-span-8 flex flex-col gap-6">
             <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-sm flex flex-col gap-6">
               <div className="flex flex-col gap-2">
-                <span className="text-3xs font-extrabold text-emerald-600 uppercase tracking-wider">Editor do Curso</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-3xs font-extrabold text-duet-brand uppercase tracking-wider">Editor do Curso</span>
+                  {selectedCourse.tipo === "vip" ? (
+                    <span className="inline-flex items-center rounded-md bg-amber-50 px-2 py-0.5 text-[10px] font-extrabold text-amber-800 ring-1 ring-inset ring-amber-600/20 uppercase tracking-wider">
+                      VIP (Exclusivo B2B)
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold text-emerald-700 ring-1 ring-inset ring-emerald-600/20 uppercase tracking-wider">
+                      Público Geral
+                    </span>
+                  )}
+                </div>
                 <h1 className="text-2xl font-black text-slate-950">{selectedCourse.titulo}</h1>
               </div>
 
@@ -536,6 +562,33 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                   rows={3}
                   className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                 />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-slate-700">Classificação</label>
+                <div className="grid grid-cols-2 gap-2 mt-1">
+                  <button
+                    type="button"
+                    onClick={() => setNewCourseTipo("publico")}
+                    className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                      newCourseTipo === "publico"
+                        ? "border-emerald-600 bg-duet-brand text-white shadow-xs"
+                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                     Público Geral
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNewCourseTipo("vip")}
+                    className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                      newCourseTipo === "vip"
+                        ? "border-amber-600 bg-amber-600 text-white shadow-xs"
+                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                     VIP (Clientes)
+                  </button>
+                </div>
               </div>
               <div className="flex gap-3 justify-end mt-2">
                 <button

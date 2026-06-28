@@ -31,6 +31,7 @@ export default async function CMSAdminPage() {
     descricao: course.descricao || "",
     imagemCapa: course.imagemCapa || "",
     ativo: course.ativo,
+    tipo: course.tipo as "publico" | "vip",
     modulos: course.modulos.map(m => ({
       id: m.id,
       cursoId: m.cursoId,

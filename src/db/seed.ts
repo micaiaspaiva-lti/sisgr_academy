@@ -73,6 +73,7 @@ async function main() {
     descricao: "Domine os fundamentos da gestão de resíduos sólidos no setor industrial, cobrindo da coleta à destinação final e conformidade legal.",
     imagemCapa: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=600&auto=format&fit=crop",
     ativo: true,
+    tipo: "publico",
   }).returning();
 
   const [modulo1_1] = await db.insert(modulos).values({
@@ -129,6 +130,7 @@ async function main() {
     descricao: "Aprenda a emitir o Manifesto de Transporte de Resíduos (MTR) e declarar informações ambientais no sistema nacional (SINIR).",
     imagemCapa: "https://images.unsplash.com/photo-1591189863430-ab87e120f312?q=80&w=600&auto=format&fit=crop",
     ativo: true,
+    tipo: "vip",
   }).returning();
 
   const [modulo2_1] = await db.insert(modulos).values({
