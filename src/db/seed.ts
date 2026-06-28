@@ -154,6 +154,306 @@ async function main() {
     }
   ]);
 
+  // Curso 3
+  const [curso3] = await db.insert(cursos).values({
+    id: "c3333333-3333-4333-8333-333333333333",
+    titulo: "Licenciamento Ambiental e Normas Técnicas",
+    descricao: "Entenda o rito completo de obtenção de licenças ambientais prévias, de instalação e de operação (LP, LI, LO).",
+    imagemCapa: "https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=600&auto=format&fit=crop",
+    ativo: true,
+    tipo: "vip",
+    cargaHoraria: 25,
+  }).returning();
+
+  const [modulo3_1] = await db.insert(modulos).values({
+    id: "d3333333-1111-4111-8111-111111111111",
+    cursoId: curso3.id,
+    titulo: "Módulo 1: O Rito de Licenciamento",
+    ordem: 1,
+  }).returning();
+
+  await db.insert(aulas).values([
+    {
+      id: "a3333333-1111-4111-8111-111111111111",
+      moduloId: modulo3_1.id,
+      titulo: "1.1 Etapas do Licenciamento (LP, LI, LO)",
+      descricaoApoio: "Aulas explicativas sobre a documentação exigida pelos órgãos estaduais de controle ambiental.",
+      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      demonstrative: false,
+      ordem: 1,
+    }
+  ]);
+
+  // Curso 4
+  const [curso4] = await db.insert(cursos).values({
+    id: "c4444444-4444-4444-8444-444444444444",
+    titulo: "Logística Reversa de Eletroeletrônicos",
+    descricao: "Conceitos e implementação de sistemas de descarte de resíduos tecnológicos e materiais eletroeletrônicos.",
+    imagemCapa: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=600&auto=format&fit=crop",
+    ativo: true,
+    tipo: "publico",
+    cargaHoraria: 15,
+  }).returning();
+
+  const [modulo4_1] = await db.insert(modulos).values({
+    id: "d4444444-1111-4111-8111-111111111111",
+    cursoId: curso4.id,
+    titulo: "Módulo 1: Fluxo de Retorno de E-Lixo",
+    ordem: 1,
+  }).returning();
+
+  await db.insert(aulas).values([
+    {
+      id: "a4444444-1111-4111-8111-111111111111",
+      moduloId: modulo4_1.id,
+      titulo: "1.1 Logística de Coleta e Descaracterização",
+      descricaoApoio: "Aborda a destruição segura de dados e a reciclagem dos metais nobres presentes no lixo eletrônico.",
+      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      demonstrative: true,
+      ordem: 1,
+    }
+  ]);
+
+  // Curso 5
+  const [curso5] = await db.insert(cursos).values({
+    id: "c5555555-5555-4555-8555-555555555555",
+    titulo: "Práticas de ESG no Setor Industrial",
+    descricao: "Governança ambiental, social e corporativa de forma prática e aplicada nas operações de manufatura.",
+    imagemCapa: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=600&auto=format&fit=crop",
+    ativo: true,
+    tipo: "publico",
+    cargaHoraria: 30,
+  }).returning();
+
+  const [modulo5_1] = await db.insert(modulos).values({
+    id: "d5555555-1111-4111-8111-111111111111",
+    cursoId: curso5.id,
+    titulo: "Módulo 1: O Pilar Ambiental (Environmental)",
+    ordem: 1,
+  }).returning();
+
+  await db.insert(aulas).values([
+    {
+      id: "a5555555-1111-4111-8111-111111111111",
+      moduloId: modulo5_1.id,
+      titulo: "1.1 Descarbonização e Economia de Baixo Carbono",
+      descricaoApoio: "Saiba como mensurar a pegada ecológica da sua empresa e reduzir emissões indiretas.",
+      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      demonstrative: true,
+      ordem: 1,
+    }
+  ]);
+
+  // Curso 6
+  const [curso6] = await db.insert(cursos).values({
+    id: "c6666666-6666-4666-8666-666666666666",
+    titulo: "Auditoria Ambiental e Conformidade",
+    descricao: "Como conduzir auditorias internas para assegurar que a planta atenda às legislações nacionais e internacionais.",
+    imagemCapa: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=600&auto=format&fit=crop",
+    ativo: true,
+    tipo: "vip",
+    cargaHoraria: 20,
+  }).returning();
+
+  const [modulo6_1] = await db.insert(modulos).values({
+    id: "d6666666-1111-4111-8111-111111111111",
+    cursoId: curso6.id,
+    titulo: "Módulo 1: Roteiro de Auditoria",
+    ordem: 1,
+  }).returning();
+
+  await db.insert(aulas).values([
+    {
+      id: "a6666666-1111-4111-8111-111111111111",
+      moduloId: modulo6_1.id,
+      titulo: "1.1 Lista de Verificação e Não-Conformidades",
+      descricaoApoio: "Técnicas de elaboração de relatórios, acompanhamento e planos de ação corretiva.",
+      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      demonstrative: false,
+      ordem: 1,
+    }
+  ]);
+
+  // Curso 7
+  const [curso7] = await db.insert(cursos).values({
+    id: "c7777777-7777-4777-8777-777777777777",
+    titulo: "Segurança com Resíduos Perigosos",
+    descricao: "Normas de segurança (NR) e Equipamentos de Proteção Individual (EPIs) para manipulação de resíduos químicos.",
+    imagemCapa: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=600&auto=format&fit=crop",
+    ativo: true,
+    tipo: "vip",
+    cargaHoraria: 12,
+  }).returning();
+
+  const [modulo7_1] = await db.insert(modulos).values({
+    id: "d7777777-1111-4111-8111-111111111111",
+    cursoId: curso7.id,
+    titulo: "Módulo 1: EPIs e Riscos Químicos",
+    ordem: 1,
+  }).returning();
+
+  await db.insert(aulas).values([
+    {
+      id: "a7777777-1111-4111-8111-111111111111",
+      moduloId: modulo7_1.id,
+      titulo: "1.1 Classificação e Rotulagem GHS",
+      descricaoApoio: "Utilização correta da Ficha de Informações de Segurança de Produtos Químicos (FISPQ) e classificação GHS.",
+      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      demonstrative: false,
+      ordem: 1,
+    }
+  ]);
+
+  // Curso 8
+  const [curso8] = await db.insert(cursos).values({
+    id: "c8888888-8888-4888-8888-888888888888",
+    titulo: "Tratamento de Efluentes Industriais",
+    descricao: "Metodologias químicas, físicas e biológicas de remediação e reuso de recursos hídricos na fábrica.",
+    imagemCapa: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop",
+    ativo: true,
+    tipo: "publico",
+    cargaHoraria: 18,
+  }).returning();
+
+  const [modulo8_1] = await db.insert(modulos).values({
+    id: "d8888888-1111-4111-8111-111111111111",
+    cursoId: curso8.id,
+    titulo: "Módulo 1: Processos Físico-Químicos",
+    ordem: 1,
+  }).returning();
+
+  await db.insert(aulas).values([
+    {
+      id: "a8888888-1111-4111-8111-111111111111",
+      moduloId: modulo8_1.id,
+      titulo: "1.1 Decantação, Coagulação e Flotação",
+      descricaoApoio: "Funcionamento prático de uma Estação de Tratamento de Efluentes (ETE).",
+      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      demonstrative: true,
+      ordem: 1,
+    }
+  ]);
+
+  // Curso 9
+  const [curso9] = await db.insert(cursos).values({
+    id: "c9999999-9999-4999-8999-999999999999",
+    titulo: "Economia Circular na Cadeia de Suprimentos",
+    descricao: "Estratégias para redesenhar produtos visando eliminação do desperdício de matérias-primas.",
+    imagemCapa: "https://images.unsplash.com/photo-1532601224476-15c79f2f7a51?q=80&w=600&auto=format&fit=crop",
+    ativo: true,
+    tipo: "publico",
+    cargaHoraria: 15,
+  }).returning();
+
+  const [modulo9_1] = await db.insert(modulos).values({
+    id: "d9999999-1111-4111-8111-111111111111",
+    cursoId: curso9.id,
+    titulo: "Módulo 1: Design Circular",
+    ordem: 1,
+  }).returning();
+
+  await db.insert(aulas).values([
+    {
+      id: "a9999999-1111-4111-8111-111111111111",
+      moduloId: modulo9_1.id,
+      titulo: "1.1 Análise de Ciclo de Vida do Produto (ACV)",
+      descricaoApoio: "Cálculo de impacto ambiental desde a extração de matérias-primas até o descarte pós-consumo.",
+      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      demonstrative: true,
+      ordem: 1,
+    }
+  ]);
+
+  // Curso 10
+  const [curso10] = await db.insert(cursos).values({
+    id: "caaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+    titulo: "Inventário Nacional de Resíduos Sólidos",
+    descricao: "Preenchimento correto do formulário eletrônico obrigatório de declaração anual do IBAMA.",
+    imagemCapa: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=600&auto=format&fit=crop",
+    ativo: true,
+    tipo: "vip",
+    cargaHoraria: 8,
+  }).returning();
+
+  const [modulo10_1] = await db.insert(modulos).values({
+    id: "daaaaaaa-1111-4111-8111-111111111111",
+    cursoId: curso10.id,
+    titulo: "Módulo 1: Preenchimento do RAPP",
+    ordem: 1,
+  }).returning();
+
+  await db.insert(aulas).values([
+    {
+      id: "aaaaaaaa-1111-4111-8111-111111111111",
+      moduloId: modulo10_1.id,
+      titulo: "1.1 Declaração Passo a Passo no Cadastro Técnico Federal",
+      descricaoApoio: "Prazos, enquadramento de atividades e geração do comprovante de conformidade legal.",
+      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      demonstrative: false,
+      ordem: 1,
+    }
+  ]);
+
+  // Curso 11
+  const [curso11] = await db.insert(cursos).values({
+    id: "cbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+    titulo: "Certificações Verdes e ISO 14001",
+    descricao: "Como planejar e implementar o Sistema de Gestão Ambiental (SGA) conforme a norma ISO 14001:2015.",
+    imagemCapa: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=600&auto=format&fit=crop",
+    ativo: true,
+    tipo: "publico",
+    cargaHoraria: 20,
+  }).returning();
+
+  const [modulo11_1] = await db.insert(modulos).values({
+    id: "dbbbbbbb-1111-4111-8111-111111111111",
+    cursoId: curso11.id,
+    titulo: "Módulo 1: Diretrizes do SGA",
+    ordem: 1,
+  }).returning();
+
+  await db.insert(aulas).values([
+    {
+      id: "bbbbbbbb-1111-4111-8111-111111111111",
+      moduloId: modulo11_1.id,
+      titulo: "1.1 Política Ambiental, Planejamento e Requisitos",
+      descricaoApoio: "Definição de aspectos e impactos significativos no planejamento estratégico organizacional.",
+      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      demonstrative: true,
+      ordem: 1,
+    }
+  ]);
+
+  // Curso 12
+  const [curso12] = await db.insert(cursos).values({
+    id: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+    titulo: "Co-processamento de Resíduos Industriais",
+    descricao: "Aproveitamento energético de resíduos industriais e substituição de combustíveis fósseis.",
+    imagemCapa: "https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?q=80&w=600&auto=format&fit=crop",
+    ativo: true,
+    tipo: "vip",
+    cargaHoraria: 16,
+  }).returning();
+
+  const [modulo12_1] = await db.insert(modulos).values({
+    id: "dccccccc-1111-4111-8111-111111111111",
+    cursoId: curso12.id,
+    titulo: "Módulo 1: O Processo de Blending",
+    ordem: 1,
+  }).returning();
+
+  await db.insert(aulas).values([
+    {
+      id: "cccccccc-1111-4111-8111-111111111111",
+      moduloId: modulo12_1.id,
+      titulo: "1.1 Preparo do Blend e Parâmetros Físico-Químicos",
+      descricaoApoio: "Padrões de cloro, poder calorífico e cinzas para queima ambientalmente licenciada.",
+      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      demonstrative: false,
+      ordem: 1,
+    }
+  ]);
+
   // 5. Inserir Progresso de Aulas para os alunos de teste
   console.log("Inserindo progresso das aulas...");
   
