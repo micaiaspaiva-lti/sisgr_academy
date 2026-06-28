@@ -62,7 +62,7 @@ export default function HeroCarousel({ courses }: HeroCarouselProps) {
       {/* Slider Window Container */}
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 w-full overflow-hidden">
         <div 
-          className="flex transition-transform duration-500 ease-in-out"
+          className="flex w-full transition-transform duration-500 ease-in-out"
           style={{ transform: `translateX(-${activeIndex * 100}%)` }}
         >
           {courses.map((course) => {
@@ -70,7 +70,7 @@ export default function HeroCarousel({ courses }: HeroCarouselProps) {
             return (
               <div 
                 key={course.id} 
-                className="w-full shrink-0 flex-none grid md:grid-cols-12 gap-12 items-center min-h-[380px] md:min-h-[340px] pb-4"
+                className="basis-full shrink-0 grid md:grid-cols-12 gap-12 items-center min-h-[380px] md:min-h-[340px] pb-4"
               >
                 {/* Lado Esquerdo: Textos com min-heights calculados para tamanho fixo */}
                 <div className="md:col-span-6 flex flex-col gap-5 text-center md:text-left justify-center h-full">
