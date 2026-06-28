@@ -10,6 +10,7 @@ import {
   Sparkles, LogOut, Clock, Lock 
 } from "lucide-react";
 import DashboardClient from "./DashboardClient";
+import { alunoLogoutAction } from "@/app/actions";
 function getYouTubeVideoId(url: string): string | null {
   if (!url) return null;
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -168,13 +169,15 @@ export default async function Dashboard() {
               {session.nome.charAt(0)}
             </div>
           </div>
-          <Link
-            href="/"
-            className="rounded-lg p-2 text-slate-400 hover:text-slate-600 transition-colors"
-            title="Sair"
-          >
-            <LogOut className="h-5 w-5" />
-          </Link>
+          <form action={alunoLogoutAction} className="inline-flex">
+            <button
+              type="submit"
+              className="rounded-lg p-2 text-slate-400 hover:text-slate-600 transition-colors hover:bg-slate-100 cursor-pointer"
+              title="Sair da plataforma"
+            >
+              <LogOut className="h-5 w-5" />
+            </button>
+          </form>
         </div>
       </header>
 

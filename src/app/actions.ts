@@ -7,6 +7,7 @@ import { addVideoToQueue } from "@/lib/queue";
 import { revalidatePath } from "next/cache";
 import { signTestToken } from "@/lib/auth";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 // 1. Marcar aula como concluída ou pendente
 export async function concluirAulaAction(alunoId: string, aulaId: string, concluida: boolean) {
@@ -916,4 +917,15 @@ export async function alunoResetPasswordAction(
     console.error("Erro ao resetar senha do aluno:", error);
     return { success: false, error: "Falha ao redefinir senha. Tente novamente mais tarde." };
   }
+}
+
+// 17. Efetuar logout do aluno (deletar sso_token)
+export async function alunoLogoutAction() {
+  try {
+    const cookieStore = await cookies();
+    cookieStore.delete("sso_token");
+  } catch (error) {
+    console.error("Erro ao remover cookie de sessão:", error);
+  }
+  redirect("/login");
 }
