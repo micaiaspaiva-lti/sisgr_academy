@@ -334,15 +334,15 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
         </main>
 
         {/* Lado Direito: Assistente de IA e Quiz */}
-        <aside className="lg:col-span-4 flex flex-col bg-slate-950 rounded-2xl border border-slate-800 shadow-sm overflow-hidden h-[600px] lg:h-auto animate-in fade-in duration-300">
+        <aside className="lg:col-span-4 flex flex-col bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-[600px] lg:h-auto animate-in fade-in duration-300">
           {/* Header com Abas */}
-          <div className="bg-slate-900 text-white border-b border-slate-800 flex">
+          <div className="bg-slate-50 border-b border-slate-200 flex">
             <button
               onClick={() => setActiveRightTab("aulas")}
               className={`flex-1 py-4 text-xs font-black uppercase tracking-wider text-center border-b-2 transition-all ${
                 activeRightTab === "aulas"
-                  ? "border-emerald-500 text-white bg-slate-950/20"
-                  : "border-transparent text-slate-400 hover:text-slate-250"
+                  ? "border-emerald-600 text-emerald-600 bg-white"
+                  : "border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-100/30"
               }`}
             >
               Aulas ({lessons.length})
@@ -351,44 +351,44 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
               onClick={() => setActiveRightTab("chat")}
               className={`flex-1 py-4 text-xs font-black uppercase tracking-wider text-center border-b-2 transition-all flex items-center justify-center gap-1.5 ${
                 activeRightTab === "chat"
-                  ? "border-emerald-500 text-white bg-slate-950/20"
-                  : "border-transparent text-slate-400 hover:text-slate-250"
+                  ? "border-emerald-600 text-emerald-600 bg-white"
+                  : "border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-100/30"
               }`}
             >
-              <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+              <Sparkles className="h-3.5 w-3.5 text-emerald-600 fill-emerald-50" />
               Chat com IA
             </button>
           </div>
 
           {/* Renderização Condicional do Conteúdo da Sidebar */}
           {activeRightTab === "aulas" ? (
-            <div className="flex-grow overflow-y-auto flex flex-col divide-y divide-slate-850 bg-slate-950">
+            <div className="flex-grow overflow-y-auto flex flex-col divide-y divide-slate-100 bg-white">
               {lessons.map((a, i) => {
                 const isActive = a.id === lesson.id;
                 return (
                   <Link
                     key={a.id}
                     href={`/demonstrativo/${a.id}`}
-                    className={`flex items-center justify-between px-6 py-4 text-xs transition-colors border-b border-slate-900/60 ${
+                    className={`flex items-center justify-between px-6 py-4 text-xs transition-colors border-b border-slate-100 ${
                       isActive
-                        ? "bg-slate-900 text-white font-bold"
-                        : "text-slate-300 hover:bg-slate-900/50 hover:text-white"
+                        ? "bg-emerald-50/20 text-emerald-800 font-bold border-l-4 border-l-emerald-600"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                     }`}
                   >
                     <div className="flex items-center gap-3 truncate">
                       <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
-                        isActive ? "bg-emerald-600 text-white" : "bg-slate-900 text-slate-500"
+                        isActive ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-500"
                       }`}>
                         {i + 1}
                       </span>
                       <span className="truncate">{a.titulo}</span>
                     </div>
                     {isActive ? (
-                      <span className="text-[10px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0">
+                      <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0 border border-emerald-100">
                         Reproduzindo
                       </span>
                     ) : (
-                      <span className="text-[10px] font-bold text-slate-500 bg-slate-900 px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0">
+                      <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0">
                         Grátis
                       </span>
                     )}
