@@ -5,7 +5,7 @@ import Link from "next/link";
 import { 
   Plus, Folder, PlayCircle, Sparkles, 
   UserCheck, BarChart3, GripVertical, CheckCircle, 
-  Trash2, Loader2, ArrowLeft, Users 
+  Trash2, Loader2, ArrowLeft, Users, LogOut 
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { 
@@ -17,6 +17,7 @@ import {
   clearDatabaseAction,
   resetDatabaseToSeedAction
 } from "@/app/actions";
+import { logoutAdminAction } from "@/lib/auth-admin";
 
 interface Lesson {
   id: string;
@@ -283,6 +284,14 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
     setIsResettingDb(false);
   };
 
+  const handleAdminLogout = async () => {
+    const res = await logoutAdminAction();
+    if (res.success) {
+      toast.success("Sessão administrativa encerrada.");
+      window.location.href = "/admin/login";
+    }
+  };
+
   return (
     <div className="flex-grow flex flex-col min-h-screen bg-slate-50 font-sans">
       <Toaster position="top-right" richColors />
@@ -342,6 +351,15 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
           >
             Ver como Aluno
           </Link>
+
+          <button
+            onClick={handleAdminLogout}
+            className="flex items-center gap-1.5 border border-slate-300 rounded-lg px-3 py-2 text-xs font-bold hover:bg-red-50 hover:text-red-650 hover:border-red-200 transition-colors bg-white cursor-pointer"
+            title="Sair do Painel Administrativo"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            Sair
+          </button>
         </div>
       </header>
 

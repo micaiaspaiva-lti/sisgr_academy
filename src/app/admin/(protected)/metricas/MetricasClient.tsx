@@ -4,9 +4,10 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { 
   ArrowLeft, Users, Clock, 
-  Award, TrendingUp, Database, RefreshCw, CheckCircle2 
+  Award, TrendingUp, Database, RefreshCw, CheckCircle2, LogOut 
 } from "lucide-react";
 import { toast, Toaster } from "sonner";
+import { logoutAdminAction } from "@/lib/auth-admin";
 
 interface EmployeeMetric {
   id: string;
@@ -57,6 +58,14 @@ export default function MetricasClient({ companies, metricsData }: MetricasClien
     }, 1500);
   };
 
+  const handleAdminLogout = async () => {
+    const res = await logoutAdminAction();
+    if (res.success) {
+      toast.success("Sessão administrativa encerrada.");
+      window.location.href = "/admin/login";
+    }
+  };
+
   return (
     <div className="flex-grow flex flex-col min-h-screen bg-slate-50 font-sans">
       <Toaster position="top-right" richColors />
@@ -92,6 +101,15 @@ export default function MetricasClient({ companies, metricsData }: MetricasClien
             title="Atualizar Métricas"
           >
             <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+          </button>
+
+          <button
+            onClick={handleAdminLogout}
+            className="flex items-center gap-1.5 border border-slate-300 rounded-lg px-3 py-2 text-xs font-bold hover:bg-red-50 hover:text-red-650 hover:border-red-200 transition-colors bg-white cursor-pointer"
+            title="Sair do Painel Administrativo"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            Sair
           </button>
         </div>
       </header>
