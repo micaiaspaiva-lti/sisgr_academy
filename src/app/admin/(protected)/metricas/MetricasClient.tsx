@@ -71,7 +71,7 @@ export default function MetricasClient({ companies, metricsData }: MetricasClien
       <Toaster position="top-right" richColors />
       
       {/* Header Admin */}
-      <header className="border-b border-slate-200 bg-white py-4 px-6 md:px-12 flex justify-between items-center shadow-xs">
+      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-md py-4 px-6 md:px-12 flex justify-between items-center shadow-xs">
         <div className="flex items-center gap-3">
           <Link href="/admin/cursos" className="p-2 -ml-2 rounded-lg text-slate-400 hover:text-slate-600 transition-colors" title="Voltar ao CMS">
             <ArrowLeft className="h-5 w-5" />
