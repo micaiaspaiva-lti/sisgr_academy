@@ -4,6 +4,16 @@ import { db } from "@/db";
 import { cursos } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
+function getYouTubeEmbedUrl(url: string): string | null {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  if (match && match[2].length === 11) {
+    return `https://www.youtube.com/embed/${match[2]}`;
+  }
+  return null;
+}
+
 export const metadata = {
   title: "SISGR Academy - Plataforma EAD de Gestão de Resíduos",
   description: "Capacite seus colaboradores e domine a gestão de resíduos sólidos. Cursos especializados em conformidade ambiental, PNRS e emissão de MTR.",
@@ -143,23 +153,31 @@ export default async function Home() {
           </div>
           
           <div className="flex-1 w-full max-w-md md:max-w-none relative aspect-video rounded-3xl overflow-hidden bg-slate-800 border-[10px] border-white shadow-2xl">
-            {/* Imagem de Capa do Curso com overlay de play para chamar atenção */}
-            <img
-              src={featuredCourse.imagemCapa || undefined}
-              alt="Destaque Gestão de Resíduos"
-              className="object-cover w-full h-full opacity-80"
-            />
-            <div className="absolute inset-0 flex items-center justify-center bg-black/25 hover:bg-black/35 transition-colors">
-              {demoLesson && (
-                <Link
-                  href={`/demonstrativo/${demoLesson.id}`}
-                  className="p-5 rounded-full bg-white text-emerald-600 shadow-2xl hover:scale-110 transition-transform"
-                  title="Assistir Aula de Demonstração"
-                >
-                  <Play className="h-8 w-8 fill-current ml-1" />
-                </Link>
-              )}
-            </div>
+            {demoLesson ? (() => {
+              const youtubeEmbedUrl = getYouTubeEmbedUrl(demoLesson.videoUrl);
+              return youtubeEmbedUrl ? (
+                <iframe
+                  src={youtubeEmbedUrl}
+                  className="w-full h-full object-cover"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title={demoLesson.titulo}
+                />
+              ) : (
+                <video
+                  src={demoLesson.videoUrl}
+                  controls
+                  className="w-full h-full object-cover"
+                  aria-label={`Player de vídeo para a aula: ${demoLesson.titulo}`}
+                />
+              );
+            })() : (
+              <img
+                src={featuredCourse.imagemCapa || undefined}
+                alt="Destaque Gestão de Resíduos"
+                className="object-cover w-full h-full opacity-80"
+              />
+            )}
           </div>
         </div>
       </section>
