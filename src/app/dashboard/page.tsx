@@ -149,8 +149,8 @@ export default async function Dashboard() {
       {/* Header Logado */}
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-md py-4 px-6 md:px-12 flex justify-between items-center shadow-xs">
         <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-3 hover:opacity-90">
-            <img src="/logo.png" alt="SISGR Academy" className="h-12 w-auto" />
+          <Link href="/" className="flex items-center hover:opacity-90 shrink-0">
+            <img src="/logo.png" alt="SISGR Academy" className="h-8 md:h-12 w-auto object-contain flex-shrink-0" />
           </Link>
           <span className="hidden sm:inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700 ring-1 ring-inset ring-blue-700/10">
             Área do Aluno

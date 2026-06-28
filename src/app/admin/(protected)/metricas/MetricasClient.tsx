@@ -76,8 +76,8 @@ export default function MetricasClient({ companies, metricsData }: MetricasClien
           <Link href="/admin/cursos" className="p-2 -ml-2 rounded-lg text-slate-400 hover:text-slate-600 transition-colors" title="Voltar ao CMS">
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <Link href="/" className="hover:opacity-90 flex items-center">
-            <img src="/logo.png" alt="SISGR Academy" className="h-12 w-auto" />
+          <Link href="/" className="hover:opacity-90 flex items-center shrink-0">
+            <img src="/logo.png" alt="SISGR Academy" className="h-8 md:h-12 w-auto object-contain flex-shrink-0" />
           </Link>
           <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700 ring-1 ring-inset ring-blue-700/10">
             Relatórios B2B

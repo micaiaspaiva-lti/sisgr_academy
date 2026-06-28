@@ -9,54 +9,61 @@ export default function LandingHeader() {
 
   return (
     <>
-      <header className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 transition-all">
-        <div className="max-w-[1600px] mx-auto px-6 md:px-12 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-              <img src="/logo.png" alt="SISGR Academy" className="h-14 w-auto" />
+      <header className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 transition-all h-20 flex items-center">
+        <div className="max-w-[1600px] mx-auto px-4 md:px-12 w-full flex items-center justify-between">
+          <div className="flex items-center gap-4 lg:gap-8">
+            <Link href="/" className="flex items-center hover:opacity-90 transition-opacity shrink-0">
+              {/* object-contain e flex-shrink-0 impedem qualquer deformação/esticamento do logo */}
+              <img 
+                src="/logo.png" 
+                alt="SISGR Academy" 
+                className="h-8 md:h-12 w-auto object-contain flex-shrink-0" 
+              />
             </Link>
             
-            {/* Navegação de Informações */}
-            <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-600">
+            {/* Navegação de Informações no Desktop (Versão em Pílula Destaque) */}
+            <nav className="hidden md:flex items-center gap-4 text-xs font-bold text-slate-600">
               <button 
                 onClick={() => setIsModalOpen(true)}
-                className="hover:text-emerald-700 transition-colors cursor-pointer flex items-center gap-1 bg-transparent border-0 font-bold"
+                className="hover:bg-emerald-100 hover:text-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 bg-emerald-50 text-emerald-750 border border-emerald-200 px-3 py-1.5 rounded-full font-black text-[10px] uppercase tracking-wider"
               >
-                <Info className="h-3.5 w-3.5 text-slate-400" />
-                Sobre o SISGR & Academy
+                <Info className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                O que é o SISGR?
               </button>
               <a 
                 href="https://sisgr.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="hover:text-emerald-700 transition-colors flex items-center gap-1 font-bold"
+                className="hover:text-emerald-700 transition-colors flex items-center gap-1 font-extrabold text-[11px] text-slate-500 uppercase tracking-wider"
               >
                 Conhecer ERP SISGR
-                <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
+                <ExternalLink className="h-3.5 w-3.5 text-slate-400 shrink-0" />
               </a>
             </nav>
           </div>
 
-          <div className="flex items-center gap-4">
-            {/* Botão Mobile para o Sobre */}
+          <div className="flex items-center gap-2 md:gap-4">
+            {/* Pílula "O que é o SISGR?" visível também no mobile para máxima clareza */}
             <button
               onClick={() => setIsModalOpen(true)}
-              className="md:hidden flex items-center justify-center p-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-emerald-700 transition-all"
-              title="Sobre o SISGR"
+              className="md:hidden flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-1 rounded-xl font-black text-[9px] uppercase tracking-wider hover:bg-emerald-100 transition-all shrink-0 cursor-pointer"
             >
-              <Info className="h-4 w-4" />
+              <Info className="h-3 w-3 text-emerald-600 shrink-0" />
+              Sobre o SISGR
             </button>
 
             <Link
               href="/dashboard"
-              className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-xs md:text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all"
+              className="rounded-xl border border-slate-205 bg-white px-3 py-1.5 md:px-5 md:py-2.5 text-[10px] md:text-sm font-extrabold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all shrink-0"
               title="Acessar Área do Aluno"
             >
               Área do Aluno
             </Link>
+            
+            {/* Painel Admin ocultado no mobile para despoluir e evitar quebras */}
             <Link
               href="/admin/cursos"
-              className="rounded-xl bg-emerald-600 px-5 py-2.5 text-xs md:text-sm font-semibold text-white hover:bg-emerald-700 transition-all shadow-md shadow-emerald-500/10"
+              className="hidden md:inline-flex rounded-xl bg-emerald-600 px-5 py-2.5 text-xs md:text-sm font-semibold text-white hover:bg-emerald-700 transition-all shadow-md shadow-emerald-500/10 shrink-0"
               title="Painel Admin"
             >
               Painel Admin
@@ -86,7 +93,7 @@ export default function LandingHeader() {
 
             <div className="flex flex-col gap-6">
               <div className="flex items-center gap-3">
-                <img src="/logo.png" alt="SISGR Academy" className="h-10 w-auto" />
+                <img src="/logo.png" alt="SISGR Academy" className="h-10 w-auto object-contain" />
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest border-l border-slate-350 pl-3">Apresentação</span>
               </div>
 

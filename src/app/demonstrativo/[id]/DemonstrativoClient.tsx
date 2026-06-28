@@ -332,18 +332,18 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
       <Toaster position="top-right" richColors />
       
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white py-4 px-6 md:px-12 flex justify-between items-center shadow-xs">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="p-2 -ml-2 rounded-lg text-slate-400 hover:text-slate-650 transition-colors" title="Voltar ao início">
+      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white py-4 px-4 md:px-12 flex justify-between items-center shadow-xs">
+        <div className="flex items-center gap-2 md:gap-3 min-w-0">
+          <Link href="/" className="p-2 -ml-2 rounded-lg text-slate-400 hover:text-slate-655 transition-colors shrink-0" title="Voltar ao início">
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <span className="text-sm font-bold text-slate-800 hidden sm:inline">{courseTitle}</span>
-          <ChevronRight className="h-5 w-5 text-slate-400 hidden sm:inline" />
-          <span className="text-xs font-semibold text-slate-500 truncate max-w-xs">{lesson.titulo}</span>
+          <span className="text-sm font-bold text-slate-800 hidden sm:inline truncate max-w-[150px] md:max-w-xs">{courseTitle}</span>
+          <ChevronRight className="h-4 w-4 text-slate-450 hidden sm:inline shrink-0" />
+          <span className="text-xs font-semibold text-slate-500 truncate max-w-[140px] sm:max-w-xs">{lesson.titulo}</span>
         </div>
         <Link
           href="/"
-          className="rounded-lg border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors bg-white shadow-xs"
+          className="hidden sm:inline-flex rounded-lg border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors bg-white shadow-xs"
         >
           Voltar ao Início
         </Link>

@@ -136,14 +136,14 @@ export default function PlayerClient({
   return (
     <div className="flex-grow flex flex-col min-h-screen bg-slate-50 font-sans">
       {/* Header Logado */}
-      <header className="border-b border-slate-200 bg-white py-4 px-6 md:px-12 flex justify-between items-center shadow-xs">
-        <div className="flex items-center gap-3">
-          <Link href="/dashboard" className="p-2 -ml-2 rounded-lg text-slate-400 hover:text-slate-600 transition-colors" title="Voltar ao Dashboard">
+      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-md py-4 px-4 md:px-12 flex justify-between items-center shadow-xs">
+        <div className="flex items-center gap-2 md:gap-3 min-w-0">
+          <Link href="/dashboard" className="p-2 -ml-2 rounded-lg text-slate-400 hover:text-slate-600 transition-colors shrink-0" title="Voltar ao Dashboard">
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <span className="text-sm font-bold text-slate-800 hidden md:inline truncate max-w-xs">{currentCourse.titulo}</span>
-          <ChevronRight className="h-4 w-4 text-slate-400 hidden md:inline" />
-          <span className="text-xs font-semibold text-slate-500 truncate max-w-xs">{currentLesson.titulo}</span>
+          <span className="text-sm font-bold text-slate-800 hidden md:inline truncate max-w-[150px] md:max-w-xs">{currentCourse.titulo}</span>
+          <ChevronRight className="h-4 w-4 text-slate-400 hidden md:inline shrink-0" />
+          <span className="text-xs font-semibold text-slate-500 truncate max-w-[140px] md:max-w-xs">{currentLesson.titulo}</span>
         </div>
         
         <button
