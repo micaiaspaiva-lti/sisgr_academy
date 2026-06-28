@@ -487,7 +487,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
     if (!selectedCourse) return;
 
     toast.info("Criando aula...");
-    const isDemo = selectedCourse.tipo === "publico" ? true : newLessonDemo;
+    const isDemo = selectedCourse.tipo === "publico" ? newLessonDemo : false;
     const res = await createAulaAction(targetModuleId, newLessonTitle, newLessonUrl, isDemo, newLessonImage, newLessonFiles, newLessonDesc);
     if (res.success && res.aula) {
       toast.success("Aula criada com sucesso!");
@@ -645,11 +645,12 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
     if (!selectedCourse || !editingLesson || !editLessonTitle.trim() || !editLessonUrl.trim()) return;
 
     toast.info("Salvando aula...");
+    const isDemo = selectedCourse.tipo === "publico" ? editLessonDemo : false;
     const res = await updateAulaAction(
       editingLesson.id,
       editLessonTitle,
       editLessonUrl,
-      editLessonDemo,
+      isDemo,
       editLessonImage,
       editLessonFiles,
       editLessonAtivo,
@@ -1115,7 +1116,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                                 <span className={`font-bold text-xs truncate ${!aula.ativo ? "text-slate-400 line-through decoration-slate-300" : "text-slate-800"}`}>
                                   {aula.titulo}
                                 </span>
-                                {aula.demonstrative && (
+                                {selectedCourse.tipo === "publico" && aula.demonstrative && (
                                   <span className="inline-flex shrink-0 items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[8px] font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/10 uppercase tracking-wider">
                                     Demonstrativa
                                   </span>
@@ -1363,7 +1364,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                       onChange={setNewLessonImage}
                       label="Imagem de Capa / Thumbnail (Aula)"
                     />
-                    {selectedCourse?.tipo === "vip" && (
+                    {selectedCourse?.tipo === "publico" && (
                       <div className="flex items-center gap-2 mt-1">
                         <input
                           type="checkbox"
@@ -1640,7 +1641,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                       onChange={setEditLessonImage}
                       label="Imagem de Capa / Thumbnail (Aula)"
                     />
-                    {selectedCourse?.tipo === "vip" && (
+                    {selectedCourse?.tipo === "publico" && (
                       <div className="flex items-center gap-2 mt-1">
                         <input
                           type="checkbox"
