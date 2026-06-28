@@ -17,14 +17,10 @@ interface PageProps {
 export default async function PlayerPage({ params }: PageProps) {
   const { id: lessonId } = await params;
 
-  // 1. SSO Session validation
+  // 1. SSO Session retrieval
   const cookieStore = await cookies();
   const token = cookieStore.get("sso_token")?.value || "";
   const session = verifySSOToken(token);
-
-  if (!session) {
-    redirect("/login");
-  }
 
   // 2. Fetch the active lesson
   const currentLesson = await db.query.aulas.findFirst({
@@ -71,16 +67,24 @@ export default async function PlayerPage({ params }: PageProps) {
     redirect("/dashboard");
   }
 
-  // 5. Fetch student completed lessons
-  const completedLessons = await db
-    .select({ aulaId: progressoAulas.aulaId })
-    .from(progressoAulas)
-    .where(
-      and(
-        eq(progressoAulas.alunoId, session.id),
-        eq(progressoAulas.concluida, true)
-      )
-    );
+  // 5. Access control: redirect if not logged in AND (course is VIP AND lesson is not demonstrative)
+  const isAccessibleWithoutLogin = currentCourse.tipo === "publico" || currentLesson.demonstrative;
+  if (!session && !isAccessibleWithoutLogin) {
+    redirect("/login");
+  }
+
+  // 6. Fetch student completed lessons (only if session exists)
+  const completedLessons = session
+    ? await db
+        .select({ aulaId: progressoAulas.aulaId })
+        .from(progressoAulas)
+        .where(
+          and(
+            eq(progressoAulas.alunoId, session.id),
+            eq(progressoAulas.concluida, true)
+          )
+        )
+    : [];
 
   const completedLessonIds = completedLessons.map(p => p.aulaId);
 
@@ -134,8 +138,8 @@ export default async function PlayerPage({ params }: PageProps) {
       currentCourse={mappedCourse}
       currentModule={mappedModule}
       completedLessonIds={completedLessonIds}
-      studentId={session.id}
-      studentTipo={session.tipo}
+      studentId={session?.id || ""}
+      studentTipo={session?.tipo || "normal"}
     />
   );
 }

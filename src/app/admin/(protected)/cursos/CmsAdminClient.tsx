@@ -224,7 +224,8 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
     if (!selectedCourse) return;
 
     toast.info("Criando aula...");
-    const res = await createAulaAction(targetModuleId, newLessonTitle, newLessonUrl, newLessonDemo);
+    const isDemo = selectedCourse.tipo === "publico" ? true : newLessonDemo;
+    const res = await createAulaAction(targetModuleId, newLessonTitle, newLessonUrl, isDemo);
     if (res.success && res.aula) {
       toast.success("Aula criada com sucesso!");
       
@@ -638,18 +639,20 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                 />
                 <span className="text-3xs text-slate-400">Pode ser uma URL HTTP de vídeo real ou um caminho local.</span>
               </div>
-              <div className="flex items-center gap-2 mt-1">
-                <input
-                  type="checkbox"
-                  id="demonstrative"
-                  checked={newLessonDemo}
-                  onChange={e => setNewLessonDemo(e.target.checked)}
-                  className="rounded-xs border-slate-300 text-emerald-600 focus:ring-emerald-600"
-                />
-                <label htmlFor="demonstrative" className="text-xs font-bold text-slate-700 cursor-pointer">
-                  Aula Demonstrativa (Acesso Gratuito)
-                </label>
-              </div>
+              {selectedCourse?.tipo === "vip" && (
+                <div className="flex items-center gap-2 mt-1">
+                  <input
+                    type="checkbox"
+                    id="demonstrative"
+                    checked={newLessonDemo}
+                    onChange={e => setNewLessonDemo(e.target.checked)}
+                    className="rounded-xs border-slate-300 text-emerald-600 focus:ring-emerald-600"
+                  />
+                  <label htmlFor="demonstrative" className="text-xs font-bold text-slate-700 cursor-pointer">
+                    Aula Demonstrativa (Acesso Gratuito)
+                  </label>
+                </div>
+              )}
               <div className="flex gap-3 justify-end mt-2">
                 <button
                   type="button"
