@@ -177,32 +177,22 @@ export default async function Home() {
             </div>
           </div>
           
-          <div className="flex-1 w-full max-w-md md:max-w-none relative aspect-video rounded-3xl overflow-hidden bg-slate-800 border-[10px] border-white shadow-2xl">
-            {demoLesson ? (() => {
-              const youtubeEmbedUrl = getYouTubeEmbedUrl(demoLesson.videoUrl);
-              return youtubeEmbedUrl ? (
-                <iframe
-                  src={youtubeEmbedUrl}
-                  className="w-full h-full object-cover"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  title={demoLesson.titulo}
-                />
-              ) : (
-                <video
-                  src={demoLesson.videoUrl}
-                  poster={demoLesson.imagemCapa || undefined}
-                  controls
-                  className="w-full h-full object-cover"
-                  aria-label={`Player de vídeo para a aula: ${demoLesson.titulo}`}
-                />
-              );
-            })() : (
-              <img
-                src={featuredCourse.imagemCapa || undefined}
-                alt="Destaque Gestão de Resíduos"
-                className="object-cover w-full h-full opacity-80"
-              />
+          <div className="flex-1 w-full max-w-md md:max-w-none relative aspect-video rounded-3xl overflow-hidden bg-slate-800 border-[10px] border-white shadow-2xl group">
+            <img
+              src={featuredCourse.imagemCapa || "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=600&auto=format&fit=crop"}
+              alt={featuredCourse.titulo}
+              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+            />
+            {demoLesson && (
+              <Link 
+                href={`/demonstrativo/${demoLesson.id}`}
+                className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300"
+                title="Assistir Aula Demonstrativa"
+              >
+                <div className="h-16 w-16 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-xl transform scale-90 group-hover:scale-100 transition-all duration-300">
+                  <Play className="h-6 w-6 fill-current translate-x-0.5" />
+                </div>
+              </Link>
             )}
           </div>
         </div>
