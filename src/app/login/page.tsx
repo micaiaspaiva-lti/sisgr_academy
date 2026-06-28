@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, Mail, LogIn, GraduationCap, AlertCircle, HelpCircle } from "lucide-react";
+import Link from "next/link";
+import { Lock, Mail, LogIn, GraduationCap, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { alunoLoginAction } from "@/app/actions";
 
@@ -42,24 +43,7 @@ export default function AlunoLoginPage() {
     }
   };
 
-  const handleSimularArthur = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await alunoLoginAction("arthur.sso@residuosparceiro.com", "123456");
-      if (res.success) {
-        toast.success("Sessão Arthur Pendragon carregada!");
-        router.push("/dashboard");
-        router.refresh();
-      } else {
-        toast.error("Erro ao simular Arthur.");
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   return (
     <div className="min-h-screen bg-[#f7f9fc] flex items-center justify-center p-4 antialiased font-sans">
@@ -133,24 +117,15 @@ export default function AlunoLoginPage() {
           </button>
         </form>
 
-        {/* Separador */}
-        <div className="relative flex py-2 items-center">
-          <div className="flex-grow border-t border-slate-250"></div>
-          <span className="flex-shrink mx-4 text-slate-400 text-3xs font-black uppercase tracking-wider">Ou Sandbox</span>
-          <div className="flex-grow border-t border-slate-250"></div>
+        {/* Voltar para o Site Principal */}
+        <div className="text-center pt-2 border-t border-slate-100">
+          <Link
+            href="/"
+            className="text-xs font-bold text-slate-500 hover:text-emerald-700 transition-colors inline-flex items-center justify-center gap-1.5"
+          >
+            ← Voltar ao site principal
+          </Link>
         </div>
-
-        {/* Botão de Simulação Arthur Pendragon */}
-        <button
-          type="button"
-          onClick={handleSimularArthur}
-          disabled={loading}
-          className="w-full py-3 border border-slate-200 hover:border-slate-350 bg-slate-50 hover:bg-slate-100/60 text-slate-600 hover:text-slate-800 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
-          title="Login automático como Arthur Pendragon para fins de teste"
-        >
-          <HelpCircle className="h-4 w-4 text-duet-brand" />
-          Simular Sessão VIP (Arthur)
-        </button>
       </div>
     </div>
   );
