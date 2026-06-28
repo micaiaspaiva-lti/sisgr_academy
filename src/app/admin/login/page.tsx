@@ -47,17 +47,17 @@ export default function AdminLoginPage() {
       {/* Container Principal Glassmorphic */}
       <div className="w-full max-w-md bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 md:p-10 shadow-2xl flex flex-col gap-6 relative overflow-hidden">
         {/* Detalhe de Luz Decorativo */}
-        <div className="absolute -top-24 -left-24 w-48 h-48 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none"></div>
-        <div className="absolute -bottom-24 -right-24 w-48 h-48 rounded-full bg-emerald-500/5 blur-3xl pointer-events-none"></div>
+        <div className="absolute -top-24 -left-24 w-48 h-48 rounded-full bg-duet-brand/10 blur-3xl pointer-events-none"></div>
+        <div className="absolute -bottom-24 -right-24 w-48 h-48 rounded-full bg-duet-brand/5 blur-3xl pointer-events-none"></div>
 
         {/* Header */}
         <div className="flex flex-col items-center gap-3 text-center">
-          <div className="bg-emerald-500/10 p-3 rounded-2xl border border-emerald-500/20 text-emerald-400 shadow-inner">
+          <div className="bg-duet-brand/10 p-3 rounded-2xl border border-duet-brand/20 text-duet-brand shadow-inner">
             <ShieldCheck className="h-8 w-8 animate-pulse" />
           </div>
           <div>
             <h1 className="text-xl font-black text-white tracking-tight">SISGR Academy</h1>
-            <p className="text-3xs font-extrabold text-emerald-400 uppercase tracking-widest mt-1">Acesso Restrito ao Administrador</p>
+            <p className="text-3xs font-extrabold text-duet-brand uppercase tracking-widest mt-1">Acesso Restrito ao Administrador</p>
           </div>
         </div>
 
@@ -82,7 +82,7 @@ export default function AdminLoginPage() {
                 placeholder="admin@exemplo.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-slate-950/40 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-3 pl-11 pr-4 text-xs text-white placeholder-slate-600 focus:outline-hidden focus:ring-4 focus:ring-emerald-500/10 transition-all font-medium"
+                className="w-full bg-slate-950/40 border border-slate-800 focus:border-duet-brand/50 rounded-xl py-3 pl-11 pr-4 text-xs text-white placeholder-slate-600 focus:outline-hidden focus:ring-4 focus:ring-duet-brand/10 transition-all font-medium"
               />
             </div>
           </div>
@@ -98,7 +98,7 @@ export default function AdminLoginPage() {
                 placeholder="Sua senha secreta"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-950/40 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-3 pl-11 pr-4 text-xs text-white placeholder-slate-600 focus:outline-hidden focus:ring-4 focus:ring-emerald-500/10 transition-all font-medium"
+                className="w-full bg-slate-950/40 border border-slate-800 focus:border-duet-brand/50 rounded-xl py-3 pl-11 pr-4 text-xs text-white placeholder-slate-600 focus:outline-hidden focus:ring-4 focus:ring-duet-brand/10 transition-all font-medium"
               />
             </div>
           </div>
@@ -107,7 +107,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-emerald-900/10 flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-75 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full mt-2 py-3.5 bg-duet-brand hover:bg-duet-brand-hover text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-75 disabled:cursor-not-allowed cursor-pointer"
           >
             <LogIn className="h-4 w-4" />
             {loading ? "Entrando..." : "Acessar Painel"}

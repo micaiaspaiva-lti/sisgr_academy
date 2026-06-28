@@ -65,8 +65,8 @@ export default function AlunoLoginPage() {
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4 antialiased font-sans">
       {/* Background Gradient Orbs */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-emerald-500/10 blur-3xl"></div>
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-teal-500/10 blur-3xl"></div>
+        <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-duet-brand/10 blur-3xl"></div>
+        <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-duet-brand/5 blur-3xl"></div>
       </div>
 
       {/* Login Card */}
@@ -74,12 +74,12 @@ export default function AlunoLoginPage() {
         
         {/* Logo/Header */}
         <div className="flex flex-col items-center gap-3 text-center">
-          <div className="bg-emerald-500/10 p-3.5 rounded-2xl border border-emerald-500/20 text-emerald-400">
+          <div className="bg-duet-brand/10 p-3.5 rounded-2xl border border-duet-brand/20 text-duet-brand">
             <GraduationCap className="h-8 w-8" />
           </div>
           <div>
             <h1 className="text-2xl font-black text-white tracking-tight">EAD SISGR Academy</h1>
-            <p className="text-3xs font-extrabold text-emerald-400 uppercase tracking-widest mt-1">Portal do Aluno & Visitante</p>
+            <p className="text-3xs font-extrabold text-duet-brand uppercase tracking-widest mt-1">Portal do Aluno & Visitante</p>
           </div>
         </div>
 
@@ -103,7 +103,7 @@ export default function AlunoLoginPage() {
                 placeholder="aluno@exemplo.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-slate-950/40 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-3 pl-11 pr-4 text-xs text-white placeholder-slate-600 focus:outline-hidden focus:ring-4 focus:ring-emerald-500/10 transition-all font-medium"
+                className="w-full bg-slate-950/40 border border-slate-800 focus:border-duet-brand/50 rounded-xl py-3 pl-11 pr-4 text-xs text-white placeholder-slate-600 focus:outline-hidden focus:ring-4 focus:ring-duet-brand/10 transition-all font-medium"
               />
             </div>
           </div>
@@ -118,7 +118,7 @@ export default function AlunoLoginPage() {
                 placeholder="Digite sua senha"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-950/40 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-3 pl-11 pr-4 text-xs text-white placeholder-slate-600 focus:outline-hidden focus:ring-4 focus:ring-emerald-500/10 transition-all font-medium"
+                className="w-full bg-slate-950/40 border border-slate-800 focus:border-duet-brand/50 rounded-xl py-3 pl-11 pr-4 text-xs text-white placeholder-slate-600 focus:outline-hidden focus:ring-4 focus:ring-duet-brand/10 transition-all font-medium"
               />
             </div>
           </div>
@@ -126,7 +126,7 @@ export default function AlunoLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full mt-2 py-3.5 bg-duet-brand hover:bg-duet-brand-hover text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
           >
             <LogIn className="h-4 w-4" />
             {loading ? "Entrando..." : "Acessar Plataforma"}
@@ -145,10 +145,10 @@ export default function AlunoLoginPage() {
           type="button"
           onClick={handleSimularArthur}
           disabled={loading}
-          className="w-full py-3 border border-slate-800 hover:border-slate-700 bg-slate-950/20 hover:bg-slate-950/40 text-slate-350 hover:text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full py-3 border border-slate-800 hover:border-slate-700 bg-slate-950/20 hover:bg-slate-950/40 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
           title="Login automático como Arthur Pendragon para fins de teste"
         >
-          <HelpCircle className="h-4 w-4 text-emerald-500" />
+          <HelpCircle className="h-4 w-4 text-duet-brand" />
           Simular Sessão VIP (Arthur)
         </button>
       </div>
