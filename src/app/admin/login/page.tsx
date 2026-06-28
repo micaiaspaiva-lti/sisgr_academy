@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Lock, Mail, LogIn, ShieldCheck, AlertCircle } from "lucide-react";
+import { Lock, Mail, LogIn, ShieldCheck, AlertCircle, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { loginAdminAction } from "@/lib/auth-admin";
 
@@ -115,8 +116,17 @@ export default function AdminLoginPage() {
         </form>
 
         {/* Footer */}
-        <div className="text-center text-3xs text-slate-400 font-bold border-t border-slate-200 pt-5 mt-2 uppercase tracking-wider">
-          Protegido por Criptografia SSL & JWT
+        <div className="flex flex-col items-center gap-3 border-t border-slate-200 pt-5 mt-2">
+          <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+            Protegido por Criptografia SSL & JWT
+          </div>
+          <Link
+            href="/"
+            className="text-xs font-bold text-slate-500 hover:text-emerald-600 transition-colors flex items-center gap-1.5 mt-1"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Voltar para a Página Inicial
+          </Link>
         </div>
       </div>
     </div>
