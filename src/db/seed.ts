@@ -90,7 +90,7 @@ async function main() {
       moduloId: modulo1_1.id,
       titulo: "1.1 Introdução ao MGR (Gestão de Resíduos)",
       descricaoApoio: "Nesta aula, discutiremos a importância da separação e triagem de resíduos sólidos e como os processos industriais se relacionam com as normas ambientais vigentes.",
-      videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+      videoUrl: "https://www.youtube.com/watch?v=1W8MvP6kO-A",
       demonstrative: true,
       ordem: 1,
     },
@@ -99,7 +99,7 @@ async function main() {
       moduloId: modulo1_1.id,
       titulo: "1.2 Política Nacional de Resíduos Sólidos (PNRS)",
       descricaoApoio: "Estudo detalhado sobre a Lei nº 12.305/10, as responsabilidades compartilhadas dos geradores de resíduos e os acordos setoriais de logística reversa.",
-      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      videoUrl: "https://www.youtube.com/watch?v=2c7A1aA8G9I",
       demonstrative: false,
       ordem: 2,
     }
@@ -118,7 +118,7 @@ async function main() {
       moduloId: modulo1_2.id,
       titulo: "2.1 Técnicas de Triagem Mecânica e Manual",
       descricaoApoio: "Aprenda sobre os equipamentos de triagem de resíduos secos e úmidos, esteiras de separação e a importância das cooperativas de reciclagem.",
-      videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+      videoUrl: "https://www.youtube.com/watch?v=y3hR9sU1p-Y",
       demonstrative: false,
       ordem: 1,
     }
@@ -148,7 +148,7 @@ async function main() {
       moduloId: modulo2_1.id,
       titulo: "1.1 O que é o MTR e Quem é Obrigado a Emitir?",
       descricaoApoio: "Guia completo sobre a obrigatoriedade da emissão do MTR online para transporte interestadual e estadual de resíduos controlados.",
-      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      videoUrl: "https://www.youtube.com/watch?v=P2L9v3CjUe0",
       demonstrative: true,
       ordem: 1,
     }
@@ -178,7 +178,7 @@ async function main() {
       moduloId: modulo3_1.id,
       titulo: "1.1 Etapas do Licenciamento (LP, LI, LO)",
       descricaoApoio: "Aulas explicativas sobre a documentação exigida pelos órgãos estaduais de controle ambiental.",
-      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      videoUrl: "https://www.youtube.com/watch?v=q6J5P7J6tO4",
       demonstrative: false,
       ordem: 1,
     }
@@ -208,7 +208,7 @@ async function main() {
       moduloId: modulo4_1.id,
       titulo: "1.1 Logística de Coleta e Descaracterização",
       descricaoApoio: "Aborda a destruição segura de dados e a reciclagem dos metais nobres presentes no lixo eletrônico.",
-      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      videoUrl: "https://www.youtube.com/watch?v=JE4O6-c4dQA",
       demonstrative: true,
       ordem: 1,
     }
@@ -238,7 +238,7 @@ async function main() {
       moduloId: modulo5_1.id,
       titulo: "1.1 Descarbonização e Economia de Baixo Carbono",
       descricaoApoio: "Saiba como mensurar a pegada ecológica da sua empresa e reduzir emissões indiretas.",
-      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      videoUrl: "https://www.youtube.com/watch?v=0kF5uD5sQeo",
       demonstrative: true,
       ordem: 1,
     }
@@ -268,7 +268,7 @@ async function main() {
       moduloId: modulo6_1.id,
       titulo: "1.1 Lista de Verificação e Não-Conformidades",
       descricaoApoio: "Técnicas de elaboração de relatórios, acompanhamento e planos de ação corretiva.",
-      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      videoUrl: "https://www.youtube.com/watch?v=kU_UaJ86P7w",
       demonstrative: false,
       ordem: 1,
     }
@@ -298,7 +298,7 @@ async function main() {
       moduloId: modulo7_1.id,
       titulo: "1.1 Classificação e Rotulagem GHS",
       descricaoApoio: "Utilização correta da Ficha de Informações de Segurança de Produtos Químicos (FISPQ) e classificação GHS.",
-      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      videoUrl: "https://www.youtube.com/watch?v=rK4p4E-0Ssk",
       demonstrative: false,
       ordem: 1,
     }
@@ -328,7 +328,7 @@ async function main() {
       moduloId: modulo8_1.id,
       titulo: "1.1 Decantação, Coagulação e Flotação",
       descricaoApoio: "Funcionamento prático de uma Estação de Tratamento de Efluentes (ETE).",
-      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      videoUrl: "https://www.youtube.com/watch?v=mC11Gg9Yc3w",
       demonstrative: true,
       ordem: 1,
     }
@@ -358,7 +358,7 @@ async function main() {
       moduloId: modulo9_1.id,
       titulo: "1.1 Análise de Ciclo de Vida do Produto (ACV)",
       descricaoApoio: "Cálculo de impacto ambiental desde a extração de matérias-primas até o descarte pós-consumo.",
-      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      videoUrl: "https://www.youtube.com/watch?v=zCRKvDyyHmI",
       demonstrative: true,
       ordem: 1,
     }
@@ -388,7 +388,7 @@ async function main() {
       moduloId: modulo10_1.id,
       titulo: "1.1 Declaração Passo a Passo no Cadastro Técnico Federal",
       descricaoApoio: "Prazos, enquadramento de atividades e geração do comprovante de conformidade legal.",
-      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      videoUrl: "https://www.youtube.com/watch?v=d_k8F7L8F8I",
       demonstrative: false,
       ordem: 1,
     }
@@ -418,7 +418,7 @@ async function main() {
       moduloId: modulo11_1.id,
       titulo: "1.1 Política Ambiental, Planejamento e Requisitos",
       descricaoApoio: "Definição de aspectos e impactos significativos no planejamento estratégico organizacional.",
-      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      videoUrl: "https://www.youtube.com/watch?v=Wz7_o6D_D-w",
       demonstrative: true,
       ordem: 1,
     }
@@ -448,7 +448,7 @@ async function main() {
       moduloId: modulo12_1.id,
       titulo: "1.1 Preparo do Blend e Parâmetros Físico-Químicos",
       descricaoApoio: "Padrões de cloro, poder calorífico e cinzas para queima ambientalmente licenciada.",
-      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      videoUrl: "https://www.youtube.com/watch?v=sU1cO46W3wU",
       demonstrative: false,
       ordem: 1,
     }
