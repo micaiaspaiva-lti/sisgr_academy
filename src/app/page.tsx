@@ -124,8 +124,10 @@ export default async function Home() {
   const featuredCourse = activeCourses.find(c => c.id === "c1111111-1111-4111-8111-111111111111") || activeCourses[0];
   const otherCourses = activeCourses.filter(c => c.id !== featuredCourse.id);
 
-  // Primeira aula demonstrativa do curso em destaque
-  const demoLesson = featuredCourse.modulos[0]?.aulas.find(a => a.demonstrative) || featuredCourse.modulos[0]?.aulas[0];
+  // Primeira aula demonstrativa do curso em destaque (só permite fallback automático para primeira aula se o curso for Público Geral)
+  const demoLesson = featuredCourse.tipo === "publico"
+    ? (featuredCourse.modulos[0]?.aulas.find(a => a.demonstrative) || featuredCourse.modulos[0]?.aulas[0])
+    : featuredCourse.modulos[0]?.aulas.find(a => a.demonstrative);
 
   return (
     <div className="flex-1 flex flex-col font-sans bg-[#FAFAFA] min-h-screen">
