@@ -127,14 +127,14 @@ export async function triggerIAAutomationAction(aulaId: string) {
 }
 
 // 6. Criar um novo curso demonstrativo
-export async function createCursoAction(titulo: string, descricao: string, tipo: "publico" | "vip" = "publico") {
+export async function createCursoAction(titulo: string, descricao: string, tipo: "publico" | "vip" = "publico", imagemCapa?: string) {
   try {
     const [newCourse] = await db
       .insert(cursos)
       .values({
         titulo,
         descricao,
-        imagemCapa: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=600&auto=format&fit=crop",
+        imagemCapa: imagemCapa?.trim() || "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=600&auto=format&fit=crop",
         ativo: true,
         tipo,
       })
@@ -161,7 +161,7 @@ export async function createCursoAction(titulo: string, descricao: string, tipo:
 }
 
 // 7. Criar uma nova aula em um módulo
-export async function createAulaAction(moduloId: string, titulo: string, videoUrl: string, demonstrative: boolean) {
+export async function createAulaAction(moduloId: string, titulo: string, videoUrl: string, demonstrative: boolean, imagemCapa?: string) {
   try {
     const existingAulas = await db
       .select()
@@ -175,6 +175,7 @@ export async function createAulaAction(moduloId: string, titulo: string, videoUr
         titulo,
         videoUrl,
         demonstrative,
+        imagemCapa: imagemCapa?.trim() || null,
         ordem: existingAulas.length + 1,
       })
       .returning();
@@ -195,6 +196,7 @@ export async function updateCursoAction(
   titulo: string,
   descricao: string,
   tipo: "publico" | "vip",
+  imagemCapa: string,
   ativo: boolean
 ) {
   try {
@@ -204,6 +206,7 @@ export async function updateCursoAction(
         titulo,
         descricao,
         tipo,
+        imagemCapa: imagemCapa?.trim() || "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=600&auto=format&fit=crop",
         ativo,
       })
       .where(eq(cursos.id, cursoId))
@@ -225,6 +228,7 @@ export async function updateAulaAction(
   titulo: string,
   videoUrl: string,
   demonstrative: boolean,
+  imagemCapa: string | null,
   ativo: boolean
 ) {
   try {
@@ -234,6 +238,7 @@ export async function updateAulaAction(
         titulo,
         videoUrl,
         demonstrative,
+        imagemCapa: imagemCapa?.trim() || null,
         ativo,
       })
       .where(eq(aulas.id, aulaId))

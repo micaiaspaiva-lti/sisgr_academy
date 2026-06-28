@@ -20,6 +20,19 @@ function getYouTubeVideoId(url: string): string | null {
 }
 
 function getCourseImage(course: any): string {
+  // 1. Se o curso tiver uma imagem de capa customizada cadastrada, usa ela
+  if (course.imagemCapa && !course.imagemCapa.includes("unsplash.com/photo-1532996122724-e3c354a0b15b")) {
+    return course.imagemCapa;
+  }
+  // 2. Se as aulas tiverem capa customizada, usa a da primeira aula
+  for (const m of course.modulos || []) {
+    for (const a of m.aulas || []) {
+      if (a.imagemCapa) {
+        return a.imagemCapa;
+      }
+    }
+  }
+  // 3. Fallback para thumbnails do YouTube
   for (const m of course.modulos || []) {
     for (const a of m.aulas || []) {
       const ytid = getYouTubeVideoId(a.videoUrl);

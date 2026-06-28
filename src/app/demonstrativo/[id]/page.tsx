@@ -68,6 +68,7 @@ export default async function DemonstrativoPage({ params }: PageProps) {
         id: a.id,
         titulo: a.titulo,
         videoUrl: a.videoUrl,
+        imagemCapa: a.imagemCapa,
       }));
   }
 
@@ -76,6 +77,7 @@ export default async function DemonstrativoPage({ params }: PageProps) {
     titulo: currentLesson.titulo,
     descricaoApoio: currentLesson.descricaoApoio || "",
     videoUrl: currentLesson.videoUrl,
+    imagemCapa: currentLesson.imagemCapa,
   };
 
   return (

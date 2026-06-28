@@ -23,11 +23,11 @@ async function main() {
   await client.connect();
 
   console.log("\n=== CURSOS REGISTROS ===");
-  const cursosRegs = await client.query("SELECT id, titulo, tipo, ativo FROM cursos");
+  const cursosRegs = await client.query("SELECT id, titulo, tipo, imagem_capa FROM cursos");
   console.table(cursosRegs.rows);
 
   console.log("\n=== AULAS REGISTROS ===");
-  const aulasRegs = await client.query("SELECT id, titulo, video_url, demonstrative, ativo, modulo_id FROM aulas");
+  const aulasRegs = await client.query("SELECT id, titulo, video_url, imagem_capa, demonstrative, ativo, modulo_id FROM aulas");
   console.table(aulasRegs.rows);
 
   await client.end();

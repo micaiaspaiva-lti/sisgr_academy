@@ -28,6 +28,7 @@ interface Lesson {
   descricaoApoio: string | null;
   videoUrl: string;
   legendasUrl: string | null;
+  imagemCapa: string | null;
   demonstrative: boolean;
   ativo: boolean;
   ordem: number;
@@ -64,17 +65,20 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
   const [newCourseTitle, setNewCourseTitle] = useState("");
   const [newCourseDesc, setNewCourseDesc] = useState("");
   const [newCourseTipo, setNewCourseTipo] = useState<"publico" | "vip">("publico");
+  const [newCourseImage, setNewCourseImage] = useState("");
 
   const [isCreatingLesson, setIsCreatingLesson] = useState(false);
   const [newLessonTitle, setNewLessonTitle] = useState("");
   const [newLessonUrl, setNewLessonUrl] = useState("");
   const [newLessonDemo, setNewLessonDemo] = useState(false);
+  const [newLessonImage, setNewLessonImage] = useState("");
   const [targetModuleId, setTargetModuleId] = useState("");
 
   const [isEditingCourse, setIsEditingCourse] = useState(false);
   const [editCourseTitle, setEditCourseTitle] = useState("");
   const [editCourseDesc, setEditCourseDesc] = useState("");
   const [editCourseTipo, setEditCourseTipo] = useState<"publico" | "vip">("publico");
+  const [editCourseImage, setEditCourseImage] = useState("");
   const [editCourseAtivo, setEditCourseAtivo] = useState(true);
 
   const [isEditingLesson, setIsEditingLesson] = useState(false);
@@ -82,6 +86,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
   const [editLessonTitle, setEditLessonTitle] = useState("");
   const [editLessonUrl, setEditLessonUrl] = useState("");
   const [editLessonDemo, setEditLessonDemo] = useState(false);
+  const [editLessonImage, setEditLessonImage] = useState("");
   const [editLessonAtivo, setEditLessonAtivo] = useState(true);
 
   const [isClearingDb, setIsClearingDb] = useState(false);
@@ -201,7 +206,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
     e.preventDefault();
     if (!newCourseTitle.trim()) return;
 
-    const res = await createCursoAction(newCourseTitle, newCourseDesc, newCourseTipo);
+    const res = await createCursoAction(newCourseTitle, newCourseDesc, newCourseTipo, newCourseImage);
     if (res.success && res.course) {
       toast.success("Curso criado com sucesso!");
       
@@ -228,6 +233,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       setIsCreatingCourse(false);
       setNewCourseTitle("");
       setNewCourseDesc("");
+      setNewCourseImage("");
       setNewCourseTipo("publico");
     } else {
       toast.error("Erro ao criar curso.");
@@ -241,7 +247,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
 
     toast.info("Criando aula...");
     const isDemo = selectedCourse.tipo === "publico" ? true : newLessonDemo;
-    const res = await createAulaAction(targetModuleId, newLessonTitle, newLessonUrl, isDemo);
+    const res = await createAulaAction(targetModuleId, newLessonTitle, newLessonUrl, isDemo, newLessonImage);
     if (res.success && res.aula) {
       toast.success("Aula criada com sucesso!");
       
@@ -257,6 +263,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
               descricaoApoio: res.aula.descricaoApoio,
               videoUrl: res.aula.videoUrl,
               legendasUrl: res.aula.legendasUrl,
+              imagemCapa: res.aula.imagemCapa,
               demonstrative: res.aula.demonstrative,
               ativo: res.aula.ativo,
               ordem: res.aula.ordem
@@ -272,6 +279,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       setIsCreatingLesson(false);
       setNewLessonTitle("");
       setNewLessonUrl("");
+      setNewLessonImage("");
       setNewLessonDemo(false);
       setTargetModuleId("");
     } else {
@@ -288,6 +296,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       editCourseTitle,
       editCourseDesc,
       editCourseTipo,
+      editCourseImage,
       editCourseAtivo
     );
 
@@ -297,6 +306,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
         ...selectedCourse,
         titulo: res.course.titulo,
         descricao: res.course.descricao || "",
+        imagemCapa: res.course.imagemCapa || "",
         tipo: (res.course.tipo || "publico") as "publico" | "vip",
         ativo: res.course.ativo
       };
@@ -316,6 +326,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       course.titulo,
       course.descricao,
       course.tipo,
+      course.imagemCapa,
       newAtivo
     );
 
@@ -341,6 +352,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       editLessonTitle,
       editLessonUrl,
       editLessonDemo,
+      editLessonImage,
       editLessonAtivo
     );
 
@@ -356,6 +368,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
               titulo: res.aula!.titulo,
               videoUrl: res.aula!.videoUrl,
               demonstrative: res.aula!.demonstrative,
+              imagemCapa: res.aula!.imagemCapa,
               ativo: res.aula!.ativo
             } : a)
           };
@@ -380,6 +393,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       lesson.titulo,
       lesson.videoUrl,
       lesson.demonstrative,
+      lesson.imagemCapa,
       newAtivo
     );
 
@@ -607,6 +621,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                       setEditCourseTitle(selectedCourse.titulo);
                       setEditCourseDesc(selectedCourse.descricao || "");
                       setEditCourseTipo(selectedCourse.tipo);
+                      setEditCourseImage(selectedCourse.imagemCapa || "");
                       setEditCourseAtivo(selectedCourse.ativo);
                       setIsEditingCourse(true);
                     }}
@@ -675,10 +690,17 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                             draggedLessonId === aula.id ? "opacity-40 border-dashed" : ""
                           } ${!aula.ativo ? "bg-slate-50/50" : ""}`}
                         >
-                          <div className="flex items-center gap-3 truncate">
-                            <GripVertical className="h-4 w-4 text-slate-400 cursor-grab shrink-0" />
-                            <PlayCircle className={`h-5 w-5 shrink-0 ${!aula.ativo ? "text-slate-300" : "text-slate-500"}`} />
-                            <div className="flex flex-col gap-0.5 truncate">
+                           <div className="flex items-center gap-3 truncate">
+                             <GripVertical className="h-4 w-4 text-slate-400 cursor-grab shrink-0" />
+                             <PlayCircle className={`h-5 w-5 shrink-0 ${!aula.ativo ? "text-slate-300" : "text-slate-500"}`} />
+                             {aula.imagemCapa && (
+                               <img 
+                                 src={aula.imagemCapa} 
+                                 alt="" 
+                                 className="h-8 w-14 object-cover rounded-md border border-slate-200 shrink-0 shadow-2xs"
+                               />
+                             )}
+                             <div className="flex flex-col gap-0.5 truncate">
                               <div className="flex items-center gap-2 truncate">
                                 <span className={`font-bold text-xs truncate ${!aula.ativo ? "text-slate-400 line-through decoration-slate-300" : "text-slate-800"}`}>
                                   {aula.titulo}
@@ -720,6 +742,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                                 setEditLessonTitle(aula.titulo);
                                 setEditLessonUrl(aula.videoUrl);
                                 setEditLessonDemo(aula.demonstrative);
+                                setEditLessonImage(aula.imagemCapa || "");
                                 setEditLessonAtivo(aula.ativo);
                                 setIsEditingLesson(true);
                               }}
@@ -811,6 +834,16 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                 />
               </div>
               <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-slate-700">Imagem de Capa (URL)</label>
+                <input
+                  type="text"
+                  value={newCourseImage}
+                  onChange={e => setNewCourseImage(e.target.value)}
+                  placeholder="https://images.unsplash.com/... ou outro link"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
                 <label className="text-xs font-bold text-slate-700">Classificação</label>
                 <div className="grid grid-cols-2 gap-2 mt-1">
                   <button
@@ -885,6 +918,16 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                 />
                 <span className="text-3xs text-slate-400">Pode ser uma URL HTTP de vídeo real ou um caminho local.</span>
               </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-slate-700">Imagem de Capa / Thumbnail (URL)</label>
+                <input
+                  type="text"
+                  value={newLessonImage}
+                  onChange={e => setNewLessonImage(e.target.value)}
+                  placeholder="Ex: https://imagens.unsplash.com/foto... (opcional)"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                />
+              </div>
               {selectedCourse?.tipo === "vip" && (
                 <div className="flex items-center gap-2 mt-1">
                   <input
@@ -946,6 +989,16 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                   value={editCourseDesc}
                   onChange={e => setEditCourseDesc(e.target.value)}
                   rows={3}
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-slate-700">Imagem de Capa (URL)</label>
+                <input
+                  type="text"
+                  value={editCourseImage}
+                  onChange={e => setEditCourseImage(e.target.value)}
+                  placeholder="https://images.unsplash.com/... ou outro link"
                   className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                 />
               </div>
@@ -1019,6 +1072,16 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                   required
                   value={editLessonUrl}
                   onChange={e => setEditLessonUrl(e.target.value)}
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-slate-700">Imagem de Capa / Thumbnail (URL)</label>
+                <input
+                  type="text"
+                  value={editLessonImage}
+                  onChange={e => setEditLessonImage(e.target.value)}
+                  placeholder="Ex: https://imagens.unsplash.com/foto... (opcional)"
                   className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                 />
               </div>

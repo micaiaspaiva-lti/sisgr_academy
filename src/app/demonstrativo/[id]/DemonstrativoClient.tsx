@@ -39,12 +39,14 @@ interface Lesson {
   titulo: string;
   descricaoApoio: string;
   videoUrl: string;
+  imagemCapa: string | null;
 }
 
 interface VisibleLesson {
   id: string;
   titulo: string;
   videoUrl: string;
+  imagemCapa?: string | null;
 }
 
 interface DemonstrativoClientProps {
@@ -370,6 +372,7 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
                   <video
                     ref={videoRef}
                     src={lesson.videoUrl}
+                    poster={lesson.imagemCapa || undefined}
                     controls
                     onPlay={() => setHasStarted(true)}
                     onEnded={handleVideoEnded}

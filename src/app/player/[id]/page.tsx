@@ -98,6 +98,7 @@ export default async function PlayerPage({ params }: PageProps) {
     descricaoApoio: currentLesson.descricaoApoio,
     videoUrl: currentLesson.videoUrl,
     legendasUrl: currentLesson.legendasUrl,
+    imagemCapa: currentLesson.imagemCapa,
     demonstrative: currentLesson.demonstrative,
     ordem: currentLesson.ordem,
   };
@@ -120,6 +121,7 @@ export default async function PlayerPage({ params }: PageProps) {
         descricaoApoio: a.descricaoApoio,
         videoUrl: a.videoUrl,
         legendasUrl: a.legendasUrl,
+        imagemCapa: a.imagemCapa,
         demonstrative: a.demonstrative,
         ordem: a.ordem,
       })),

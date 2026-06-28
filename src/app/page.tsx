@@ -191,6 +191,7 @@ export default async function Home() {
               ) : (
                 <video
                   src={demoLesson.videoUrl}
+                  poster={demoLesson.imagemCapa || undefined}
                   controls
                   className="w-full h-full object-cover"
                   aria-label={`Player de vídeo para a aula: ${demoLesson.titulo}`}

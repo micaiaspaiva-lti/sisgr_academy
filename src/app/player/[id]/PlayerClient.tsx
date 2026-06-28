@@ -28,6 +28,7 @@ interface Lesson {
   descricaoApoio: string | null;
   videoUrl: string;
   legendasUrl: string | null;
+  imagemCapa: string | null;
   demonstrative: boolean;
   ordem: number;
 }
@@ -188,6 +189,7 @@ export default function PlayerClient({
                   ) : (
                     <video
                       src={currentLesson.videoUrl}
+                      poster={currentLesson.imagemCapa || undefined}
                       controls
                       className="w-full h-full object-contain"
                       aria-label={`Player de vídeo para a aula: ${currentLesson.titulo}`}
