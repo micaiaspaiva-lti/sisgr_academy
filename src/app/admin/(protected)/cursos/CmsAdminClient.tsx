@@ -1015,30 +1015,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                               <Pencil className="h-3.5 w-3.5" />
                             </button>
 
-                            {aula.legendasUrl ? (
-                              <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-1 text-3xs font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/10">
-                                <CheckCircle className="h-3 w-3" />
-                                Legendas OK
-                              </span>
-                            ) : (
-                              <button
-                                onClick={() => triggerIAAutomation(aula.id)}
-                                disabled={processingIAId === aula.id}
-                                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-3xs font-bold text-slate-700 hover:bg-slate-50 disabled:bg-slate-100 disabled:cursor-not-allowed transition-all cursor-pointer"
-                              >
-                                {processingIAId === aula.id ? (
-                                  <>
-                                    <Loader2 className="h-3 w-3 animate-spin text-emerald-600" />
-                                    Processando...
-                                  </>
-                                ) : (
-                                  <>
-                                    <Sparkles className="h-3 w-3 text-purple-600" />
-                                    Legendar com IA
-                                  </>
-                                )}
-                              </button>
-                            )}
+
 
                             <button 
                               onClick={() => handleDeleteLesson(aula.id)}
