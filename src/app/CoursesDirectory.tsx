@@ -205,11 +205,11 @@ export default function CoursesDirectory({ courses }: CoursesDirectoryProps) {
               key={course.id}
               className="flex flex-col rounded-3xl border border-slate-200 overflow-hidden bg-white shadow-xl shadow-emerald-500/3 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
             >
-              <div className="relative aspect-video">
+              <div className="relative w-full aspect-video overflow-hidden">
                 <img
                   src={getCourseImage(course)}
                   alt={course.titulo}
-                  className="object-cover w-full h-full"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
                 {course.tipo === "vip" && (
                   <span className="absolute top-3 right-3 inline-flex items-center rounded-md bg-amber-500/90 backdrop-blur-xs px-2.5 py-1 text-xs font-black text-white uppercase tracking-wider shadow-md">
