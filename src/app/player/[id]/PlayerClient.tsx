@@ -280,14 +280,12 @@ export default function PlayerClient({
               {/* Conteúdo das Abas */}
               <div className="py-6">
                 {activeTab === "apoio" && (
-                  <div className="prose max-w-none text-sm text-slate-650 leading-relaxed flex flex-col gap-4">
-                    <p>{currentLesson.descricaoApoio || "Nenhum material de apoio cadastrado para esta aula."}</p>
-                    <h4 className="font-bold text-slate-800 mt-2">Principais Tópicos da Aula:</h4>
-                    <ul className="list-disc pl-5 flex flex-col gap-1.5">
-                      <li>Conformidade com a legislação e normativas da ANVISA e IBAMA.</li>
-                      <li>Classificação de resíduos industriais perigosos (Classe I) e não perigosos (Classe II).</li>
-                      <li>Importância do preenchimento correto das guias de remessa de materiais.</li>
-                    </ul>
+                  <div className="prose max-w-none text-sm text-slate-650 leading-relaxed">
+                    {currentLesson.descricaoApoio ? (
+                      <div dangerouslySetInnerHTML={{ __html: currentLesson.descricaoApoio }} />
+                    ) : (
+                      <p className="text-slate-400 italic">Nenhum texto de apoio cadastrado para esta aula.</p>
+                    )}
                   </div>
                 )}
 

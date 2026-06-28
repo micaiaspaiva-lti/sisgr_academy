@@ -393,9 +393,10 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
               <h1 className="text-2xl font-black text-slate-900 leading-tight">
                 {lesson.titulo}
               </h1>
-              <p className="text-slate-650 leading-relaxed font-medium text-sm">
-                {lesson.descricaoApoio}
-              </p>
+              <div 
+                className="text-slate-650 leading-relaxed font-medium text-sm prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: lesson.descricaoApoio }}
+              />
 
               {/* Material de Apoio */}
               {lesson.materiais && lesson.materiais.length > 0 && (

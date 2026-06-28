@@ -5,7 +5,7 @@ import Link from "next/link";
 import { 
   Plus, Folder, PlayCircle, Sparkles, 
   UserCheck, BarChart3, GripVertical, CheckCircle, 
-  Trash2, Loader2, ArrowLeft, Users, LogOut, Pencil, Eye, EyeOff, Upload, Image, FileText, Paperclip
+  Trash2, Loader2, ArrowLeft, Users, LogOut, Pencil, Eye, EyeOff, Upload, Image, FileText, Paperclip, Link as LinkIcon
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { 
@@ -229,18 +229,45 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(initialCourses[0] || null);
   const [draggedLessonId, setDraggedLessonId] = useState<string | null>(null);
   const [processingIAId, setProcessingIAId] = useState<string | null>(null);
+
+  const insertTextAtCursor = (
+    textareaId: string,
+    beforeText: string,
+    afterText: string,
+    setState: (val: string) => void
+  ) => {
+    const textarea = document.getElementById(textareaId) as HTMLTextAreaElement | null;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    
+    const selected = text.substring(start, end) || "";
+    const replacement = beforeText + selected + afterText;
+    
+    const newValue = text.substring(0, start) + replacement + text.substring(end);
+    setState(newValue);
+
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + beforeText.length, start + beforeText.length + selected.length);
+    }, 0);
+  };
+
   const [isCreatingCourse, setIsCreatingCourse] = useState(false);
   const [newCourseTitle, setNewCourseTitle] = useState("");
   const [newCourseDesc, setNewCourseDesc] = useState("");
   const [newCourseTipo, setNewCourseTipo] = useState<"publico" | "vip">("publico");
   const [newCourseImage, setNewCourseImage] = useState("");
 
-  const [isCreatingLesson, setIsCreatingLesson] = useState(false);
+   const [isCreatingLesson, setIsCreatingLesson] = useState(false);
   const [newLessonTitle, setNewLessonTitle] = useState("");
   const [newLessonUrl, setNewLessonUrl] = useState("");
   const [newLessonDemo, setNewLessonDemo] = useState(false);
   const [newLessonImage, setNewLessonImage] = useState("");
   const [newLessonFiles, setNewLessonFiles] = useState<{ name: string; url: string }[]>([]);
+  const [newLessonDesc, setNewLessonDesc] = useState("");
   const [targetModuleId, setTargetModuleId] = useState("");
 
   const [isCreatingModule, setIsCreatingModule] = useState(false);
@@ -260,6 +287,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
   const [editLessonDemo, setEditLessonDemo] = useState(false);
   const [editLessonImage, setEditLessonImage] = useState("");
   const [editLessonFiles, setEditLessonFiles] = useState<{ name: string; url: string }[]>([]);
+  const [editLessonDesc, setEditLessonDesc] = useState("");
   const [editLessonAtivo, setEditLessonAtivo] = useState(true);
 
   const [isClearingDb, setIsClearingDb] = useState(false);
@@ -452,7 +480,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
 
     toast.info("Criando aula...");
     const isDemo = selectedCourse.tipo === "publico" ? true : newLessonDemo;
-    const res = await createAulaAction(targetModuleId, newLessonTitle, newLessonUrl, isDemo, newLessonImage, newLessonFiles);
+    const res = await createAulaAction(targetModuleId, newLessonTitle, newLessonUrl, isDemo, newLessonImage, newLessonFiles, newLessonDesc);
     if (res.success && res.aula) {
       toast.success("Aula criada com sucesso!");
       
@@ -487,6 +515,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       setNewLessonUrl("");
       setNewLessonImage("");
       setNewLessonFiles([]);
+      setNewLessonDesc("");
       setNewLessonDemo(false);
       setTargetModuleId("");
     } else {
@@ -561,7 +590,8 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       editLessonDemo,
       editLessonImage,
       editLessonFiles,
-      editLessonAtivo
+      editLessonAtivo,
+      editLessonDesc
     );
 
     if (res.success && res.aula) {
@@ -578,6 +608,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
               demonstrative: res.aula!.demonstrative,
               imagemCapa: res.aula!.imagemCapa,
               materiais: res.aula!.materiais || [],
+              descricaoApoio: res.aula!.descricaoApoio,
               ativo: res.aula!.ativo
             } : a)
           };
@@ -973,6 +1004,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                                 setEditLessonDemo(aula.demonstrative);
                                 setEditLessonImage(aula.imagemCapa || "");
                                 setEditLessonFiles(aula.materiais || []);
+                                setEditLessonDesc(aula.descricaoApoio || "");
                                 setEditLessonAtivo(aula.ativo);
                                 setIsEditingLesson(true);
                               }}
@@ -1156,12 +1188,13 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       {/* Modal de Criação de Aula */}
       {isCreatingLesson && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-3xl w-full p-6 border border-slate-200 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-white rounded-2xl max-w-5xl w-full p-6 border border-slate-200 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
             <h2 className="text-lg font-black text-slate-900 border-b border-slate-100 pb-2">Nova Aula</h2>
             <form onSubmit={handleCreateLesson} className="flex flex-col gap-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Coluna Esquerda: Detalhes da Aula */}
-                <div className="flex flex-col gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                {/* Coluna Esquerda (lg:col-span-5): Detalhes e Arquivos */}
+                <div className="lg:col-span-5 flex flex-col gap-4">
                   <div className="flex flex-col gap-1">
                     <label className="text-xs font-bold text-slate-700">Título da Aula</label>
                     <input
@@ -1183,7 +1216,6 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                       placeholder="Ex: https://exemplo.com/video.mp4"
                       className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                     />
-                    <span className="text-3xs text-slate-400">Pode ser uma URL HTTP de vídeo real ou um caminho local.</span>
                   </div>
                   <ImageUploadZone
                     value={newLessonImage}
@@ -1204,21 +1236,16 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                       </label>
                     </div>
                   )}
-                </div>
 
-                {/* Coluna Direita: Materiais de Apoio */}
-                <div className="flex flex-col gap-4">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-xs font-bold text-slate-700">Materiais de Apoio (PDF, Planilhas, etc.)</label>
-                    
-                    {/* Lista de materiais já adicionados */}
+                  <div className="flex flex-col gap-2 border-t border-slate-100 pt-4 mt-2">
+                    <label className="text-xs font-bold text-slate-700">Materiais de Apoio (Anexos)</label>
                     {newLessonFiles.length > 0 && (
-                      <div className="flex flex-col gap-2 border border-slate-205 rounded-xl p-3 bg-slate-50/50 max-h-[160px] overflow-y-auto">
+                      <div className="flex flex-col gap-2 border border-slate-205 rounded-xl p-2 bg-slate-50/50 max-h-[120px] overflow-y-auto">
                         {newLessonFiles.map((file, idx) => (
-                          <div key={idx} className="flex items-center justify-between gap-3 p-2 bg-white rounded-lg border border-slate-150 shadow-3xs">
-                            <div className="flex items-center gap-2 truncate">
-                              <FileText className="h-4 w-4 text-emerald-600 shrink-0" />
-                              <span className="text-xs font-semibold text-slate-800 truncate" title={file.name}>
+                          <div key={idx} className="flex items-center justify-between gap-3 p-1.5 bg-white rounded-lg border border-slate-150 shadow-3xs">
+                            <div className="flex items-center gap-1.5 truncate">
+                              <FileText className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                              <span className="text-[11px] font-semibold text-slate-800 truncate" title={file.name}>
                                 {file.name}
                               </span>
                             </div>
@@ -1228,30 +1255,113 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                                 setNewLessonFiles(prev => prev.filter((_, i) => i !== idx));
                               }}
                               className="p-1 rounded-md hover:bg-red-50 text-slate-400 hover:text-red-650 transition-colors cursor-pointer"
-                              title="Remover material"
                             >
-                              <Trash2 className="h-3.5 w-3.5" />
+                              <Trash2 className="h-3 w-3" />
                             </button>
                           </div>
                         ))}
                       </div>
                     )}
-
-                    {/* Zona de Upload para adicionar novo arquivo */}
                     <ImageUploadZone
                       value=""
                       onChange={(url) => {
                         const fileName = url.split("/").pop() || "arquivo";
-                        const cleanName = fileName.replace(/^\d+-/, ""); // remove o timestamp prefixo
+                        const cleanName = fileName.replace(/^\d+-/, "");
                         setNewLessonFiles(prev => [...prev, { name: cleanName, url }]);
                         toast.success(`Arquivo ${cleanName} adicionado!`);
                       }}
                       label=""
                       accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
-                      placeholderText="Clique para anexar um arquivo de apoio"
+                      placeholderText="Clique para anexar um arquivo"
                     />
                   </div>
                 </div>
+
+                {/* Coluna Direita (lg:col-span-7): Editor de Descrição Formatado e Preview */}
+                <div className="lg:col-span-7 flex flex-col gap-4 border-l border-slate-100 lg:pl-6">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-slate-700">Texto / Conteúdo da Aula (HTML)</label>
+                    
+                    {/* Barra de Ferramentas de Formatação */}
+                    <div className="flex flex-wrap items-center gap-1 p-1 bg-slate-55 border border-slate-205 rounded-t-lg shadow-3xs">
+                      <button
+                        type="button"
+                        onClick={() => insertTextAtCursor("newLessonDescTextarea", "<b>", "</b>", setNewLessonDesc)}
+                        className="px-2 py-1 rounded hover:bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer transition-colors"
+                        title="Negrito"
+                      >
+                        B
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => insertTextAtCursor("newLessonDescTextarea", "<i>", "</i>", setNewLessonDesc)}
+                        className="px-2 py-1 rounded hover:bg-slate-200 text-xs italic text-slate-700 cursor-pointer transition-colors"
+                        title="Itálico"
+                      >
+                        I
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => insertTextAtCursor("newLessonDescTextarea", '<a href="https://" target="_blank" class="text-emerald-600 hover:underline font-semibold">', '</a>', setNewLessonDesc)}
+                        className="p-1 rounded hover:bg-slate-200 text-xs text-slate-700 cursor-pointer transition-colors flex items-center"
+                        title="Inserir Link"
+                      >
+                        <LinkIcon className="h-3.5 w-3.5" />
+                      </button>
+                      <div className="h-4 w-px bg-slate-300 mx-1" />
+                      <button
+                        type="button"
+                        onClick={() => insertTextAtCursor("newLessonDescTextarea", "<li>", "</li>", setNewLessonDesc)}
+                        className="px-2 py-1 rounded hover:bg-slate-200 text-3xs text-slate-700 cursor-pointer transition-colors"
+                        title="Item de Lista"
+                      >
+                        • Item
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => insertTextAtCursor("newLessonDescTextarea", '<ul class="list-disc pl-5 flex flex-col gap-1">\n  <li>', "</li>\n</ul>", setNewLessonDesc)}
+                        className="px-2 py-1 rounded hover:bg-slate-200 text-3xs text-slate-700 cursor-pointer transition-colors"
+                        title="Lista com Marcadores"
+                      >
+                        Lista
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => insertTextAtCursor("newLessonDescTextarea", "<br />", "", setNewLessonDesc)}
+                        className="px-2 py-1 rounded hover:bg-slate-200 text-3xs text-slate-700 cursor-pointer transition-colors"
+                        title="Quebra de Linha"
+                      >
+                        Quebra ↵
+                      </button>
+                    </div>
+
+                    {/* Textarea */}
+                    <textarea
+                      id="newLessonDescTextarea"
+                      value={newLessonDesc}
+                      onChange={e => setNewLessonDesc(e.target.value)}
+                      rows={5}
+                      placeholder="Escreva a descrição, conteúdo ou links de apoio da aula utilizando HTML para formatação..."
+                      className="rounded-b-lg border-x border-b border-slate-300 p-3 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 font-mono"
+                    />
+                  </div>
+
+                  {/* Live Preview Container */}
+                  <div className="flex flex-col gap-1.5 flex-1">
+                    <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider">Visualização em Tempo Real (Aluno)</span>
+                    <div className="border border-slate-200 rounded-xl p-4 bg-slate-50 min-h-[140px] max-h-[220px] overflow-y-auto shadow-3xs prose prose-sm max-w-none">
+                      {newLessonDesc.trim() ? (
+                        <div 
+                          className="text-xs text-slate-750 font-medium leading-relaxed"
+                          dangerouslySetInnerHTML={{ __html: newLessonDesc }} 
+                        />
+                      ) : (
+                        <p className="text-xs text-slate-400 italic">Escreva acima para visualizar a renderização formatada...</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
               </div>
 
               {/* Footer */}
@@ -1263,6 +1373,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                     setNewLessonTitle("");
                     setNewLessonUrl("");
                     setNewLessonFiles([]);
+                    setNewLessonDesc("");
                     setNewLessonDemo(false);
                     setTargetModuleId("");
                   }}
@@ -1361,12 +1472,13 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
       {/* Modal de Edição de Aula */}
       {isEditingLesson && editingLesson && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-3xl w-full p-6 border border-slate-200 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-white rounded-2xl max-w-5xl w-full p-6 border border-slate-200 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
             <h2 className="text-lg font-black text-slate-900 border-b border-slate-100 pb-2">Editar Aula</h2>
             <form onSubmit={handleUpdateLesson} className="flex flex-col gap-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Coluna Esquerda: Detalhes da Aula */}
-                <div className="flex flex-col gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                {/* Coluna Esquerda (lg:col-span-5): Detalhes e Arquivos */}
+                <div className="lg:col-span-5 flex flex-col gap-4">
                   <div className="flex flex-col gap-1">
                     <label className="text-xs font-bold text-slate-700">Título da Aula</label>
                     <input
@@ -1406,21 +1518,16 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                       </label>
                     </div>
                   )}
-                </div>
 
-                {/* Coluna Direita: Materiais de Apoio */}
-                <div className="flex flex-col gap-4">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-xs font-bold text-slate-700">Materiais de Apoio (PDF, Planilhas, etc.)</label>
-                    
-                    {/* Lista de materiais já adicionados */}
+                  <div className="flex flex-col gap-2 border-t border-slate-100 pt-4 mt-2">
+                    <label className="text-xs font-bold text-slate-700">Materiais de Apoio (Anexos)</label>
                     {editLessonFiles.length > 0 && (
-                      <div className="flex flex-col gap-2 border border-slate-205 rounded-xl p-3 bg-slate-50/50 max-h-[160px] overflow-y-auto">
+                      <div className="flex flex-col gap-2 border border-slate-205 rounded-xl p-2 bg-slate-50/50 max-h-[120px] overflow-y-auto">
                         {editLessonFiles.map((file, idx) => (
-                          <div key={idx} className="flex items-center justify-between gap-3 p-2 bg-white rounded-lg border border-slate-150 shadow-3xs">
-                            <div className="flex items-center gap-2 truncate">
-                              <FileText className="h-4 w-4 text-emerald-600 shrink-0" />
-                              <span className="text-xs font-semibold text-slate-800 truncate" title={file.name}>
+                          <div key={idx} className="flex items-center justify-between gap-3 p-1.5 bg-white rounded-lg border border-slate-150 shadow-3xs">
+                            <div className="flex items-center gap-1.5 truncate">
+                              <FileText className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                              <span className="text-[11px] font-semibold text-slate-800 truncate" title={file.name}>
                                 {file.name}
                               </span>
                             </div>
@@ -1430,30 +1537,113 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                                 setEditLessonFiles(prev => prev.filter((_, i) => i !== idx));
                               }}
                               className="p-1 rounded-md hover:bg-red-50 text-slate-400 hover:text-red-650 transition-colors cursor-pointer"
-                              title="Remover material"
                             >
-                              <Trash2 className="h-3.5 w-3.5" />
+                              <Trash2 className="h-3 w-3" />
                             </button>
                           </div>
                         ))}
                       </div>
                     )}
-
-                    {/* Zona de Upload para adicionar novo arquivo */}
                     <ImageUploadZone
                       value=""
                       onChange={(url) => {
                         const fileName = url.split("/").pop() || "arquivo";
-                        const cleanName = fileName.replace(/^\d+-/, ""); // remove o timestamp prefixo
+                        const cleanName = fileName.replace(/^\d+-/, "");
                         setEditLessonFiles(prev => [...prev, { name: cleanName, url }]);
                         toast.success(`Arquivo ${cleanName} adicionado!`);
                       }}
                       label=""
                       accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
-                      placeholderText="Clique para anexar um arquivo de apoio"
+                      placeholderText="Clique para anexar um arquivo"
                     />
                   </div>
                 </div>
+
+                {/* Coluna Direita (lg:col-span-7): Editor de Descrição Formatado e Preview */}
+                <div className="lg:col-span-7 flex flex-col gap-4 border-l border-slate-100 lg:pl-6">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-slate-700">Texto / Conteúdo da Aula (HTML)</label>
+                    
+                    {/* Barra de Ferramentas de Formatação */}
+                    <div className="flex flex-wrap items-center gap-1 p-1 bg-slate-55 border border-slate-205 rounded-t-lg shadow-3xs">
+                      <button
+                        type="button"
+                        onClick={() => insertTextAtCursor("editLessonDescTextarea", "<b>", "</b>", setEditLessonDesc)}
+                        className="px-2 py-1 rounded hover:bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer transition-colors"
+                        title="Negrito"
+                      >
+                        B
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => insertTextAtCursor("editLessonDescTextarea", "<i>", "</i>", setEditLessonDesc)}
+                        className="px-2 py-1 rounded hover:bg-slate-200 text-xs italic text-slate-700 cursor-pointer transition-colors"
+                        title="Itálico"
+                      >
+                        I
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => insertTextAtCursor("editLessonDescTextarea", '<a href="https://" target="_blank" class="text-emerald-600 hover:underline font-semibold">', '</a>', setEditLessonDesc)}
+                        className="p-1 rounded hover:bg-slate-200 text-xs text-slate-700 cursor-pointer transition-colors flex items-center"
+                        title="Inserir Link"
+                      >
+                        <LinkIcon className="h-3.5 w-3.5" />
+                      </button>
+                      <div className="h-4 w-px bg-slate-300 mx-1" />
+                      <button
+                        type="button"
+                        onClick={() => insertTextAtCursor("editLessonDescTextarea", "<li>", "</li>", setEditLessonDesc)}
+                        className="px-2 py-1 rounded hover:bg-slate-200 text-3xs text-slate-700 cursor-pointer transition-colors"
+                        title="Item de Lista"
+                      >
+                        • Item
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => insertTextAtCursor("editLessonDescTextarea", '<ul class="list-disc pl-5 flex flex-col gap-1">\n  <li>', "</li>\n</ul>", setEditLessonDesc)}
+                        className="px-2 py-1 rounded hover:bg-slate-200 text-3xs text-slate-700 cursor-pointer transition-colors"
+                        title="Lista com Marcadores"
+                      >
+                        Lista
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => insertTextAtCursor("editLessonDescTextarea", "<br />", "", setEditLessonDesc)}
+                        className="px-2 py-1 rounded hover:bg-slate-200 text-3xs text-slate-700 cursor-pointer transition-colors"
+                        title="Quebra de Linha"
+                      >
+                        Quebra ↵
+                      </button>
+                    </div>
+
+                    {/* Textarea */}
+                    <textarea
+                      id="editLessonDescTextarea"
+                      value={editLessonDesc}
+                      onChange={e => setEditLessonDesc(e.target.value)}
+                      rows={5}
+                      placeholder="Escreva a descrição, conteúdo ou links de apoio da aula utilizando HTML para formatação..."
+                      className="rounded-b-lg border-x border-b border-slate-300 p-3 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 font-mono"
+                    />
+                  </div>
+
+                  {/* Live Preview Container */}
+                  <div className="flex flex-col gap-1.5 flex-1">
+                    <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider">Visualização em Tempo Real (Aluno)</span>
+                    <div className="border border-slate-200 rounded-xl p-4 bg-slate-50 min-h-[140px] max-h-[220px] overflow-y-auto shadow-3xs prose prose-sm max-w-none">
+                      {editLessonDesc.trim() ? (
+                        <div 
+                          className="text-xs text-slate-750 font-medium leading-relaxed"
+                          dangerouslySetInnerHTML={{ __html: editLessonDesc }} 
+                        />
+                      ) : (
+                        <p className="text-xs text-slate-400 italic">Escreva acima para visualizar a renderização formatada...</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
               </div>
 
               {/* Footer */}
@@ -1464,7 +1654,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                     setIsEditingLesson(false);
                     setEditingLesson(null);
                   }}
-                  className="px-4 py-2 border border-slate-350 rounded-lg text-xs font-bold text-slate-650 hover:bg-slate-50 cursor-pointer"
+                  className="px-4 py-2 border border-slate-355 rounded-lg text-xs font-bold text-slate-650 hover:bg-slate-50 cursor-pointer"
                 >
                   Cancelar
                 </button>

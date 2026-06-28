@@ -194,7 +194,8 @@ export async function createAulaAction(
   videoUrl: string,
   demonstrative: boolean,
   imagemCapa?: string,
-  materiais?: { name: string; url: string }[]
+  materiais?: { name: string; url: string }[],
+  descricaoApoio?: string
 ) {
   try {
     const existingAulas = await db
@@ -211,6 +212,7 @@ export async function createAulaAction(
         demonstrative,
         imagemCapa: imagemCapa?.trim() || null,
         materiais: materiais || [],
+        descricaoApoio: descricaoApoio?.trim() || null,
         ordem: existingAulas.length + 1,
       })
       .returning();
@@ -265,7 +267,8 @@ export async function updateAulaAction(
   demonstrative: boolean,
   imagemCapa: string | null,
   materiais: { name: string; url: string }[] | null,
-  ativo: boolean
+  ativo: boolean,
+  descricaoApoio: string | null = null
 ) {
   try {
     const [updatedAula] = await db
@@ -277,6 +280,7 @@ export async function updateAulaAction(
         imagemCapa: imagemCapa?.trim() || null,
         materiais: materiais || [],
         ativo,
+        descricaoApoio: descricaoApoio?.trim() || null,
       })
       .where(eq(aulas.id, aulaId))
       .returning();
