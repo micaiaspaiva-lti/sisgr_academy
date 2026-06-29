@@ -2,7 +2,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { verifySSOToken } from "@/lib/auth";
 import { db } from "@/db";
-import { cursos, progressoAulas, aulas } from "@/db/schema";
+import { cursos, progressoAulas, aulas, solicitacoesVip, alunos } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { 
@@ -60,6 +60,18 @@ export default async function Dashboard() {
     redirect("/login");
   }
 
+  // Buscar informações atualizadas do aluno no banco de dados (para contornar token SSO desatualizado em cookies)
+  const dbAluno = await db.query.alunos.findFirst({
+    where: eq(alunos.id, session.id),
+  });
+
+  const currentTipo = dbAluno ? (dbAluno.tipo as "normal" | "vip") : session.tipo;
+  const updatedSession = {
+    ...session,
+    tipo: currentTipo,
+    empresaId: dbAluno?.empresaId || session.empresaId,
+  };
+
   // 1. Buscar todos os cursos ativos, módulos e aulas
   const allCourses = await db.query.cursos.findMany({
     where: eq(cursos.ativo, true),
@@ -89,6 +101,19 @@ export default async function Dashboard() {
 
   const completedSet = new Set(completedLessons.map(p => p.aulaId));
 
+  // 2.1. Buscar solicitações VIP pendentes do aluno
+  const pendingRequests = await db
+    .select({ cursoId: solicitacoesVip.cursoId })
+    .from(solicitacoesVip)
+    .where(
+      and(
+        eq(solicitacoesVip.alunoId, session.id),
+        eq(solicitacoesVip.status, "pendente")
+      )
+    );
+
+  const requestedCourseIds = new Set(pendingRequests.map(r => r.cursoId));
+
   // 3. Mapear cursos calculando progresso real
   const studentCourses = allCourses.map(course => {
     let totalLessons = 0;
@@ -112,7 +137,8 @@ export default async function Dashboard() {
     });
 
     const progresso = totalLessons > 0 ? Math.round((completedLessonsCount / totalLessons) * 100) : 0;
-    const isLocked = session.tipo === "normal" && course.tipo === "vip";
+    const isLocked = currentTipo === "normal" && course.tipo === "vip";
+    const isRequested = requestedCourseIds.has(course.id);
     
     return {
       ...course,
@@ -120,13 +146,14 @@ export default async function Dashboard() {
       totalLessons,
       completedLessonsCount,
       isLocked,
+      isRequested,
       // Aula para continuar: primeira incompleta, ou a primeira se nada concluído, ou a última se tudo concluído
       proximaAulaId: firstIncompleteLessonId || firstLessonId,
     };
   });
 
-  // Curso em andamento com maior progresso para sugerir retomada rápida
-  const activeCourse = studentCourses.find(c => c.progresso > 0 && c.progresso < 100) || studentCourses[0];
+  // Curso em andamento com maior progresso para sugerir retomada rápida (apenas se realmente iniciado)
+  const activeCourse = studentCourses.find(c => c.progresso > 0 && c.progresso < 100);
   
   // Determina a aula de retomada
   let continueLessonId = "";
@@ -216,7 +243,7 @@ export default async function Dashboard() {
         )}
 
         {/* Painel Interativo com Abas, Filtros e Busca */}
-        <DashboardClient session={session} courses={studentCourses} />
+        <DashboardClient session={updatedSession} courses={studentCourses} />
 
         {/* Banner de Dúvidas / Suporte */}
         <section className="bg-slate-100 rounded-xl p-6 border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">

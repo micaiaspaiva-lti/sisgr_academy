@@ -1,11 +1,11 @@
 "use server";
 
 import { db } from "@/db";
-import { progressoAulas, aulas, modulos, cursos, alunos, empresas } from "@/db/schema";
+import { progressoAulas, aulas, modulos, cursos, alunos, empresas, solicitacoesVip } from "@/db/schema";
 import { eq, and, asc, ne } from "drizzle-orm";
 import { addVideoToQueue } from "@/lib/queue";
 import { revalidatePath } from "next/cache";
-import { signTestToken } from "@/lib/auth";
+import { signTestToken, verifySSOToken } from "@/lib/auth";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -996,4 +996,235 @@ export async function alunoLogoutAction() {
     console.error("Erro ao remover cookie de sessão:", error);
   }
   redirect("/login");
+}
+
+// 18. Criar Solicitação de Acesso VIP
+export async function criarSolicitacaoVipAction(
+  cursoId: string,
+  empresaNome: string,
+  cnpj: string
+) {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("sso_token")?.value || "";
+    const session = verifySSOToken(token);
+
+    if (!session || !session.id) {
+      return { success: false, error: "Usuário não autenticado. Faça login para continuar." };
+    }
+
+    if (!cursoId) {
+      return { success: false, error: "ID do curso é obrigatório." };
+    }
+    if (!empresaNome.trim()) {
+      return { success: false, error: "Nome da empresa é obrigatório." };
+    }
+    if (!cnpj.trim()) {
+      return { success: false, error: "CNPJ é obrigatório para verificação." };
+    }
+
+    // Verificar se já existe uma solicitação pendente para este curso e aluno
+    const existing = await db
+      .select()
+      .from(solicitacoesVip)
+      .where(
+        and(
+          eq(solicitacoesVip.alunoId, session.id),
+          eq(solicitacoesVip.cursoId, cursoId),
+          eq(solicitacoesVip.status, "pendente")
+        )
+      )
+      .limit(1);
+
+    if (existing.length > 0) {
+      return { success: false, error: "Você já possui uma solicitação pendente para este curso." };
+    }
+
+    const [newRequest] = await db
+      .insert(solicitacoesVip)
+      .values({
+        alunoId: session.id,
+        cursoId,
+        empresaNome: empresaNome.trim(),
+        cnpj: cnpj.trim(),
+        status: "pendente",
+      })
+      .returning();
+
+    revalidatePath("/dashboard");
+    revalidatePath("/admin/alunos");
+    return { success: true, request: newRequest };
+  } catch (error: any) {
+    console.error("Erro ao criar solicitação VIP:", error);
+    return { success: false, error: `Erro ao enviar solicitação: ${error?.message || error}` };
+  }
+}
+
+// 19. Aprovar Solicitação de Acesso VIP
+export async function aprovarSolicitacaoVipAction(
+  solicitacaoId: string,
+  empresaId: string
+) {
+  try {
+    if (!solicitacaoId) return { success: false, error: "ID da solicitação é obrigatório." };
+    if (!empresaId) return { success: false, error: "Selecione uma empresa para aprovar." };
+
+    // Buscar a solicitação
+    const [solicitacao] = await db
+      .select()
+      .from(solicitacoesVip)
+      .where(eq(solicitacoesVip.id, solicitacaoId))
+      .limit(1);
+
+    if (!solicitacao) {
+      return { success: false, error: "Solicitação não encontrada." };
+    }
+
+    // Executar a transação para associar o aluno à empresa, torná-lo VIP e atualizar a solicitação
+    await db.transaction(async (tx) => {
+      // 1. Atualizar o aluno
+      await tx
+        .update(alunos)
+        .set({
+          tipo: "vip",
+          empresaId,
+        })
+        .where(eq(alunos.id, solicitacao.alunoId));
+
+      // 2. Atualizar a solicitação
+      await tx
+        .update(solicitacoesVip)
+        .set({
+          status: "aprovada",
+        })
+        .where(eq(solicitacoesVip.id, solicitacaoId));
+    });
+
+    revalidatePath("/dashboard");
+    revalidatePath("/admin/alunos");
+    revalidatePath("/admin/metricas");
+    return { success: true };
+  } catch (error: any) {
+    console.error("Erro ao aprovar solicitação VIP:", error);
+    return { success: false, error: `Falha ao aprovar solicitação: ${error?.message || error}` };
+  }
+}
+
+// 20. Rejeitar Solicitação de Acesso VIP
+export async function rejeitarSolicitacaoVipAction(solicitacaoId: string) {
+  try {
+    if (!solicitacaoId) return { success: false, error: "ID da solicitação é obrigatório." };
+
+    await db
+      .update(solicitacoesVip)
+      .set({
+        status: "rejeitada",
+      })
+      .where(eq(solicitacoesVip.id, solicitacaoId));
+
+    revalidatePath("/dashboard");
+    revalidatePath("/admin/alunos");
+    return { success: true };
+  } catch (error: any) {
+    console.error("Erro ao rejeitar solicitação VIP:", error);
+    return { success: false, error: `Falha ao rejeitar solicitação: ${error?.message || error}` };
+  }
+}
+
+// 21. Cadastrar Nova Empresa
+export async function createEmpresaAction(nomeFantasia: string, cnpj: string) {
+  try {
+    if (!nomeFantasia.trim()) return { success: false, error: "O nome fantasia é obrigatório." };
+    if (!cnpj.trim()) return { success: false, error: "O CNPJ é obrigatório." };
+
+    const formattedCnpj = cnpj.replace(/\D/g, ""); // Apenas números
+    if (formattedCnpj.length !== 14) {
+      return { success: false, error: "O CNPJ deve conter exatamente 14 dígitos." };
+    }
+
+    // Verificar se a empresa já existe pelo CNPJ
+    const existing = await db
+      .select()
+      .from(empresas)
+      .where(eq(empresas.cnpj, formattedCnpj))
+      .limit(1);
+
+    if (existing.length > 0) {
+      return { success: false, error: "Já existe uma empresa cadastrada com este CNPJ." };
+    }
+
+    const [newEmpresa] = await db
+      .insert(empresas)
+      .values({
+        nomeFantasia: nomeFantasia.trim(),
+        cnpj: formattedCnpj,
+      })
+      .returning();
+
+    revalidatePath("/admin/alunos");
+    revalidatePath("/admin/metricas");
+    return { success: true, empresa: newEmpresa };
+  } catch (error: any) {
+    console.error("Erro ao cadastrar empresa:", error);
+    return { success: false, error: `Erro ao cadastrar empresa: ${error?.message || error}` };
+  }
+}
+
+// 22. Atualizar Empresa
+export async function updateEmpresaAction(id: string, nomeFantasia: string, cnpj: string) {
+  try {
+    if (!id) return { success: false, error: "ID da empresa é obrigatório." };
+    if (!nomeFantasia.trim()) return { success: false, error: "O nome fantasia é obrigatório." };
+    if (!cnpj.trim()) return { success: false, error: "O CNPJ é obrigatório." };
+
+    const formattedCnpj = cnpj.replace(/\D/g, "");
+    if (formattedCnpj.length !== 14) {
+      return { success: false, error: "O CNPJ deve conter exatamente 14 dígitos." };
+    }
+
+    // Verificar se outra empresa já tem esse CNPJ
+    const existing = await db
+      .select()
+      .from(empresas)
+      .where(and(eq(empresas.cnpj, formattedCnpj), ne(empresas.id, id)))
+      .limit(1);
+
+    if (existing.length > 0) {
+      return { success: false, error: "Já existe outra empresa cadastrada com este CNPJ." };
+    }
+
+    const [updated] = await db
+      .update(empresas)
+      .set({
+        nomeFantasia: nomeFantasia.trim(),
+        cnpj: formattedCnpj,
+      })
+      .where(eq(empresas.id, id))
+      .returning();
+
+    revalidatePath("/admin/alunos");
+    revalidatePath("/admin/empresas");
+    revalidatePath("/admin/metricas");
+    return { success: true, empresa: updated };
+  } catch (error: any) {
+    console.error("Erro ao atualizar empresa:", error);
+    return { success: false, error: `Erro ao atualizar empresa: ${error?.message || error}` };
+  }
+}
+
+// 23. Excluir Empresa
+export async function deleteEmpresaAction(id: string) {
+  try {
+    if (!id) return { success: false, error: "ID da empresa é obrigatório." };
+
+    await db.delete(empresas).where(eq(empresas.id, id));
+
+    revalidatePath("/admin/alunos");
+    revalidatePath("/admin/empresas");
+    revalidatePath("/admin/metricas");
+    return { success: true };
+  } catch (error: any) {
+    console.error("Erro ao excluir empresa:", error);
+    return { success: false, error: `Erro ao excluir empresa: ${error?.message || error}` };
+  }
 }

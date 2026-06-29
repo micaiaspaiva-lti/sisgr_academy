@@ -441,7 +441,7 @@ export default function DemonstrativoClient({ lesson, courseTitle, lessons = [] 
                     href="/login" 
                     className="text-xs font-black text-emerald-600 hover:underline mt-2 flex items-center gap-1"
                   >
-                    Acessar área privada com SSO/Login <ChevronRight className="h-3.5 w-3.5" />
+                    Acessar Área do Aluno <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
               </div>

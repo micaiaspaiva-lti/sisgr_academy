@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { 
   ArrowLeft, Users, Clock, 
-  Award, TrendingUp, Database, RefreshCw, CheckCircle2, LogOut 
+  Award, TrendingUp, Database, RefreshCw, CheckCircle2, LogOut, Building2, BookOpen
 } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import { logoutAdminAction } from "@/lib/auth-admin";
@@ -86,6 +86,33 @@ export default function MetricasClient({ companies, metricsData }: MetricasClien
 
         {/* Cache Indicator */}
         <div className="flex items-center gap-3">
+          <Link 
+            href="/admin/cursos" 
+            className="flex items-center gap-1.5 border border-slate-300 rounded-lg px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors bg-white"
+            title="Gerenciar Cursos"
+          >
+            <BookOpen className="h-3.5 w-3.5" />
+            Cursos
+          </Link>
+
+          <Link 
+            href="/admin/alunos" 
+            className="flex items-center gap-1.5 border border-slate-300 rounded-lg px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors bg-white"
+            title="Gerenciar Alunos"
+          >
+            <Users className="h-3.5 w-3.5" />
+            Alunos
+          </Link>
+
+          <Link 
+            href="/admin/empresas" 
+            className="flex items-center gap-1.5 border border-slate-300 rounded-lg px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors bg-white"
+            title="Gerenciar Empresas"
+          >
+            <Building2 className="h-3.5 w-3.5" />
+            Empresas
+          </Link>
+
           <span className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-3xs font-bold ring-1 ring-inset ${
             cacheStatus === "hit" 
               ? "bg-emerald-50 text-emerald-700 ring-emerald-600/20" 

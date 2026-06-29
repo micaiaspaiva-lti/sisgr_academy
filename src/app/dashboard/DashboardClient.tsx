@@ -5,9 +5,11 @@ import Link from "next/link";
 import { 
   Play, BookOpen, Award, CheckCircle2, Lock, 
   Search, SlidersHorizontal, BookMarked, GraduationCap, 
-  Sparkles, ShieldAlert 
+  Sparkles, ShieldAlert, Clock
 } from "lucide-react";
 import { UserSession } from "@/lib/auth";
+import { toast } from "sonner";
+import { criarSolicitacaoVipAction } from "@/app/actions";
 
 interface Course {
   id: string;
@@ -24,6 +26,7 @@ interface Course {
   totalLessons: number;
   completedLessonsCount: number;
   isLocked: boolean;
+  isRequested?: boolean;
   proximaAulaId: string | null;
   modulos: any[];
 }
@@ -36,6 +39,57 @@ interface DashboardClientProps {
 export default function DashboardClient({ session, courses }: DashboardClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"todos" | "meus" | "disponiveis" | "vip">("todos");
+  const [localCourses, setLocalCourses] = useState<Course[]>(courses);
+
+  // Modal State for VIP Request
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [empresaNome, setEmpresaNome] = useState("");
+  const [cnpj, setCnpj] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleOpenRequestModal = (course: Course) => {
+    setSelectedCourse(course);
+    setEmpresaNome("");
+    setCnpj("");
+    setIsModalOpen(true);
+  };
+
+  const handleCloseRequestModal = () => {
+    setIsModalOpen(false);
+    setSelectedCourse(null);
+  };
+
+  const handleSubmitRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedCourse) return;
+    if (!empresaNome.trim() || !cnpj.trim()) {
+      toast.error("Por favor, preencha todos os campos.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const res = await criarSolicitacaoVipAction(selectedCourse.id, empresaNome, cnpj);
+      if (res.success) {
+        toast.success("Solicitação de acesso VIP enviada! O administrador irá validar seus dados.");
+        setLocalCourses(prev => prev.map(c => {
+          if (c.id === selectedCourse.id) {
+            return { ...c, isRequested: true };
+          }
+          return c;
+        }));
+        handleCloseRequestModal();
+      } else {
+        toast.error(res.error || "Erro ao enviar solicitação.");
+      }
+    } catch (err) {
+      toast.error("Falha ao processar solicitação.");
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Helper to resolve course image
   function getYouTubeVideoId(url: string): string | null {
@@ -68,17 +122,17 @@ export default function DashboardClient({ session, courses }: DashboardClientPro
 
   // Categories of courses for counts
   const categorizedCourses = useMemo(() => {
-    const meus = courses.filter(c => c.progresso > 0);
-    const disponiveis = courses.filter(c => c.progresso === 0 && !c.isLocked);
-    const vip = courses.filter(c => c.isLocked);
+    const meus = localCourses.filter(c => c.progresso > 0);
+    const disponiveis = localCourses.filter(c => c.progresso === 0 && !c.isLocked);
+    const vip = localCourses.filter(c => c.isLocked);
     
     return {
-      todos: courses,
+      todos: localCourses,
       meus,
       disponiveis,
       vip
     };
-  }, [courses]);
+  }, [localCourses]);
 
   // Filtered courses based on selected tab and search query
   const filteredCourses = useMemo(() => {
@@ -272,15 +326,25 @@ export default function DashboardClient({ session, courses }: DashboardClientPro
                   {/* Botões de Ação */}
                   <div className="flex gap-4 items-center border-t border-slate-200 pt-4">
                     {course.isLocked ? (
-                      <a
-                        href="https://sisgr.com.br/contato"
-                        target="_blank"
-                        className="flex-grow inline-flex items-center justify-center gap-2 rounded-xl bg-slate-150 hover:bg-slate-200 px-4 py-2.5 text-xs font-bold text-purple-750 border border-purple-200/30 transition-all text-center"
-                        title="Fale conosco para liberar o conteúdo VIP"
-                      >
-                        <Lock className="h-3.5 w-3.5 text-purple-650" />
-                        Liberar Acesso VIP
-                      </a>
+                      course.isRequested ? (
+                        <button
+                          disabled
+                          className="flex-grow inline-flex items-center justify-center gap-2 rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-400 border border-slate-200 transition-all text-center cursor-not-allowed"
+                          title="Sua solicitação de acesso VIP está pendente de análise"
+                        >
+                          <Clock className="h-3.5 w-3.5 text-slate-450" />
+                          Solicitação Pendente
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleOpenRequestModal(course)}
+                          className="flex-grow inline-flex items-center justify-center gap-2 rounded-xl bg-purple-50 hover:bg-purple-100 px-4 py-2.5 text-xs font-bold text-purple-750 border border-purple-200/55 transition-all text-center cursor-pointer"
+                          title="Fale conosco ou solicite a liberação deste curso VIP"
+                        >
+                          <Lock className="h-3.5 w-3.5 text-purple-650" />
+                          Solicitar Acesso VIP
+                        </button>
+                      )
                     ) : course.progresso === 100 ? (
                       <Link
                         href={`/api/certificados/emitir?cursoId=${course.id}`}
@@ -333,6 +397,87 @@ export default function DashboardClient({ session, courses }: DashboardClientPro
           </div>
         )}
       </div>
+
+      {/* Modal de Solicitação VIP */}
+      {isModalOpen && selectedCourse && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
+          <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-2xl flex flex-col gap-6 animate-scaleUp">
+            
+            {/* Cabeçalho */}
+            <div className="flex flex-col gap-2 text-center relative">
+              <div className="mx-auto bg-purple-50 p-3 rounded-2xl border border-purple-100 text-purple-600">
+                <Sparkles className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-black text-slate-900 tracking-tight">Solicitar Acesso VIP</h3>
+                <p className="text-3xs font-bold text-purple-600 uppercase tracking-widest mt-1">Verificação de Cliente</p>
+              </div>
+              <p className="text-xs text-slate-500 leading-relaxed font-semibold px-2 mt-1">
+                Você solicitou liberação para o curso: <br />
+                <strong className="text-slate-800">"{selectedCourse.titulo}"</strong>.
+              </p>
+            </div>
+
+            {/* Formulário */}
+            <form onSubmit={handleSubmitRequest} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-3xs font-extrabold text-slate-500 uppercase tracking-wider pl-1">Nome da Empresa</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Nome fantasia da sua empresa"
+                  value={empresaNome}
+                  onChange={(e) => setEmpresaNome(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-purple-500/50 rounded-xl py-2.5 px-4 text-xs text-slate-850 placeholder-slate-400 focus:outline-hidden focus:ring-4 focus:ring-purple-500/10 transition-all font-semibold"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-3xs font-extrabold text-slate-500 uppercase tracking-wider pl-1">CNPJ</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="00.000.000/0000-00"
+                  value={cnpj}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    const digits = val.replace(/\D/g, "");
+                    let formatted = digits;
+                    if (digits.length > 2) formatted = `${digits.slice(0, 2)}.${digits.slice(2)}`;
+                    if (digits.length > 5) formatted = `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5)}`;
+                    if (digits.length > 8) formatted = `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8)}`;
+                    if (digits.length > 12) formatted = `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8, 12)}-${digits.slice(12, 14)}`;
+                    setCnpj(formatted.slice(0, 18));
+                  }}
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-purple-500/50 rounded-xl py-2.5 px-4 text-xs text-slate-850 placeholder-slate-400 focus:outline-hidden focus:ring-4 focus:ring-purple-500/10 transition-all font-semibold"
+                />
+              </div>
+
+              <p className="text-[10px] text-slate-400 font-semibold leading-normal pl-1">
+                * Nosso administrador utilizará estas informações para verificar o contrato ativo e liberar sua conta corporativa como VIP.
+              </p>
+
+              {/* Botões */}
+              <div className="grid grid-cols-2 gap-3 mt-2">
+                <button
+                  type="button"
+                  onClick={handleCloseRequestModal}
+                  className="py-2.5 border border-slate-300 hover:bg-slate-50 text-slate-600 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs transition-all shadow-md hover:shadow-lg disabled:opacity-75 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {isSubmitting ? "Enviando..." : "Enviar Pedido"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

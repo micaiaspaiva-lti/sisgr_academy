@@ -99,11 +99,13 @@ export const alunosRelations = relations(alunos, ({ one, many }) => ({
   empresa: one(empresas, { fields: [alunos.empresaId], references: [empresas.id] }),
   progresso: many(progressoAulas),
   certificados: many(certificados),
+  solicitacoes: many(solicitacoesVip),
 }));
 
 export const cursosRelations = relations(cursos, ({ many }) => ({
   modulos: many(modulos),
   certificados: many(certificados),
+  solicitacoes: many(solicitacoesVip),
 }));
 
 export const modulosRelations = relations(modulos, ({ one, many }) => ({
@@ -124,4 +126,19 @@ export const progressoAulasRelations = relations(progressoAulas, ({ one }) => ({
 export const certificadosRelations = relations(certificados, ({ one }) => ({
   aluno: one(alunos, { fields: [certificados.alunoId], references: [alunos.id] }),
   curso: one(cursos, { fields: [certificados.cursoId], references: [cursos.id] }),
+}));
+
+export const solicitacoesVip = pgTable("solicitacoes_vip", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  alunoId: uuid("aluno_id").notNull().references(() => alunos.id, { onDelete: "cascade" }),
+  cursoId: uuid("curso_id").notNull().references(() => cursos.id, { onDelete: "cascade" }),
+  empresaNome: varchar("empresa_nome", { length: 255 }).notNull(),
+  cnpj: varchar("cnpj", { length: 20 }).notNull(),
+  status: varchar("status", { length: 20 }).default("pendente").notNull(), // 'pendente', 'aprovada', 'rejeitada'
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const solicitacoesVipRelations = relations(solicitacoesVip, ({ one }) => ({
+  aluno: one(alunos, { fields: [solicitacoesVip.alunoId], references: [alunos.id] }),
+  curso: one(cursos, { fields: [solicitacoesVip.cursoId], references: [cursos.id] }),
 }));

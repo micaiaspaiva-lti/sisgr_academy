@@ -1,8 +1,9 @@
 import { db } from "@/db";
-import { empresas } from "@/db/schema";
+import { empresas, solicitacoesVip } from "@/db/schema";
 import AlunosClient from "./AlunosClient";
 import { cookies } from "next/headers";
 import { verifySSOToken } from "@/lib/auth";
+import { eq } from "drizzle-orm";
 
 export const metadata = {
   title: "Gerenciamento de Alunos - SISGR Academy",
@@ -21,6 +22,16 @@ export default async function AdminAlunosPage() {
 
   // 2. Buscar todas as empresas para associar a alunos VIP
   const dbEmpresas = await db.select().from(empresas).orderBy(empresas.nomeFantasia);
+
+  // 2.1. Buscar todas as solicitações pendentes de acesso VIP
+  const dbSolicitacoes = await db.query.solicitacoesVip.findMany({
+    where: eq(solicitacoesVip.status, "pendente"),
+    with: {
+      aluno: true,
+      curso: true,
+    },
+    orderBy: (solicitacoes, { desc }) => [desc(solicitacoes.createdAt)],
+  });
 
   // 3. Obter sessão atual simulada
   const cookieStore = await cookies();
@@ -47,11 +58,24 @@ export default async function AdminAlunosPage() {
     nomeFantasia: e.nomeFantasia,
   }));
 
+  const mappedSolicitacoes = dbSolicitacoes.map(s => ({
+    id: s.id,
+    alunoId: s.alunoId,
+    alunoNome: s.aluno.nome,
+    alunoEmail: s.aluno.email,
+    cursoId: s.cursoId,
+    cursoTitulo: s.curso.titulo,
+    empresaNome: s.empresaNome,
+    cnpj: s.cnpj,
+    createdAt: s.createdAt.toISOString(),
+  }));
+
   return (
     <AlunosClient
       initialAlunos={mappedAlunos}
       empresas={mappedEmpresas}
       activeSessionId={activeSessionId}
+      initialSolicitacoes={mappedSolicitacoes}
     />
   );
 }

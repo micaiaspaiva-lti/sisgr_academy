@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { aulas, modulos, cursos, progressoAulas } from "@/db/schema";
+import { aulas, modulos, cursos, progressoAulas, alunos } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { verifySSOToken } from "@/lib/auth";
@@ -75,6 +75,20 @@ export default async function PlayerPage({ params }: PageProps) {
     redirect("/login");
   }
 
+  // Buscar informações atualizadas do aluno no banco de dados para segurança
+  let currentTipo: "normal" | "vip" = "normal";
+  if (session) {
+    const dbAluno = await db.query.alunos.findFirst({
+      where: eq(alunos.id, session.id),
+    });
+    currentTipo = dbAluno ? (dbAluno.tipo as "normal" | "vip") : session.tipo;
+  }
+
+  // Se o curso for VIP e a aula não for demonstrativa, apenas alunos VIP podem assistir
+  if (session && currentCourse.tipo === "vip" && !currentLesson.demonstrative && currentTipo !== "vip") {
+    redirect("/dashboard");
+  }
+
   // 6. Fetch student completed lessons (only if session exists)
   const completedLessons = session
     ? await db
@@ -145,7 +159,7 @@ export default async function PlayerPage({ params }: PageProps) {
       currentModule={mappedModule}
       completedLessonIds={completedLessonIds}
       studentId={session?.id || ""}
-      studentTipo={session?.tipo || "normal"}
+      studentTipo={currentTipo}
     />
   );
 }
