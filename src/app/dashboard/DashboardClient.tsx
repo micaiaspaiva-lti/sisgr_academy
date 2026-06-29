@@ -5,11 +5,11 @@ import Link from "next/link";
 import { 
   Play, BookOpen, Award, CheckCircle2, Lock, 
   Search, SlidersHorizontal, BookMarked, GraduationCap, 
-  Sparkles, ShieldAlert, Clock
+  Sparkles, ShieldAlert, Clock, MessageSquare, HelpCircle, X, ChevronDown, ChevronUp, Check
 } from "lucide-react";
 import { UserSession } from "@/lib/auth";
 import { toast } from "sonner";
-import { criarSolicitacaoVipAction } from "@/app/actions";
+import { criarSolicitacaoVipAction, criarChamadoAction } from "@/app/actions";
 
 interface Course {
   id: string;
@@ -31,12 +31,23 @@ interface Course {
   modulos: any[];
 }
 
+interface Chamado {
+  id: string;
+  assunto: string;
+  mensagem: string;
+  status: "aberto" | "respondido" | "fechado";
+  resposta: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface DashboardClientProps {
   session: UserSession;
   courses: Course[];
+  initialChamados?: Chamado[];
 }
 
-export default function DashboardClient({ session, courses }: DashboardClientProps) {
+export default function DashboardClient({ session, courses, initialChamados = [] }: DashboardClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"todos" | "meus" | "disponiveis" | "vip">("todos");
   const [localCourses, setLocalCourses] = useState<Course[]>(courses);
@@ -47,6 +58,49 @@ export default function DashboardClient({ session, courses }: DashboardClientPro
   const [empresaNome, setEmpresaNome] = useState("");
   const [cnpj, setCnpj] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Support Tickets States
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
+  const [chamadosList, setChamadosList] = useState<Chamado[]>(initialChamados);
+  const [supportAssunto, setSupportAssunto] = useState("");
+  const [supportMensagem, setSupportMensagem] = useState("");
+  const [isSupportSubmitting, setIsSupportSubmitting] = useState(false);
+  const [expandedChamadoId, setExpandedChamadoId] = useState<string | null>(null);
+
+  const handleSupportSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!supportAssunto.trim() || !supportMensagem.trim()) {
+      toast.error("Por favor, preencha todos os campos.");
+      return;
+    }
+
+    setIsSupportSubmitting(true);
+    try {
+      const res = await criarChamadoAction(supportAssunto, supportMensagem);
+      if (res.success && res.chamado) {
+        toast.success("Chamado aberto com sucesso! Nosso time responderá em breve.");
+        const newTicket: Chamado = {
+          id: res.chamado.id,
+          assunto: res.chamado.assunto,
+          mensagem: res.chamado.mensagem,
+          status: res.chamado.status as "aberto" | "respondido" | "fechado",
+          resposta: res.chamado.resposta || "",
+          createdAt: res.chamado.createdAt.toISOString(),
+          updatedAt: res.chamado.updatedAt.toISOString(),
+        };
+        setChamadosList(prev => [newTicket, ...prev]);
+        setSupportAssunto("");
+        setSupportMensagem("");
+      } else {
+        toast.error(res.error || "Erro ao abrir chamado.");
+      }
+    } catch (err) {
+      toast.error("Falha ao enviar chamado.");
+      console.error(err);
+    } finally {
+      setIsSupportSubmitting(false);
+    }
+  };
 
   const handleOpenRequestModal = (course: Course) => {
     setSelectedCourse(course);
@@ -475,6 +529,183 @@ export default function DashboardClient({ session, courses }: DashboardClientPro
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Banner de Dúvidas / Suporte */}
+      <section className="bg-slate-100 rounded-xl p-6 border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 mt-8">
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-white text-slate-650 rounded-lg shadow-xs">
+            <MessageSquare className="h-6 w-6 text-purple-600" />
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <h4 className="font-bold text-sm text-slate-800">Precisando de suporte no SISGR Academy?</h4>
+            <p className="text-xs text-slate-500">
+              Nosso suporte está disponível de segunda a sexta, das 8h às 18h.
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsSupportModalOpen(true)}
+          className="rounded-lg border border-slate-350 bg-white px-4 py-2 text-xs font-semibold text-slate-705 hover:bg-slate-50 transition-colors shadow-3xs cursor-pointer"
+        >
+          Abrir Chamado
+        </button>
+      </section>
+
+      {/* Modal de Suporte Técnico */}
+      {isSupportModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl max-w-4xl w-full p-6 md:p-8 border border-slate-200 shadow-2xl flex flex-col gap-6 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-hidden">
+            
+            {/* Cabeçalho */}
+            <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-2">
+                <div className="p-2 bg-purple-50 text-purple-650 rounded-xl border border-purple-100">
+                  <HelpCircle className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="text-base font-black text-slate-900 leading-tight">Suporte Técnico</h2>
+                  <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">SISGR Academy</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsSupportModalOpen(false)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all cursor-pointer"
+                title="Fechar"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Grid de Conteúdo */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-hidden flex-1">
+              
+              {/* Lado Esquerdo: Formulário */}
+              <div className="flex flex-col gap-4 overflow-y-auto pr-1">
+                <div className="flex flex-col gap-0.5">
+                  <h3 className="font-extrabold text-xs text-slate-800">Abrir Novo Chamado</h3>
+                  <p className="text-[10px] text-slate-400 font-semibold leading-normal">
+                    Descreva sua dúvida, problema ou solicitação. Retornaremos o contato em breve.
+                  </p>
+                </div>
+
+                <form onSubmit={handleSupportSubmit} className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-3xs font-extrabold text-slate-400 uppercase tracking-wider pl-1">Assunto / Tópico</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Ex: Dúvida sobre certificado, Problema no vídeo..."
+                      value={supportAssunto}
+                      onChange={(e) => setSupportAssunto(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-205 focus:border-purple-500/50 rounded-xl py-2.5 px-4 text-xs text-slate-850 placeholder-slate-400 focus:outline-hidden"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-3xs font-extrabold text-slate-400 uppercase tracking-wider pl-1">Sua Mensagem</label>
+                    <textarea
+                      required
+                      rows={4}
+                      placeholder="Descreva detalhadamente o que precisa..."
+                      value={supportMensagem}
+                      onChange={(e) => setSupportMensagem(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-205 focus:border-purple-500/50 rounded-xl py-2.5 px-4 text-xs text-slate-850 placeholder-slate-400 focus:outline-hidden"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSupportSubmitting}
+                    className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-all shadow-md hover:shadow-lg disabled:opacity-75 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    {isSupportSubmitting ? "Enviando..." : "Enviar Chamado"}
+                  </button>
+                </form>
+              </div>
+
+              {/* Lado Direito: Histórico */}
+              <div className="flex flex-col gap-4 overflow-y-auto pl-1 border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-6 max-h-[45vh] md:max-h-none">
+                <div className="flex justify-between items-center shrink-0">
+                  <h3 className="font-extrabold text-xs text-slate-800">Seus Chamados Anteriores</h3>
+                  <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-bold">
+                    {chamadosList.length}
+                  </span>
+                </div>
+
+                <div className="flex flex-col gap-3 flex-1 overflow-y-auto pr-1">
+                  {chamadosList.length > 0 ? (
+                    chamadosList.map((c) => {
+                      const isExpanded = expandedChamadoId === c.id;
+                      return (
+                        <div key={c.id} className="border border-slate-150 rounded-2xl overflow-hidden shadow-3xs bg-slate-50/20">
+                          {/* Header Accordion */}
+                          <button
+                            type="button"
+                            onClick={() => setExpandedChamadoId(isExpanded ? null : c.id)}
+                            className="w-full text-left p-3.5 flex items-center justify-between gap-3 hover:bg-slate-50 transition-colors font-semibold cursor-pointer"
+                          >
+                            <div className="flex flex-col gap-1 min-w-0">
+                              <span className="text-xs font-extrabold text-slate-800 truncate">{c.assunto}</span>
+                              <span className="text-[10px] text-slate-400">
+                                {new Date(c.createdAt).toLocaleDateString("pt-BR")}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider ${
+                                c.status === "aberto"
+                                  ? "bg-amber-100 text-amber-800"
+                                  : c.status === "respondido"
+                                  ? "bg-emerald-100 text-emerald-800"
+                                  : "bg-slate-200 text-slate-700"
+                              }`}>
+                                {c.status}
+                              </span>
+                              {isExpanded ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+                            </div>
+                          </button>
+
+                          {/* Content Accordion */}
+                          {isExpanded && (
+                            <div className="p-4 bg-white border-t border-slate-100 flex flex-col gap-3 text-3xs font-semibold leading-relaxed text-slate-655">
+                              <div className="flex flex-col gap-1 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Sua Mensagem:</span>
+                                <p className="text-slate-700 whitespace-pre-wrap">{c.mensagem}</p>
+                              </div>
+                              
+                              {c.resposta ? (
+                                <div className="flex flex-col gap-1 bg-emerald-50/20 p-2.5 rounded-xl border border-emerald-100">
+                                  <span className="text-[9px] font-black text-emerald-700 uppercase tracking-wider flex items-center gap-1">
+                                    <Check className="h-3 w-3" />
+                                    Resposta do Suporte:
+                                  </span>
+                                  <p className="text-slate-700 whitespace-pre-wrap">{c.resposta}</p>
+                                </div>
+                              ) : (
+                                <div className="text-[9px] text-slate-400 font-medium italic pl-1 flex items-center gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  Aguardando resposta do suporte...
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="flex flex-col items-center justify-center p-8 text-center text-slate-400 font-medium italic border border-dashed border-slate-200 rounded-2xl bg-slate-50/30">
+                      Nenhum chamado aberto ainda.
+                    </div>
+                  )}
+                </div>
+
+              </div>
+
+            </div>
+
           </div>
         </div>
       )}

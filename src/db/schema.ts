@@ -100,6 +100,7 @@ export const alunosRelations = relations(alunos, ({ one, many }) => ({
   progresso: many(progressoAulas),
   certificados: many(certificados),
   solicitacoes: many(solicitacoesVip),
+  chamados: many(chamados),
 }));
 
 export const cursosRelations = relations(cursos, ({ many }) => ({
@@ -141,4 +142,19 @@ export const solicitacoesVip = pgTable("solicitacoes_vip", {
 export const solicitacoesVipRelations = relations(solicitacoesVip, ({ one }) => ({
   aluno: one(alunos, { fields: [solicitacoesVip.alunoId], references: [alunos.id] }),
   curso: one(cursos, { fields: [solicitacoesVip.cursoId], references: [cursos.id] }),
+}));
+
+export const chamados = pgTable("chamados", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  alunoId: uuid("aluno_id").notNull().references(() => alunos.id, { onDelete: "cascade" }),
+  assunto: varchar("assunto", { length: 255 }).notNull(),
+  mensagem: varchar("mensagem", { length: 2000 }).notNull(),
+  status: varchar("status", { length: 20 }).default("aberto").notNull(), // 'aberto', 'respondido', 'fechado'
+  resposta: varchar("resposta", { length: 2000 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const chamadosRelations = relations(chamados, ({ one }) => ({
+  aluno: one(alunos, { fields: [chamados.alunoId], references: [alunos.id] }),
 }));

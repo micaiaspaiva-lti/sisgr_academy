@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { progressoAulas, aulas, modulos, cursos, alunos, empresas, solicitacoesVip } from "@/db/schema";
+import { progressoAulas, aulas, modulos, cursos, alunos, empresas, solicitacoesVip, chamados } from "@/db/schema";
 import { eq, and, asc, ne } from "drizzle-orm";
 import { addVideoToQueue } from "@/lib/queue";
 import { revalidatePath } from "next/cache";
@@ -1226,5 +1226,87 @@ export async function deleteEmpresaAction(id: string) {
   } catch (error: any) {
     console.error("Erro ao excluir empresa:", error);
     return { success: false, error: `Erro ao excluir empresa: ${error?.message || error}` };
+  }
+}
+
+// 24. Criar Chamado de Suporte (Aluno)
+export async function criarChamadoAction(assunto: string, mensagem: string) {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("sso_token")?.value || "";
+    const session = verifySSOToken(token);
+
+    if (!session) {
+      return { success: false, error: "Usuário não autenticado." };
+    }
+
+    if (!assunto.trim() || !mensagem.trim()) {
+      return { success: false, error: "Assunto e mensagem são obrigatórios." };
+    }
+
+    const [newChamado] = await db
+      .insert(chamados)
+      .values({
+        alunoId: session.id,
+        assunto: assunto.trim(),
+        mensagem: mensagem.trim(),
+        status: "aberto",
+      })
+      .returning();
+
+    revalidatePath("/dashboard");
+    revalidatePath("/admin/suporte");
+    return { success: true, chamado: newChamado };
+  } catch (error: any) {
+    console.error("Erro ao criar chamado:", error);
+    return { success: false, error: `Erro ao criar chamado: ${error?.message || error}` };
+  }
+}
+
+// 25. Responder Chamado (Admin)
+export async function responderChamadoAction(chamadoId: string, resposta: string) {
+  try {
+    if (!chamadoId) return { success: false, error: "ID do chamado é obrigatório." };
+    if (!resposta.trim()) return { success: false, error: "A resposta é obrigatória." };
+
+    const [updated] = await db
+      .update(chamados)
+      .set({
+        resposta: resposta.trim(),
+        status: "respondido",
+        updatedAt: new Date(),
+      })
+      .where(eq(chamados.id, chamadoId))
+      .returning();
+
+    revalidatePath("/dashboard");
+    revalidatePath("/admin/suporte");
+    return { success: true, chamado: updated };
+  } catch (error: any) {
+    console.error("Erro ao responder chamado:", error);
+    return { success: false, error: `Erro ao responder chamado: ${error?.message || error}` };
+  }
+}
+
+// 26. Fechar Chamado (Admin)
+export async function fecharChamadoAction(chamadoId: string) {
+  try {
+    if (!chamadoId) return { success: false, error: "ID do chamado é obrigatório." };
+
+    const [updated] = await db
+      .update(chamados)
+      .set({
+        status: "fechado",
+        updatedAt: new Date(),
+      })
+      .where(eq(chamados.id, chamadoId))
+      .returning();
+
+    revalidatePath("/dashboard");
+    revalidatePath("/admin/suporte");
+    return { success: true, chamado: updated };
+  } catch (error: any) {
+    console.error("Erro ao fechar chamado:", error);
+    return { success: false, error: `Erro ao fechar chamado: ${error?.message || error}` };
   }
 }

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { verifySSOToken } from "@/lib/auth";
 import { db } from "@/db";
-import { cursos, progressoAulas, aulas, solicitacoesVip, alunos } from "@/db/schema";
+import { cursos, progressoAulas, aulas, solicitacoesVip, alunos, chamados } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { 
@@ -113,6 +113,22 @@ export default async function Dashboard() {
     );
 
   const requestedCourseIds = new Set(pendingRequests.map(r => r.cursoId));
+
+  // 2.2. Buscar chamados de suporte abertos por este aluno
+  const dbChamados = await db.query.chamados.findMany({
+    where: eq(chamados.alunoId, session.id),
+    orderBy: (chamados, { desc }) => [desc(chamados.createdAt)],
+  });
+
+  const studentChamados = dbChamados.map(c => ({
+    id: c.id,
+    assunto: c.assunto,
+    mensagem: c.mensagem,
+    status: c.status as "aberto" | "respondido" | "fechado",
+    resposta: c.resposta || "",
+    createdAt: c.createdAt.toISOString(),
+    updatedAt: c.updatedAt.toISOString(),
+  }));
 
   // 3. Mapear cursos calculando progresso real
   const studentCourses = allCourses.map(course => {
@@ -242,30 +258,8 @@ export default async function Dashboard() {
           </section>
         )}
 
-        {/* Painel Interativo com Abas, Filtros e Busca */}
-        <DashboardClient session={updatedSession} courses={studentCourses} />
-
-        {/* Banner de Dúvidas / Suporte */}
-        <section className="bg-slate-100 rounded-xl p-6 border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-white text-slate-600 rounded-lg shadow-xs">
-              <Sparkles className="h-6 w-6 text-purple-600" />
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <h4 className="font-bold text-sm text-slate-800">Precisando de suporte nos processos do ERP SISGR?</h4>
-              <p className="text-xs text-slate-500">
-                Nosso suporte está disponível de segunda a sexta, das 8h às 18h.
-              </p>
-            </div>
-          </div>
-          <a
-            href="https://sisgr.com.br/suporte"
-            target="_blank"
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
-          >
-            Abrir Chamado
-          </a>
-        </section>
+        {/* Painel Interativo com Abas, Filtros e Busca (com suporte integrado) */}
+        <DashboardClient session={updatedSession} courses={studentCourses} initialChamados={studentChamados} />
 
       </main>
     </div>

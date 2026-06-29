@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { 
   ArrowLeft, Users, Clock, 
-  Award, TrendingUp, Database, RefreshCw, CheckCircle2, LogOut, Building2, BookOpen
+  Award, TrendingUp, Database, RefreshCw, CheckCircle2, LogOut, Building2, BookOpen, MessageSquare
 } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import { logoutAdminAction } from "@/lib/auth-admin";
@@ -111,6 +111,15 @@ export default function MetricasClient({ companies, metricsData }: MetricasClien
           >
             <Building2 className="h-3.5 w-3.5" />
             Empresas
+          </Link>
+
+          <Link 
+            href="/admin/suporte" 
+            className="flex items-center gap-1.5 border border-slate-300 rounded-lg px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors bg-white"
+            title="Suporte Técnico"
+          >
+            <MessageSquare className="h-3.5 w-3.5" />
+            Suporte
           </Link>
 
           <span className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-3xs font-bold ring-1 ring-inset ${
