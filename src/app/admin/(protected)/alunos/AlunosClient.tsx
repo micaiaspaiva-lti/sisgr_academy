@@ -17,11 +17,13 @@ import {
   Shield,
   Sparkles,
   BarChart3,
-  Key
+  Key,
+  Pencil
 } from "lucide-react";
 import { toast } from "sonner";
 import { 
   createAlunoAction, 
+  updateAlunoAction,
   deleteAlunoAction, 
   simularSessaoAlunoAction, 
   limparSessaoSimuladaAction 
@@ -56,6 +58,7 @@ export default function AlunosClient({ initialAlunos, empresas, activeSessionId 
   const [alunosList, setAlunosList] = useState<Aluno[]>(initialAlunos);
   const [search, setSearch] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingAlunoId, setEditingAlunoId] = useState<string | null>(null);
 
   // Form State
   const [nome, setNome] = useState("");
@@ -64,6 +67,28 @@ export default function AlunosClient({ initialAlunos, empresas, activeSessionId 
   const [tipo, setTipo] = useState<"normal" | "vip">("normal");
   const [empresaId, setEmpresaId] = useState("");
   const [senha, setSenha] = useState("");
+
+  // Funções de Edição
+  const handleEditClick = (aluno: Aluno) => {
+    setEditingAlunoId(aluno.id);
+    setNome(aluno.nome);
+    setEmail(aluno.email);
+    setTelefone(aluno.telefone);
+    setTipo(aluno.tipo);
+    setEmpresaId(aluno.empresa?.id || "");
+    setSenha(""); // Deixa vazio; só altera a senha se preenchido
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingAlunoId(null);
+    setNome("");
+    setEmail("");
+    setTelefone("");
+    setTipo("normal");
+    setEmpresaId("");
+    setSenha("");
+  };
 
   // Formatação de telefone em tempo real
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,44 +126,83 @@ export default function AlunosClient({ initialAlunos, empresas, activeSessionId 
 
     setIsSubmitting(true);
     try {
-      const res = await createAlunoAction(
-        nome, 
-        email, 
-        telefone, 
-        tipo, 
-        tipo === "vip" ? empresaId : null,
-        senha.trim() ? senha : undefined
-      );
-      if (res.success && res.aluno) {
-        const empresaObj = tipo === "vip" 
-          ? empresas.find(e => e.id === empresaId) || null 
-          : null;
+      if (editingAlunoId) {
+        // Modo Edição
+        const res = await updateAlunoAction(
+          editingAlunoId,
+          nome,
+          email,
+          telefone,
+          tipo,
+          tipo === "vip" ? empresaId : null,
+          senha.trim() ? senha : undefined
+        );
 
-        const newAluno: Aluno = {
-          id: res.aluno.id,
-          nome: res.aluno.nome,
-          email: res.aluno.email,
-          telefone: res.aluno.telefone || "",
-          tipo: (res.aluno.tipo || "normal") as "normal" | "vip",
-          createdAt: res.aluno.createdAt.toISOString(),
-          empresa: empresaObj ? { id: empresaObj.id, nomeFantasia: empresaObj.nomeFantasia } : null
-        };
+        if (res.success && res.aluno) {
+          const empresaObj = tipo === "vip" 
+            ? empresas.find(e => e.id === empresaId) || null 
+            : null;
 
-        setAlunosList(prev => [newAluno, ...prev]);
-        toast.success("Aluno cadastrado com sucesso!");
-        
-        // Limpa formulário
-        setNome("");
-        setEmail("");
-        setTelefone("");
-        setTipo("normal");
-        setEmpresaId("");
-        setSenha("");
+          setAlunosList(prev => prev.map(a => {
+            if (a.id === editingAlunoId) {
+              return {
+                ...a,
+                nome: res.aluno.nome,
+                email: res.aluno.email,
+                telefone: res.aluno.telefone || "",
+                tipo: (res.aluno.tipo || "normal") as "normal" | "vip",
+                empresa: empresaObj ? { id: empresaObj.id, nomeFantasia: empresaObj.nomeFantasia } : null
+              };
+            }
+            return a;
+          }));
+
+          toast.success("Aluno atualizado com sucesso!");
+          handleCancelEdit();
+        } else {
+          toast.error(res.error || "Erro ao atualizar aluno.");
+        }
       } else {
-        toast.error(res.error || "Erro ao cadastrar aluno.");
+        // Modo Cadastro
+        const res = await createAlunoAction(
+          nome, 
+          email, 
+          telefone, 
+          tipo, 
+          tipo === "vip" ? empresaId : null,
+          senha.trim() ? senha : undefined
+        );
+        if (res.success && res.aluno) {
+          const empresaObj = tipo === "vip" 
+            ? empresas.find(e => e.id === empresaId) || null 
+            : null;
+
+          const newAluno: Aluno = {
+            id: res.aluno.id,
+            nome: res.aluno.nome,
+            email: res.aluno.email,
+            telefone: res.aluno.telefone || "",
+            tipo: (res.aluno.tipo || "normal") as "normal" | "vip",
+            createdAt: res.aluno.createdAt.toISOString(),
+            empresa: empresaObj ? { id: empresaObj.id, nomeFantasia: empresaObj.nomeFantasia } : null
+          };
+
+          setAlunosList(prev => [newAluno, ...prev]);
+          toast.success("Aluno cadastrado com sucesso!");
+          
+          // Limpa formulário
+          setNome("");
+          setEmail("");
+          setTelefone("");
+          setTipo("normal");
+          setEmpresaId("");
+          setSenha("");
+        } else {
+          toast.error(res.error || "Erro ao cadastrar aluno.");
+        }
       }
     } catch (err) {
-      toast.error("Ocorreu uma falha ao cadastrar.");
+      toast.error("Ocorreu uma falha no processamento.");
       console.error(err);
     } finally {
       setIsSubmitting(false);
@@ -394,6 +458,14 @@ export default function AlunosClient({ initialAlunos, empresas, activeSessionId 
                               </button>
 
                               <button
+                                onClick={() => handleEditClick(aluno)}
+                                className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-400 hover:text-emerald-600 hover:border-slate-350 transition-colors cursor-pointer"
+                                title="Editar aluno"
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                              </button>
+
+                              <button
                                 onClick={() => handleDeleteAluno(aluno.id)}
                                 className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-red-50 text-slate-400 hover:text-red-600 hover:border-red-100 transition-colors cursor-pointer"
                                 title="Excluir aluno"
@@ -423,7 +495,9 @@ export default function AlunosClient({ initialAlunos, empresas, activeSessionId 
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col gap-5 sticky top-24">
             <div className="flex flex-col gap-1.5">
               <span className="text-3xs font-extrabold text-emerald-600 uppercase tracking-wider">Ações Administrativas</span>
-              <h2 className="font-extrabold text-slate-800 text-sm">Cadastrar Novo Aluno</h2>
+              <h2 className="font-extrabold text-slate-800 text-sm">
+                {editingAlunoId ? "Editar Aluno" : "Cadastrar Novo Aluno"}
+              </h2>
             </div>
 
             <form onSubmit={handleCreateAluno} className="flex flex-col gap-4">
@@ -543,14 +617,28 @@ export default function AlunosClient({ initialAlunos, empresas, activeSessionId 
               )}
 
               {/* Botão de Envio */}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="mt-2 w-full py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition-colors flex items-center justify-center gap-1 shadow-sm disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
-              >
-                <Plus className="h-4 w-4" />
-                {isSubmitting ? "Cadastrando..." : "Cadastrar Aluno"}
-              </button>
+              <div className="flex flex-col gap-2 mt-2">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition-colors flex items-center justify-center gap-1 shadow-sm disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {editingAlunoId ? <UserCheck className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                  {isSubmitting 
+                    ? (editingAlunoId ? "Salvando..." : "Cadastrando...") 
+                    : (editingAlunoId ? "Salvar Alterações" : "Cadastrar Aluno")}
+                </button>
+                
+                {editingAlunoId && (
+                  <button
+                    type="button"
+                    onClick={handleCancelEdit}
+                    className="w-full py-2 border border-slate-300 hover:border-slate-405 text-slate-600 hover:bg-slate-50 transition-colors rounded-xl text-xs font-bold flex items-center justify-center gap-1 cursor-pointer"
+                  >
+                    Cancelar Edição
+                  </button>
+                )}
+              </div>
             </form>
           </div>
         </aside>

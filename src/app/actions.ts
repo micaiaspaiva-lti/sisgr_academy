@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { progressoAulas, aulas, modulos, cursos, alunos, empresas } from "@/db/schema";
-import { eq, and, asc } from "drizzle-orm";
+import { eq, and, asc, ne } from "drizzle-orm";
 import { addVideoToQueue } from "@/lib/queue";
 import { revalidatePath } from "next/cache";
 import { signTestToken } from "@/lib/auth";
@@ -310,7 +310,6 @@ export async function updateAulaAction(
 }
 
 // 8. Limpar o banco de dados (remover cursos, módulos, aulas, progresso e alunos adicionais)
-import { ne } from "drizzle-orm";
 export async function clearDatabaseAction() {
   try {
     await db.delete(progressoAulas);
@@ -565,6 +564,67 @@ export async function createAlunoAction(
   }
 }
 
+// 10.1. Editar Aluno com validações (telefone obrigatório e e-mail único exceto próprio aluno)
+export async function updateAlunoAction(
+  id: string,
+  nome: string,
+  email: string,
+  telefone: string,
+  tipo: "normal" | "vip",
+  empresaId?: string | null,
+  senha?: string
+) {
+  try {
+    if (!id) return { success: false, error: "ID do aluno é obrigatório para atualização." };
+    if (!nome.trim()) return { success: false, error: "O campo Nome é obrigatório." };
+    if (!email.trim()) return { success: false, error: "O campo E-mail é obrigatório." };
+    if (!telefone.trim()) return { success: false, error: "O campo Telefone é obrigatório." };
+
+    const formattedEmail = email.trim().toLowerCase();
+
+    // Validar e-mail único excluindo o próprio aluno
+    const existing = await db
+      .select()
+      .from(alunos)
+      .where(and(eq(alunos.email, formattedEmail), ne(alunos.id, id)))
+      .limit(1);
+
+    if (existing.length > 0) {
+      return { success: false, error: "Este e-mail já está cadastrado em outro aluno." };
+    }
+
+    if (tipo === "vip" && !empresaId) {
+      return { success: false, error: "Um aluno VIP precisa estar associado a uma empresa." };
+    }
+
+    const updateData: any = {
+      nome: nome.trim(),
+      email: formattedEmail,
+      telefone: telefone.trim(),
+      tipo,
+      empresaId: tipo === "vip" ? empresaId : null,
+      updatedAt: new Date(),
+    };
+
+    if (senha && senha.trim()) {
+      updateData.senha = senha.trim();
+    }
+
+    const [updatedAluno] = await db
+      .update(alunos)
+      .set(updateData)
+      .where(eq(alunos.id, id))
+      .returning();
+
+    revalidatePath("/admin/alunos");
+    revalidatePath("/admin/metricas");
+    return { success: true, aluno: updatedAluno };
+  } catch (error) {
+    console.error("Erro ao atualizar aluno:", error);
+    return { success: false, error: "Falha ao atualizar aluno no banco de dados." };
+  }
+}
+
 // 11. Excluir Aluno (preservando o aluno padrão do SSO)
 export async function deleteAlunoAction(id: string) {
   try {
@@ -808,29 +868,33 @@ export async function alunoRegisterAction(
       return { success: false, error: "Este e-mail já está cadastrado. Vá na aba 'Entrar' e acesse." };
     }
 
-    const [newAluno] = await db
-      .insert(alunos)
-      .values({
-        nome: nome.trim(),
-        email: formattedEmail,
-        senha: senhaInserida.trim(),
-        telefone: telefone?.trim() || null,
-        tipo: "normal", // Entra como aluno normal por padrão
-      })
-      .returning();
+    const result = await db.transaction(async (tx) => {
+      const [newAluno] = await tx
+        .insert(alunos)
+        .values({
+          nome: nome.trim(),
+          email: formattedEmail,
+          senha: senhaInserida.trim(),
+          telefone: telefone?.trim() || null,
+          tipo: "normal", // Entra como aluno normal por padrão
+        })
+        .returning();
 
-    // Gerar token de sessão e efetuar login automático
-    const token = signTestToken({
-      sub: newAluno.id,
-      nome: newAluno.nome,
-      email: newAluno.email,
-      empresaId: newAluno.empresaId || undefined,
-      tipo: newAluno.tipo || "normal",
-      role: "aluno",
+      // Gerar token de sessão e efetuar login automático
+      const token = signTestToken({
+        sub: newAluno.id,
+        nome: newAluno.nome,
+        email: newAluno.email,
+        empresaId: newAluno.empresaId || undefined,
+        tipo: newAluno.tipo || "normal",
+        role: "aluno",
+      });
+
+      return { newAluno, token };
     });
 
     const cookieStore = await cookies();
-    cookieStore.set("sso_token", token, {
+    cookieStore.set("sso_token", result.token, {
       maxAge: 30 * 24 * 60 * 60, // 30 dias
       path: "/",
       httpOnly: true,
@@ -886,25 +950,29 @@ export async function alunoResetPasswordAction(
       return { success: false, error: "O número de telefone não corresponde ao e-mail informado." };
     }
 
-    // 3. Atualizar a senha
-    const [updatedAluno] = await db
-      .update(alunos)
-      .set({ senha: novaSenhaInserida.trim() })
-      .where(eq(alunos.id, aluno.id))
-      .returning();
+    // 3. Atualizar a senha e assinar o token na mesma transação
+    const result = await db.transaction(async (tx) => {
+      const [updatedAluno] = await tx
+        .update(alunos)
+        .set({ senha: novaSenhaInserida.trim() })
+        .where(eq(alunos.id, aluno.id))
+        .returning();
 
-    // 4. Logar automaticamente
-    const token = signTestToken({
-      sub: updatedAluno.id,
-      nome: updatedAluno.nome,
-      email: updatedAluno.email,
-      empresaId: updatedAluno.empresaId || undefined,
-      tipo: updatedAluno.tipo || "normal",
-      role: "aluno",
+      // 4. Logar automaticamente
+      const token = signTestToken({
+        sub: updatedAluno.id,
+        nome: updatedAluno.nome,
+        email: updatedAluno.email,
+        empresaId: updatedAluno.empresaId || undefined,
+        tipo: updatedAluno.tipo || "normal",
+        role: "aluno",
+      });
+
+      return { updatedAluno, token };
     });
 
     const cookieStore = await cookies();
-    cookieStore.set("sso_token", token, {
+    cookieStore.set("sso_token", result.token, {
       maxAge: 30 * 24 * 60 * 60, // 30 dias
       path: "/",
       httpOnly: true,
