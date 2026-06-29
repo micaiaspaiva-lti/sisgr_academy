@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { 
   ChevronRight, Play, CheckCircle2, Lock, 
-  Menu, X, Maximize2, Minimize2, BookOpen, MessageSquare, 
+  Menu, X, Maximize2, Minimize2, BookOpen, 
   Download, ArrowLeft, ArrowRight, Award, CheckCircle 
 } from "lucide-react";
 import { toast } from "sonner";
@@ -73,7 +73,7 @@ export default function PlayerClient({
   // Estados locais
   const [cinemaMode, setCinemaMode] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"apoio" | "forum" | "downloads">("apoio");
+  const [activeTab, setActiveTab] = useState<"apoio" | "downloads">("apoio");
   
   // Lista de ID de aulas concluídas (estado base local)
   const [concluidas, setConcluidas] = useState<string[]>(completedLessonIds);
@@ -257,17 +257,6 @@ export default function PlayerClient({
                   Conteúdo de Apoio
                 </button>
                 <button
-                  onClick={() => setActiveTab("forum")}
-                  className={`flex items-center gap-2 border-b-2 py-3 px-6 text-sm font-semibold transition-all -mb-px cursor-pointer ${
-                    activeTab === "forum"
-                      ? "border-emerald-600 text-emerald-600"
-                      : "border-transparent text-slate-500 hover:text-slate-800"
-                  }`}
-                >
-                  <MessageSquare className="h-4 w-4" />
-                  Fórum de Dúvidas
-                </button>
-                <button
                   onClick={() => setActiveTab("downloads")}
                   className={`flex items-center gap-2 border-b-2 py-3 px-6 text-sm font-semibold transition-all -mb-px cursor-pointer ${
                     activeTab === "downloads"
@@ -292,34 +281,7 @@ export default function PlayerClient({
                     ) : (
                       <p className="text-slate-400 italic">Nenhum texto de apoio cadastrado para esta aula.</p>
                     )}
-                  </div>
-                )}
-
-                {activeTab === "forum" && (
-                  <div className="flex flex-col gap-6 text-sm">
-                    <div className="border border-slate-200 rounded-xl p-4 flex gap-4 bg-slate-50">
-                      <div className="h-8 w-8 rounded-full bg-slate-400 text-white flex items-center justify-center font-bold shrink-0">J</div>
-                      <div className="flex flex-col gap-1.5 text-left">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-slate-800">Júlio Martins</span>
-                          <span className="text-xs text-slate-400">há 2 dias</span>
-                        </div>
-                        <p className="text-slate-600 leading-relaxed">Como gerador de resíduos, eu preciso emitir MTR mesmo se for transportar dentro do próprio município com veículo próprio?</p>
-                      </div>
-                    </div>
-
-                    <div className="border border-emerald-100 rounded-xl p-4 flex gap-4 bg-emerald-50/30">
-                      <div className="h-8 w-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold shrink-0">I</div>
-                      <div className="flex flex-col gap-1.5 text-left">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-emerald-800">Instrutor SISGR</span>
-                          <span className="inline-flex items-center rounded-md bg-emerald-100 px-1.5 py-0.5 text-2xs font-semibold text-emerald-800 ring-1 ring-inset ring-emerald-650/10">Equipe</span>
-                          <span className="text-xs text-slate-400">há 1 dia</span>
-                        </div>
-                        <p className="text-slate-700 leading-relaxed">Olá Júlio! Sim, a PNRS e as diretrizes do SINIR exigem a emissão de MTR para todos os resíduos industriais, comerciais e de serviços de saúde, mesmo em transportes municipais internos. O sistema nacional precisa rastrear todo o fluxo.</p>
-                      </div>
-                    </div>
-                  </div>
+                                  </div>
                 )}
 
                 {activeTab === "downloads" && (
