@@ -233,6 +233,63 @@ function ImageUploadZone({ value, onChange, label, accept, placeholderText, comp
   );
 }
 
+function getYouTubeEmbedUrl(url: string): string | null {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  if (match && match[2].length === 11) {
+    return `https://www.youtube.com/embed/${match[2]}`;
+  }
+  return null;
+}
+
+interface VideoPreviewProps {
+  url: string;
+}
+
+function VideoPreview({ url }: VideoPreviewProps) {
+  const [hasError, setHasError] = useState(false);
+
+  React.useEffect(() => {
+    setHasError(false);
+  }, [url]);
+
+  if (!url) return null;
+
+  const youtubeEmbedUrl = getYouTubeEmbedUrl(url);
+
+  return (
+    <div className="flex flex-col gap-1 w-full animate-fadeIn mt-1">
+      <label className="text-3xs font-extrabold text-slate-400 uppercase tracking-wider pl-1">Pré-visualização do Vídeo</label>
+      <div className="aspect-video bg-slate-950 rounded-xl overflow-hidden shadow-inner border border-slate-205 relative flex items-center justify-center">
+        {youtubeEmbedUrl ? (
+          <iframe
+            src={youtubeEmbedUrl}
+            className="w-full h-full object-contain"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        ) : (
+          url.startsWith("http") && !hasError ? (
+            <video
+              src={url}
+              controls
+              onError={() => setHasError(true)}
+              className="w-full h-full object-contain"
+            />
+          ) : (
+            <div className="p-6 text-center flex flex-col items-center gap-1.5 text-slate-400">
+              <span className="text-3xs font-semibold italic">
+                {hasError ? "Não foi possível carregar o vídeo direto (verifique o link)." : "Link de vídeo detectado."}
+              </span>
+            </div>
+          )
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) {
   const [courses, setCourses] = useState<Course[]>(initialCourses);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(initialCourses[0] || null);
@@ -1516,16 +1573,17 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                       />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <label className="text-xs font-bold text-slate-700">URL do Vídeo (MP4)</label>
+                      <label className="text-xs font-bold text-slate-700">URL do Vídeo</label>
                       <input
                         type="text"
                         required
                         value={newLessonUrl}
                         onChange={e => setNewLessonUrl(e.target.value)}
-                        placeholder="Ex: https://exemplo.com/video.mp4"
+                        placeholder="Ex: https://www.youtube.com/watch?v=mC11Gg9Yc3w"
                         className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                       />
                     </div>
+                    <VideoPreview url={newLessonUrl} />
                     <ImageUploadZone
                       value={newLessonImage}
                       onChange={setNewLessonImage}
@@ -1814,6 +1872,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                         className="rounded-lg border border-slate-300 px-3 py-2 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                       />
                     </div>
+                    <VideoPreview url={editLessonUrl} />
                     <ImageUploadZone
                       value={editLessonImage}
                       onChange={setEditLessonImage}
