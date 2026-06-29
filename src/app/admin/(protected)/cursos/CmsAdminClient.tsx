@@ -1559,8 +1559,8 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
               <div className="p-6 overflow-y-auto flex-grow min-h-0">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                   
-                  {/* Coluna Esquerda (lg:col-span-5): Detalhes e Arquivos */}
-                  <div className="lg:col-span-5 flex flex-col gap-4">
+                  {/* Coluna Esquerda (lg:col-span-6): Detalhes do Vídeo */}
+                  <div className="lg:col-span-6 flex flex-col gap-4">
                     <div className="flex flex-col gap-1">
                       <label className="text-xs font-bold text-slate-700">Título da Aula</label>
                       <input
@@ -1584,11 +1584,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                       />
                     </div>
                     <VideoPreview url={newLessonUrl} />
-                    <ImageUploadZone
-                      value={newLessonImage}
-                      onChange={setNewLessonImage}
-                      label="Imagem de Capa / Thumbnail (Aula)"
-                    />
+
                     {selectedCourse?.tipo === "publico" && (
                       <div className="flex items-center gap-2 mt-1">
                         <input
@@ -1603,50 +1599,10 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                         </label>
                       </div>
                     )}
-
-                    <div className="flex flex-col gap-2 border-t border-slate-100 pt-4 mt-2">
-                      <label className="text-xs font-bold text-slate-700">Materiais de Apoio (Anexos)</label>
-                      {newLessonFiles.length > 0 && (
-                        <div className="flex flex-col gap-2 border border-slate-205 rounded-xl p-2 bg-slate-50/50 max-h-[120px] overflow-y-auto">
-                          {newLessonFiles.map((file, idx) => (
-                            <div key={idx} className="flex items-center justify-between gap-3 p-1.5 bg-white rounded-lg border border-slate-150 shadow-3xs">
-                              <div className="flex items-center gap-1.5 truncate">
-                                <FileText className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                                <span className="text-[11px] font-semibold text-slate-800 truncate" title={file.name}>
-                                  {file.name}
-                                </span>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setNewLessonFiles(prev => prev.filter((_, i) => i !== idx));
-                                }}
-                                className="p-1 rounded-md hover:bg-red-50 text-slate-400 hover:text-red-650 transition-colors cursor-pointer"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      <ImageUploadZone
-                        value=""
-                        onChange={(url) => {
-                          const fileName = url.split("/").pop() || "arquivo";
-                          const cleanName = fileName.replace(/^\d+-/, "");
-                          setNewLessonFiles(prev => [...prev, { name: cleanName, url }]);
-                          toast.success(`Arquivo ${cleanName} adicionado!`);
-                        }}
-                        label=""
-                        accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
-                        placeholderText="Anexar arquivo de apoio"
-                        compact={true}
-                      />
-                    </div>
                   </div>
 
-                  {/* Coluna Direita (lg:col-span-7): Editor de Descrição Formatado e Preview */}
-                  <div className="lg:col-span-7 flex flex-col gap-4 border-l border-slate-100 lg:pl-6">
+                  {/* Coluna Direita (lg:col-span-6): Editor de Conteúdo, Thumbnail e Anexos */}
+                  <div className="lg:col-span-6 flex flex-col gap-4 border-l border-slate-100 lg:pl-6">
                     <div className="flex flex-col gap-1.5">
                       <label className="text-xs font-bold text-slate-700">Texto / Conteúdo da Aula (HTML)</label>
                       
@@ -1708,15 +1664,64 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                         id="newLessonDescTextarea"
                         value={newLessonDesc}
                         onChange={e => setNewLessonDesc(e.target.value)}
-                        rows={12}
+                        rows={6}
                         placeholder="Escreva a descrição, conteúdo ou links de apoio da aula utilizando HTML para formatação..."
-                        className="rounded-b-lg border-x border-b border-slate-300 p-3 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 font-mono flex-grow min-h-[220px]"
+                        className="rounded-b-lg border-x border-b border-slate-300 p-3 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 font-mono min-h-[140px]"
                       />
                     </div>
-                  </div>
 
+                    {/* Sub-grid para Thumbnail e Materiais de Apoio side-by-side */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-1 border-t border-slate-100 pt-3">
+                      <div>
+                        <ImageUploadZone
+                          value={newLessonImage}
+                          onChange={setNewLessonImage}
+                          label="Imagem de Capa / Thumbnail (Aula)"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <label className="text-xs font-bold text-slate-700">Materiais de Apoio (Anexos)</label>
+                        {newLessonFiles.length > 0 && (
+                          <div className="flex flex-col gap-2 border border-slate-205 rounded-xl p-2 bg-slate-50/50 max-h-[80px] overflow-y-auto">
+                            {newLessonFiles.map((file, idx) => (
+                              <div key={idx} className="flex items-center justify-between gap-3 p-1.5 bg-white rounded-lg border border-slate-150 shadow-3xs">
+                                <div className="flex items-center gap-1.5 truncate">
+                                  <FileText className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                                  <span className="text-[11px] font-semibold text-slate-800 truncate" title={file.name}>
+                                    {file.name}
+                                  </span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setNewLessonFiles(prev => prev.filter((_, i) => i !== idx));
+                                  }}
+                                  className="p-1 rounded-md hover:bg-red-50 text-slate-400 hover:text-red-650 transition-colors cursor-pointer"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <ImageUploadZone
+                          value=""
+                          onChange={(url) => {
+                            const fileName = url.split("/").pop() || "arquivo";
+                            const cleanName = fileName.replace(/^\d+-/, "");
+                            setNewLessonFiles(prev => [...prev, { name: cleanName, url }]);
+                            toast.success(`Arquivo ${cleanName} adicionado!`);
+                          }}
+                          label=""
+                          accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
+                          placeholderText="Anexar arquivo de apoio"
+                          compact={true}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  </div>
                 </div>
-              </div>
 
               {/* Footer */}
               <div className="p-4 border-t border-slate-100 flex gap-3 justify-end shrink-0 bg-slate-50/40 rounded-b-2xl">
@@ -1850,8 +1855,8 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
               <div className="p-6 overflow-y-auto flex-grow min-h-0">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                   
-                  {/* Coluna Esquerda (lg:col-span-5): Detalhes e Arquivos */}
-                  <div className="lg:col-span-5 flex flex-col gap-4">
+                  {/* Coluna Esquerda (lg:col-span-6): Detalhes do Vídeo */}
+                  <div className="lg:col-span-6 flex flex-col gap-4">
                     <div className="flex flex-col gap-1">
                       <label className="text-xs font-bold text-slate-700">Título da Aula</label>
                       <input
@@ -1873,11 +1878,7 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                       />
                     </div>
                     <VideoPreview url={editLessonUrl} />
-                    <ImageUploadZone
-                      value={editLessonImage}
-                      onChange={setEditLessonImage}
-                      label="Imagem de Capa / Thumbnail (Aula)"
-                    />
+
                     {selectedCourse?.tipo === "publico" && (
                       <div className="flex items-center gap-2 mt-1">
                         <input
@@ -1892,50 +1893,10 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                         </label>
                       </div>
                     )}
-
-                    <div className="flex flex-col gap-2 border-t border-slate-100 pt-4 mt-2">
-                      <label className="text-xs font-bold text-slate-700">Materiais de Apoio (Anexos)</label>
-                      {editLessonFiles.length > 0 && (
-                        <div className="flex flex-col gap-2 border border-slate-205 rounded-xl p-2 bg-slate-50/50 max-h-[120px] overflow-y-auto">
-                          {editLessonFiles.map((file, idx) => (
-                            <div key={idx} className="flex items-center justify-between gap-3 p-1.5 bg-white rounded-lg border border-slate-150 shadow-3xs">
-                              <div className="flex items-center gap-1.5 truncate">
-                                <FileText className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                                <span className="text-[11px] font-semibold text-slate-800 truncate" title={file.name}>
-                                  {file.name}
-                                </span>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setEditLessonFiles(prev => prev.filter((_, i) => i !== idx));
-                                }}
-                                className="p-1 rounded-md hover:bg-red-50 text-slate-400 hover:text-red-650 transition-colors cursor-pointer"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      <ImageUploadZone
-                        value=""
-                        onChange={(url) => {
-                          const fileName = url.split("/").pop() || "arquivo";
-                          const cleanName = fileName.replace(/^\d+-/, "");
-                          setEditLessonFiles(prev => [...prev, { name: cleanName, url }]);
-                          toast.success(`Arquivo ${cleanName} adicionado!`);
-                        }}
-                        label=""
-                        accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
-                        placeholderText="Anexar arquivo de apoio"
-                        compact={true}
-                      />
-                    </div>
                   </div>
 
-                  {/* Coluna Direita (lg:col-span-7): Editor de Descrição Formatado e Preview */}
-                  <div className="lg:col-span-7 flex flex-col gap-4 border-l border-slate-100 lg:pl-6">
+                  {/* Coluna Direita (lg:col-span-6): Editor de Conteúdo, Thumbnail e Anexos */}
+                  <div className="lg:col-span-6 flex flex-col gap-4 border-l border-slate-100 lg:pl-6">
                     <div className="flex flex-col gap-1.5">
                       <label className="text-xs font-bold text-slate-700">Texto / Conteúdo da Aula (HTML)</label>
                       
@@ -1997,15 +1958,64 @@ export default function CmsAdminClient({ initialCourses }: CmsAdminClientProps) 
                         id="editLessonDescTextarea"
                         value={editLessonDesc}
                         onChange={e => setEditLessonDesc(e.target.value)}
-                        rows={12}
+                        rows={6}
                         placeholder="Escreva a descrição, conteúdo ou links de apoio da aula utilizando HTML para formatação..."
-                        className="rounded-b-lg border-x border-b border-slate-300 p-3 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 font-mono flex-grow min-h-[220px]"
+                        className="rounded-b-lg border-x border-b border-slate-300 p-3 text-xs focus:outline-hidden focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 font-mono min-h-[140px]"
                       />
                     </div>
-                  </div>
 
+                    {/* Sub-grid para Thumbnail e Materiais de Apoio side-by-side */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-1 border-t border-slate-100 pt-3">
+                      <div>
+                        <ImageUploadZone
+                          value={editLessonImage}
+                          onChange={setEditLessonImage}
+                          label="Imagem de Capa / Thumbnail (Aula)"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <label className="text-xs font-bold text-slate-700">Materiais de Apoio (Anexos)</label>
+                        {editLessonFiles.length > 0 && (
+                          <div className="flex flex-col gap-2 border border-slate-205 rounded-xl p-2 bg-slate-50/50 max-h-[80px] overflow-y-auto">
+                            {editLessonFiles.map((file, idx) => (
+                              <div key={idx} className="flex items-center justify-between gap-3 p-1.5 bg-white rounded-lg border border-slate-150 shadow-3xs">
+                                <div className="flex items-center gap-1.5 truncate">
+                                  <FileText className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                                  <span className="text-[11px] font-semibold text-slate-800 truncate" title={file.name}>
+                                    {file.name}
+                                  </span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditLessonFiles(prev => prev.filter((_, i) => i !== idx));
+                                  }}
+                                  className="p-1 rounded-md hover:bg-red-50 text-slate-400 hover:text-red-650 transition-colors cursor-pointer"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <ImageUploadZone
+                          value=""
+                          onChange={(url) => {
+                            const fileName = url.split("/").pop() || "arquivo";
+                            const cleanName = fileName.replace(/^\d+-/, "");
+                            setEditLessonFiles(prev => [...prev, { name: cleanName, url }]);
+                            toast.success(`Arquivo ${cleanName} adicionado!`);
+                          }}
+                          label=""
+                          accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain,text/csv"
+                          placeholderText="Anexar arquivo de apoio"
+                          compact={true}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  </div>
                 </div>
-              </div>
 
               {/* Footer */}
               <div className="p-4 border-t border-slate-100 flex gap-3 justify-end shrink-0 bg-slate-50/40 rounded-b-2xl">
